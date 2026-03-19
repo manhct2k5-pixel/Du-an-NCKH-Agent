@@ -1,0 +1,3 @@
+BASELINE RESULTS
+Logistic Regression - AUC: 0.9708, F1: 0.0720
+XGBoost             - AUC: 0.9944, F1: 0.9021

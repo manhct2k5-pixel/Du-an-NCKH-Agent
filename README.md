@@ -1,4 +1,6 @@
-# Fraud Detection Flow for NCKH
+# Du-an-NCKH-Agent
+
+## Fraud Detection Flow for NCKH
 
 Mô hình hiện tại đã được chỉnh lại theo hướng phù hợp hơn với đề tài Nghiên cứu Khoa học: `PaySim-first`, dùng `XGBoost` làm mô hình triển khai chính, có lớp phân tích kiểu LLM để tạo đặc trưng, và có nhánh `ReAct Agent` chỉ chạy cho giao dịch mức rủi ro trung bình. PaySim được dùng để chứng minh hiệu năng của kiến trúc, còn IEEE-CIS được dùng làm external validation: XGBoost PaySim được đóng băng, IEEE-CIS được align sang 25 PaySim features rồi chỉ dùng để dự đoán và tính metric cuối. Kết quả frozen-model hiện tại cho thấy domain shift mạnh, nên không diễn giải quá mức là model PaySim tổng quát hóa trực tiếp sang IEEE-CIS.
 

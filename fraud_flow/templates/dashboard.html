@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud Flow Control Room</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v={{ version }}">
+</head>
+<body>
+  <div class="page-shell">
+    {% include "_app_header.html" %}
+  </div>
+  <main class="dashboard-shell">
+    <aside class="left-rail">
+      <section class="rail-card brand-card">
+        <div class="brand-kicker">FRAUD FLOW</div>
+        <h2>Realtime fraud review cockpit</h2>
+        <p>{{ dashboard_report.executive_summary }}</p>
+        <div class="hero-tags">
+          <span class="pill tone-neutral">{{ profile.source|upper }}</span>
+          <span class="pill tone-neutral">{{ deployment.active_version or 'N/A' }}</span>
+        </div>
+      </section>
+
+      <section class="rail-card">
+        <div class="section-label">Live Snapshot</div>
+        <div class="rail-metrics">
+          {% for item in spotlight_metrics %}
+          <div class="rail-metric">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="rail-card recent-cases-card">
+        <div class="rail-head">
+          <div class="section-label">Recent Cases</div>
+          <span class="pill tiny tone-neutral">{{ recent_case_cards|length }} cases</span>
+        </div>
+        <div class="case-list">
+          {% for row in recent_case_cards %}
+          <article class="case-item {% if row.is_focus %}active{% endif %}">
+            <div class="case-head">
+              <strong>{{ row.tx_id }}</strong>
+              <span class="pill tiny tone-{{ row.action_tone }}">{{ row.action_label }}</span>
+            </div>
+            <p>{{ row.tx_type }} • {{ row.amount }}</p>
+            <div class="case-meta">
+              <span class="route-tag tone-{{ row.route_tone }}">{{ row.route_label }}</span>
+              <span>score {{ row.score }}</span>
+            </div>
+          </article>
+          {% else %}
+          <div class="empty-state">Chưa có case gần đây để hiển thị.</div>
+          {% endfor %}
+        </div>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      {% if product_story.direct_focus %}
+      <section class="focus-banner">
+        <span class="pill tone-success">Live demo path</span>
+        <p>{{ product_story.operator_prompt }}</p>
+      </section>
+      {% endif %}
+
+      <section class="top-grid">
+        <article class="panel hero-card">
+          <div class="hero-head">
+            <div>
+              <div class="section-label">Transaction Spotlight</div>
+              <div class="hero-tags">
+                <span class="pill tone-neutral">{{ focus_case.llm_mode }}</span>
+              </div>
+            </div>
+
+            <div class="amount-box">
+              <span>Transaction Amount</span>
+              <strong>{{ focus_case.amount }}</strong>
+              <small>{{ focus_case.tx_type }}</small>
+            </div>
+          </div>
+
+          <h1>{{ focus_case.tx_id }}</h1>
+
+          <div class="reason-row">
+            {% for badge in focus_case.reason_badges %}
+            <span class="pill tone-warning">{{ badge }}</span>
+            {% endfor %}
+            {% if not focus_case.reason_badges %}
+            <span class="pill tone-neutral">Không có reason code nổi bật</span>
+            {% endif %}
+          </div>
+
+          <div class="detail-grid">
+            {% for field in focus_case.fields %}
+            <div class="detail-card">
+              <span>{{ field.label }}</span>
+              <strong>{{ field.value }}</strong>
+            </div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <aside class="panel result-card">
+          <div class="section-label">Assessment Result</div>
+          <div class="decision-banner tone-{{ focus_case.action_tone }}">{{ focus_case.action_label }}</div>
+
+          <div class="score-card">
+            <strong>{{ focus_case.score }}</strong>
+            <span>Composite fraud score</span>
+          </div>
+
+          <div class="kv-list">
+            <div><span>Route</span><strong>{{ focus_case.route_label }}</strong></div>
+            <div><span>Raw probability</span><strong>{{ focus_case.raw_probability }}</strong></div>
+            <div><span>E2E latency</span><strong>{{ focus_case.latency }}</strong></div>
+          </div>
+
+          <div class="signal-block">
+            <div class="signal-title positive">Tín hiệu giảm rủi ro</div>
+            <ul>
+              {% for item in focus_case.key_strengths %}
+              <li>{{ item }}</li>
+              {% else %}
+              <li>Chưa có tín hiệu nổi bật.</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="signal-block">
+            <div class="signal-title negative">Tín hiệu cần xem thêm</div>
+            <ul>
+              {% for item in focus_case.key_concerns %}
+              <li>{{ item }}</li>
+              {% else %}
+              <li>Chưa có cờ cảnh báo bổ sung.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel workflow-panel">
+        <div class="workflow-head">
+          <div>
+            <div class="section-label">Decision Workflow</div>
+            <h2>Luồng ra quyết định cho case đang spotlight</h2>
+          </div>
+        </div>
+
+        <div class="workflow-nodes">
+          {% for node in focus_case.workflow_nodes %}
+          <article class="workflow-node tone-{{ node.state }}">
+            <span class="node-dot"></span>
+            <h3>{{ node.title }}</h3>
+            <p>{{ node.detail }}</p>
+          </article>
+          {% endfor %}
+        </div>
+
+        <div class="ops-strip">
+          <div class="ops-card">
+            <span>Batch gần nhất</span>
+            <strong>{{ simulation_summary.processed_transactions }}</strong>
+          </div>
+          <div class="ops-card">
+            <span>Fraud thật</span>
+            <strong>{{ simulation_summary.fraud_transactions }}</strong>
+          </div>
+          <div class="ops-card">
+            <span>Pending review</span>
+            <strong>{{ totals.pending_reviews }}</strong>
+          </div>
+          <div class="ops-card">
+            <span>Drift summary</span>
+            <strong>{{ live_metrics.drift_summary }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel queue-panel">
+        <div class="workflow-head">
+          <div>
+            <div class="section-label">Review Queue</div>
+            <h2>Nếu nhiều giao dịch cùng cần xem xét, analyst xử lý theo hàng đợi ưu tiên</h2>
+          </div>
+          <div class="hero-tags">
+            <span class="pill tiny tone-neutral">{{ queue_overview.total }} pending</span>
+            <span class="pill tiny tone-neutral">{{ queue_overview.displayed }} đang hiển thị</span>
+            {% if queue_overview.priority %}
+            <span class="pill tiny tone-danger">{{ queue_overview.priority }} ưu tiên cao</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <p class="queue-note">
+          Dashboard đang hiển thị {{ queue_overview.displayed }} case ưu tiên nhất trong {{ queue_overview.total }} pending để màn hình không bị quá tải.
+          {% if queue_overview.hidden %}
+          Còn {{ queue_overview.hidden }} case chưa render ở danh sách này.
+          {% else %}
+          Toàn bộ backlog đang được render trong danh sách này.
+          {% endif %}
+        </p>
+
+        <div class="queue-actions">
+          {% if queue_overview.can_show_more %}
+          <a class="queue-action" href="/dashboard/html?queue_limit={{ queue_overview.next_limit }}">Xem {{ queue_overview.next_limit }} case</a>
+          {% elif queue_overview.reached_dashboard_cap %}
+          <span class="queue-action is-disabled">Dashboard giới hạn {{ queue_overview.limit }} case</span>
+          {% endif %}
+          <a class="queue-action" href="/reviews/pending">Mở review queue</a>
+        </div>
+
+        <div class="queue-list">
+          {% for row in review_queue_cards %}
+          <article class="queue-card {% if row.is_focus %}active{% endif %}">
+            <div class="case-head">
+              <strong>{{ row.tx_id }}</strong>
+              <span class="pill tiny tone-{{ row.priority_tone }}">{{ row.priority_label }}</span>
+            </div>
+            <p>{{ row.tx_type }} • {{ row.amount }} • {{ row.timestamp }}</p>
+            <p class="queue-detail">{{ row.note }}</p>
+            <div class="case-meta">
+              <span class="route-tag tone-{{ row.route_tone }}">{{ row.route_label }}</span>
+              <span>score {{ row.score }}</span>
+            </div>
+          </article>
+          {% else %}
+          <div class="empty-state">Hiện chưa có case nào nằm trong review queue.</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="panel sim-confusion-panel">
+        <div class="workflow-head">
+          <div>
+            <div class="section-label">Model Performance</div>
+            <h2>Confusion Matrix &amp; Độ chính xác mô hình</h2>
+          </div>
+          <div class="hero-tags">
+            <span class="pill tiny tone-neutral">{{ simulation_summary.labeled_transactions }} labeled</span>
+            <span class="pill tiny tone-success">Live simulation</span>
+          </div>
+        </div>
+
+        <div class="sim-confusion-body">
+          <div class="sim-metrics-row">
+            <div class="sim-metric sim-metric--highlight">
+              <div class="sim-metric-head">
+                <span>Precision</span>
+                <span class="metric-tooltip-icon" data-tooltip="Trong số giao dịch bị BLOCK, bao nhiêu % thật sự là fraud? Cao = ít chặn nhầm (FP thấp). Công thức: TP / (TP + FP)">?</span>
+              </div>
+              <strong class="metric-value-precision">{{ live_metrics.precision_block }}</strong>
+              <div class="metric-desc">Tỉ lệ block đúng trên tổng block</div>
+            </div>
+            <div class="sim-metric sim-metric--highlight">
+              <div class="sim-metric-head">
+                <span>Recall</span>
+                <span class="metric-tooltip-icon" data-tooltip="Trong số fraud THẬT, bao nhiêu % bị mô hình phát hiện? Cao = ít bỏ sót (FN thấp). Công thức: TP / (TP + FN)">?</span>
+              </div>
+              <strong class="metric-value-recall">{{ live_metrics.recall_block }}</strong>
+              <div class="metric-desc">Tỉ lệ phát hiện fraud thật</div>
+            </div>
+            <div class="sim-metric sim-metric--highlight">
+              <div class="sim-metric-head">
+                <span>F1-Score</span>
+                <span class="metric-tooltip-icon" data-tooltip="Trung bình điều hòa của Precision và Recall. Cân bằng giữa hai chỉ số — quan trọng khi dữ liệu mất cân bằng. Công thức: 2 × (P × R) / (P + R)">?</span>
+              </div>
+              <strong class="metric-value-f1">{{ live_metrics.f1_block }}</strong>
+              <div class="metric-desc">Cân bằng Precision &amp; Recall</div>
+            </div>
+          </div>
+
+          <div class="sim-confusion-grid">
+            <div class="sim-conf-header"></div>
+            <div class="sim-conf-header">
+              Dự đoán: Pass
+              <span class="metric-tooltip-icon" data-tooltip="Mô hình cho qua — không bị block">?</span>
+            </div>
+            <div class="sim-conf-header">
+              Dự đoán: Block
+              <span class="metric-tooltip-icon" data-tooltip="Mô hình chặn lại — đánh dấu đáng ngờ">?</span>
+            </div>
+
+            <div class="sim-conf-label">Thật: Fraud</div>
+            <div class="sim-conf-cell tone-fn">
+              <span>FN — Bỏ sót</span>
+              <strong>{{ simulation_summary.false_negative_misses }}</strong>
+              <div class="conf-cell-desc">
+                Fraud thật nhưng mô hình cho qua.
+                <span class="metric-tooltip-icon" data-tooltip="False Negative: nguy hiểm nhất — tổn thất tài chính thực sự xảy ra vì không chặn kịp thời.">?</span>
+              </div>
+            </div>
+            <div class="sim-conf-cell tone-tp">
+              <span>TP — Chặn đúng</span>
+              <strong>{{ simulation_summary.true_positive_blocks }}</strong>
+              <div class="conf-cell-desc">
+                Fraud thật và bị chặn thành công.
+                <span class="metric-tooltip-icon" data-tooltip="True Positive: kết quả tốt nhất — mô hình phát hiện và ngăn chặn fraud đúng.">?</span>
+              </div>
+            </div>
+
+            <div class="sim-conf-label">Thật: Normal</div>
+            <div class="sim-conf-cell tone-tn">
+              <span>TN — Thông đúng</span>
+              <strong>{{ simulation_summary.true_negative_passes }}</strong>
+              <div class="conf-cell-desc">
+                Giao dịch hợp lệ, cho qua đúng.
+                <span class="metric-tooltip-icon" data-tooltip="True Negative: đúng — không phải fraud và không bị chặn, trải nghiệm người dùng tốt.">?</span>
+              </div>
+            </div>
+            <div class="sim-conf-cell tone-fp">
+              <span>FP — Chặn nhầm</span>
+              <strong>{{ simulation_summary.false_positive_blocks }}</strong>
+              <div class="conf-cell-desc">
+                Giao dịch hợp lệ nhưng bị chặn.
+                <span class="metric-tooltip-icon" data-tooltip="False Positive: gây phiền cho người dùng vô tội — ảnh hưởng trải nghiệm và doanh thu.">?</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="panel">
+          <div class="section-label">Route Mix</div>
+          <h2>{{ route_window }} giao dịch gần nhất đang đi nhánh nào</h2>
+          <div class="bar-list">
+            {% for row in route_breakdown %}
+            <div class="bar-row">
+              <div class="bar-head">
+                <span>{{ row.display_label }} <span class="muted">({{ row.count }})</span></span>
+                <strong>{{ row.share }}%</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%; background: {{ row.color }};"></div></div>
+            </div>
+            {% else %}
+            <div class="empty-state">Chưa có route mix để hiển thị.</div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="section-label">Action Mix</div>
+          <h2>{{ route_window }} giao dịch gần nhất được xử lý ra sao</h2>
+          <div class="bar-list">
+            {% for row in action_breakdown %}
+            <div class="bar-row">
+              <div class="bar-head">
+                <span>{{ row.display_label }} <span class="muted">({{ row.count }})</span></span>
+                <strong>{{ row.share }}%</strong>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%; background: {{ row.color }};"></div></div>
+            </div>
+            {% else %}
+            <div class="empty-state">Chưa có action mix để hiển thị.</div>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+
+      <section class="panel llm-panel">
+        <div class="workflow-head">
+          <div>
+            <div class="section-label">LLM Reasoning</div>
+            <h2>Trace reasoning và tool execution của case này</h2>
+          </div>
+        </div>
+
+        <div class="trace-toolbar">
+          <span class="pill tiny tone-neutral">{{ focus_case.llm_trace|length }} steps</span>
+          <span class="trace-hint">Mobile: cuộn trong khung để xem đủ trace</span>
+        </div>
+
+        <div class="trace-list">
+          {% for item in focus_case.llm_trace %}
+          <article class="trace-item tone-{{ item.kind }}">
+            <div class="trace-head">
+              <span class="trace-label">{{ item.label }}</span>
+              <strong>{{ item.title }}</strong>
+            </div>
+            <p>{{ item.body }}</p>
+            <small>{{ item.meta }}</small>
+          </article>
+          {% else %}
+          <div class="empty-state">Case hiện chưa có reasoning trace.</div>
+          {% endfor %}
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

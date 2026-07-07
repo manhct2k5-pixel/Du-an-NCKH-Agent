@@ -1,0 +1,2 @@
+model_name,family,validation_mode,selected_threshold,test_auc,test_pr_auc,test_f1,test_precision,test_recall
+xgboost_frozen_paysim,XGBClassifier,frozen_model_external_validation,0.5,0.4991899980213692,0.036071416063317846,0.0,0.0,0.0

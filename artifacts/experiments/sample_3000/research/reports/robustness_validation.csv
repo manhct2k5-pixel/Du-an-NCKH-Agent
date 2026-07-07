@@ -1,0 +1,3 @@
+model_name,seeds,auc_mean,auc_std,f1_mean,f1_std,precision_mean,precision_std,recall_mean,recall_std,pr_auc_mean,pr_auc_std
+hist_gradient_boosting,42,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0
+xgboost,42,1.0,0.0,0.833333,0.0,0.714286,0.0,1.0,0.0,1.0,0.0

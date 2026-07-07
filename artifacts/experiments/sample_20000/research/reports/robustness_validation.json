@@ -1,0 +1,225 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_20000",
+  "seeds": [
+    42,
+    43
+  ],
+  "bootstrap_iterations": 25,
+  "best_baseline": {
+    "model_name": "hist_gradient_boosting",
+    "family": "HistGradientBoostingClassifier"
+  },
+  "multi_seed_runs": [
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9984137665833493,
+        "f1": 0.9642857142857143,
+        "precision": 0.9642857142857143,
+        "recall": 0.9642857142857143,
+        "pr_auc": 0.9705357142857143
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9999158815612382,
+        "f1": 0.9230769230769231,
+        "precision": 1.0,
+        "recall": 0.8571428571428571,
+        "pr_auc": 0.9928571428571428
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 43,
+      "selected_threshold": 0.65,
+      "test_metrics": {
+        "auc": 0.9992669678907902,
+        "f1": 0.9642857142857143,
+        "precision": 0.9642857142857143,
+        "recall": 0.9642857142857143,
+        "pr_auc": 0.9755216693418939
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 43,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9999519323207074,
+        "f1": 0.8333333333333334,
+        "precision": 1.0,
+        "recall": 0.7142857142857143,
+        "pr_auc": 0.9955357142857142
+      }
+    }
+  ],
+  "multi_seed_summary": [
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "seeds": [
+        42,
+        43
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 0.999934,
+          "std": 1.8e-05,
+          "min": 0.999916,
+          "max": 0.999952
+        },
+        "f1": {
+          "mean": 0.878205,
+          "std": 0.044872,
+          "min": 0.833333,
+          "max": 0.923077
+        },
+        "precision": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "recall": {
+          "mean": 0.785714,
+          "std": 0.071429,
+          "min": 0.714286,
+          "max": 0.857143
+        },
+        "pr_auc": {
+          "mean": 0.994196,
+          "std": 0.001339,
+          "min": 0.992857,
+          "max": 0.995536
+        }
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "seeds": [
+        42,
+        43
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 0.99884,
+          "std": 0.000427,
+          "min": 0.998414,
+          "max": 0.999267
+        },
+        "f1": {
+          "mean": 0.964286,
+          "std": 0.0,
+          "min": 0.964286,
+          "max": 0.964286
+        },
+        "precision": {
+          "mean": 0.964286,
+          "std": 0.0,
+          "min": 0.964286,
+          "max": 0.964286
+        },
+        "recall": {
+          "mean": 0.964286,
+          "std": 0.0,
+          "min": 0.964286,
+          "max": 0.964286
+        },
+        "pr_auc": {
+          "mean": 0.973029,
+          "std": 0.002493,
+          "min": 0.970536,
+          "max": 0.975522
+        }
+      }
+    }
+  ],
+  "confidence_intervals": {
+    "xgboost": {
+      "auc": {
+        "mean": 0.998361,
+        "std": 0.001215,
+        "ci95_low": 0.996186,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 0.969591,
+        "std": 0.022514,
+        "ci95_low": 0.927754,
+        "ci95_high": 1.0
+      },
+      "f1": {
+        "mean": 0.965311,
+        "std": 0.019686,
+        "ci95_low": 0.932093,
+        "ci95_high": 1.0
+      },
+      "precision": {
+        "mean": 0.968192,
+        "std": 0.029976,
+        "ci95_low": 0.909091,
+        "ci95_high": 1.0
+      },
+      "recall": {
+        "mean": 0.963366,
+        "std": 0.027341,
+        "ci95_low": 0.912467,
+        "ci95_high": 1.0
+      }
+    },
+    "hist_gradient_boosting": {
+      "auc": {
+        "mean": 0.999882,
+        "std": 0.000103,
+        "ci95_low": 0.999659,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 0.989975,
+        "std": 0.008293,
+        "ci95_low": 0.973333,
+        "ci95_high": 1.0
+      },
+      "f1": {
+        "mean": 0.907589,
+        "std": 0.034486,
+        "ci95_low": 0.843697,
+        "ci95_high": 0.96571
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "recall": {
+        "mean": 0.832632,
+        "std": 0.057671,
+        "ci95_low": 0.73,
+        "ci95_high": 0.934033
+      }
+    }
+  },
+  "mcnemar_test": {
+    "baseline_model": "hist_gradient_boosting",
+    "better_for_xgboost": 3,
+    "better_for_baseline": 1,
+    "discordant": 4,
+    "chi_square": 0.25,
+    "p_value": 0.617075
+  }
+}

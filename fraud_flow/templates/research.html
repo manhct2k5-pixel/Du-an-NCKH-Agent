@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud Flow — Research</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/research.css?v={{ version }}">
+</head>
+<body>
+  <div class="page-shell">
+    {% include "_app_header.html" %}
+  </div>
+
+  <main class="research-shell">
+    <div class="research-hero">
+      <div class="hero-kicker">RESEARCH</div>
+      <h1>Kết quả thực nghiệm</h1>
+      <p class="hero-sub">
+        Dữ liệu nguồn: <strong>{{ source|upper }}</strong> &nbsp;·&nbsp;
+        Train {{ split.train_pct|default("N/A") }} % &nbsp;/&nbsp;
+        Val {{ split.val_pct|default("N/A") }} % &nbsp;/&nbsp;
+        Test {{ split.test_pct|default("N/A") }} %
+      </p>
+    </div>
+
+    {% if not research_ready %}
+    <div class="not-ready-banner">
+      <strong>Chưa có dữ liệu thực nghiệm.</strong>
+      Chạy lệnh sau để sinh kết quả: <code>python run_fraud_flow.py research</code>
+    </div>
+    {% endif %}
+
+    <!-- ── 1. Baseline Comparison ─────────────────────────────── -->
+    <section class="research-section panel">
+      <div class="section-head">
+        <div class="section-label">Experiment 1</div>
+        <h2>Baseline Comparison</h2>
+        <p class="section-sub">So sánh XGBoost với các baseline cùng feature set và ngưỡng tối ưu trên tập test.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="research-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Family</th>
+              <th>Features</th>
+              <th>Threshold</th>
+              <th>ROC-AUC</th>
+              <th>PR-AUC</th>
+              <th>F1</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>Train time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in baseline_rows %}
+            <tr class="{% if row.name == 'xgboost' %}row-highlight{% endif %}">
+              <td class="name-col"><strong>{{ row.name }}</strong></td>
+              <td class="muted-col">{{ row.family }}</td>
+              <td class="num-col">{{ row.features }}</td>
+              <td class="num-col">{{ row.threshold }}</td>
+              <td class="num-col">{{ row.auc }}</td>
+              <td class="num-col">{{ row.pr_auc }}</td>
+              <td class="num-col emph-col">{{ row.f1 }}</td>
+              <td class="num-col">{{ row.precision }}</td>
+              <td class="num-col">{{ row.recall }}</td>
+              <td class="num-col muted-col">{{ row.train_s }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="10" class="empty-cell">Chưa có dữ liệu baseline.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── 2. Feature Ablation ────────────────────────────────── -->
+    <section class="research-section panel">
+      <div class="section-head">
+        <div class="section-label">Experiment 2</div>
+        <h2>Feature Ablation</h2>
+        <p class="section-sub">Đánh giá tầm quan trọng của từng nhóm feature bằng cách loại lần lượt và đo hiệu quả giảm.</p>
+      </div>
+
+      {% if ablation_params %}
+      <div class="params-strip">
+        <span class="params-label">Fixed XGBoost params:</span>
+        {% for k, v in ablation_params.items() %}
+        <span class="param-chip"><span class="param-key">{{ k }}</span>{{ v }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="table-wrap">
+        <table class="research-table">
+          <thead>
+            <tr>
+              <th>Config</th>
+              <th>Note</th>
+              <th class="num-col">Features</th>
+              <th class="num-col">ROC-AUC</th>
+              <th class="num-col">PR-AUC</th>
+              <th class="num-col">F1</th>
+              <th class="num-col delta-col">ΔAUC</th>
+              <th class="num-col delta-col">ΔF1</th>
+              <th class="num-col delta-col">ΔPR-AUC</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in ablation_rows %}
+            <tr class="{% if row.is_baseline %}row-highlight{% endif %}">
+              <td class="name-col"><strong>{{ row.name }}</strong></td>
+              <td class="note-col muted-col">{{ row.note }}</td>
+              <td class="num-col">{{ row.features }}</td>
+              <td class="num-col">{{ row.auc }}</td>
+              <td class="num-col">{{ row.pr_auc }}</td>
+              <td class="num-col emph-col">{{ row.f1 }}</td>
+              <td class="num-col delta-col {% if row.delta_auc.startswith('+') %}delta-pos{% elif row.delta_auc.startswith('-') %}delta-neg{% endif %}">
+                {{ row.delta_auc }}
+              </td>
+              <td class="num-col delta-col {% if row.delta_f1.startswith('+') %}delta-pos{% elif row.delta_f1.startswith('-') %}delta-neg{% endif %}">
+                {{ row.delta_f1 }}
+              </td>
+              <td class="num-col delta-col {% if row.delta_pr_auc.startswith('+') %}delta-pos{% elif row.delta_pr_auc.startswith('-') %}delta-neg{% endif %}">
+                {{ row.delta_pr_auc }}
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9" class="empty-cell">Chưa có dữ liệu ablation.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── 3. Robustness Validation ───────────────────────────── -->
+    <section class="research-section panel">
+      <div class="section-head">
+        <div class="section-label">Experiment 3</div>
+        <h2>Robustness Validation</h2>
+        <p class="section-sub">Multi-seed evaluation để đánh giá tính ổn định. Kết quả trình bày dạng mean ± std.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="research-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Seeds</th>
+              <th class="num-col">AUC mean</th>
+              <th class="num-col">AUC std</th>
+              <th class="num-col">F1 mean</th>
+              <th class="num-col">F1 std</th>
+              <th class="num-col">Recall mean</th>
+              <th class="num-col">Recall std</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in robustness_rows %}
+            <tr class="{% if row.name == 'xgboost' %}row-highlight{% endif %}">
+              <td class="name-col"><strong>{{ row.name }}</strong></td>
+              <td class="muted-col seed-col">{{ row.seeds }}</td>
+              <td class="num-col">{{ row.auc_mean }}</td>
+              <td class="num-col muted-col">± {{ row.auc_std }}</td>
+              <td class="num-col emph-col">{{ row.f1_mean }}</td>
+              <td class="num-col muted-col">± {{ row.f1_std }}</td>
+              <td class="num-col">{{ row.recall_mean }}</td>
+              <td class="num-col muted-col">± {{ row.recall_std }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="empty-cell">Chưa có dữ liệu robustness.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ci-strip">
+        <div class="ci-block">
+          <span class="ci-label">XGBoost 95% CI — AUC</span>
+          <strong>{{ xgb_ci.auc }}</strong>
+        </div>
+        <div class="ci-block">
+          <span class="ci-label">XGBoost 95% CI — F1</span>
+          <strong>{{ xgb_ci.f1 }}</strong>
+        </div>
+        <div class="ci-block">
+          <span class="ci-label">XGBoost 95% CI — PR-AUC</span>
+          <strong>{{ xgb_ci.pr_auc }}</strong>
+        </div>
+        {% if mcnemar %}
+        <div class="ci-block">
+          <span class="ci-label">McNemar p-value</span>
+          <strong>{{ mcnemar.p_value|default("N/A") }}</strong>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- ── 4. External Validation ─────────────────────────────── -->
+    {% if ext_available %}
+    <section class="research-section panel">
+      <div class="section-head">
+        <div class="section-label">Experiment 4</div>
+        <h2>External Validation</h2>
+        <p class="section-sub">
+          Kiểm tra generalization trên dataset ngoài:
+          <strong>{{ ext_source|upper }}</strong>.
+          {% if ext_validation_mode == "frozen_model_external_validation" %}
+          Frozen PaySim model, IEEE-CIS chỉ dùng để tính metric cuối.
+          {% elif ext_split %}
+          Train {{ ext_split.train_rows_display|default("N/A") }} dòng / Val {{ ext_split.validation_rows_display|default("N/A") }} dòng / Test {{ ext_split.test_rows_display|default("N/A") }} dòng
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="research-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th class="num-col">ROC-AUC</th>
+              <th class="num-col">PR-AUC</th>
+              <th class="num-col">F1</th>
+              <th class="num-col">Precision</th>
+              <th class="num-col">Recall</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in ext_rows %}
+            <tr class="{% if row.name in ['xgboost', 'xgboost_frozen_paysim'] %}row-highlight{% endif %}">
+              <td class="name-col"><strong>{{ row.name }}</strong></td>
+              <td class="num-col">{{ row.auc }}</td>
+              <td class="num-col">{{ row.pr_auc }}</td>
+              <td class="num-col emph-col">{{ row.f1 }}</td>
+              <td class="num-col">{{ row.precision }}</td>
+              <td class="num-col">{{ row.recall }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty-cell">Không có kết quả external validation.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% else %}
+    <section class="research-section panel ext-unavailable">
+      <div class="section-head">
+        <div class="section-label">Experiment 4</div>
+        <h2>External Validation</h2>
+      </div>
+      <p class="ext-note">
+        External validation chưa được thực thi. Chạy <code>python run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv</code> để kích hoạt.
+      </p>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>

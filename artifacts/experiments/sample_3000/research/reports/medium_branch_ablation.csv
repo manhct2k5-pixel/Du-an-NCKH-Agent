@@ -1,0 +1,5 @@
+policy_name,note,approve_count,review_count,block_count,approve_rate,review_rate,block_rate,block_precision,block_recall,block_f1,fraud_review_rate,review_fraud_share,false_positive_block_rate,medium_case_count,medium_case_share
+score_threshold_block,Binary threshold baseline with no routing and no manual review state.,443,0,7,0.984444,0.0,0.015556,0.7142857142857143,1.0,0.8333333333333334,0.0,0.0,0.004494,138,0.306667
+route_without_agent,Original routing but every medium case is held for human review.,305,138,7,0.677778,0.306667,0.015556,0.7142857142857143,1.0,0.8333333333333334,0.0,0.0,0.004494,138,0.306667
+route_medium_auto_approve,Routing with the medium band auto-approved to show the risk of removing investigation.,443,0,7,0.984444,0.0,0.015556,0.7142857142857143,1.0,0.8333333333333334,0.0,0.0,0.004494,138,0.306667
+route_with_medium_agent,Routing with the offline replay of the current investigator logic on medium cases.,309,134,7,0.686667,0.297778,0.015556,0.7142857142857143,1.0,0.8333333333333334,0.0,0.0,0.004494,138,0.306667

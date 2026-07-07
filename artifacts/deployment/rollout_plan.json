@@ -1,0 +1,18 @@
+{
+  "active_version": "v20260424T074126106494Z",
+  "candidate_version": "v20260424T074126106494Z",
+  "strategy": "canary_then_full_rollout",
+  "canary_percent": 10,
+  "ab_test_plan": {
+    "control_version": "v20260424T065818461239Z",
+    "candidate_version": "v20260424T074126106494Z",
+    "primary_metric": "AUC",
+    "guardrails": [
+      "precision",
+      "recall",
+      "false_positive_rate",
+      "latency_p95_ms"
+    ]
+  },
+  "rollback_target": "v20260424T065818461239Z"
+}

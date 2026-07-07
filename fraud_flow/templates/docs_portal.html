@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cổng Tài Liệu API Fraud Flow</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/docs_portal.css?v={{ version }}">
+</head>
+<body>
+  <main class="shell">
+    {% include "_app_header.html" %}
+
+    <section class="hero-grid">
+      <article class="hero-card">
+        <div class="eyebrow">API Workspace <span class="pill tone-neutral">v{{ version }}</span></div>
+        <h1>Test endpoint thật mà vẫn nhìn gọn và có định hướng.</h1>
+        <p class="subtext">Dùng màn này khi cần chứng minh hệ thống có API thật, payload thật và luồng test rõ ràng. Nếu cần thao tác nhanh hơn Swagger, chuyển qua form giao dịch.</p>
+
+        <div class="actions">
+          <a class="action primary" href="/transaction/form">Mở transaction form</a>
+          <a class="action" href="/dashboard/html">Mở dashboard</a>
+          <a class="action" href="/swagger-ui">Mở Swagger trực tiếp</a>
+        </div>
+
+        <div class="step-grid">
+          <div class="step-card">
+            <span>01</span>
+            <strong>Gửi đúng request</strong>
+            <p>Dùng <code>POST /gateway/transaction</code> cho 1 case hoặc endpoint batch khi cần chấm nhiều giao dịch.</p>
+          </div>
+          <div class="step-card">
+            <span>02</span>
+            <strong>Để model route</strong>
+            <p>Request sẽ được score rồi tách sang low, medium hoặc high thay vì chỉ trả một nhãn tĩnh.</p>
+          </div>
+          <div class="step-card">
+            <span>03</span>
+            <strong>Đối chiếu review queue</strong>
+            <p>Nếu case rơi vào vùng cần xem xét, dashboard sẽ cho thấy spotlight case và backlog queue chứ không chỉ một decision đơn lẻ.</p>
+          </div>
+        </div>
+      </article>
+
+      <aside class="status-card">
+        <div class="section-label">Live API Status</div>
+        <div class="status-stack">
+          <div class="status-row"><span>Source</span><strong>{{ profile.source|upper }}</strong></div>
+          <div class="status-row"><span>Active version</span><strong>{{ deployment.active_version or 'N/A' }}</strong></div>
+          <div class="status-row"><span>AUC test</span><strong>{{ offline_metrics.auc }}</strong></div>
+          <div class="status-row"><span>Avg latency</span><strong>{{ live_metrics.avg_ms }}</strong></div>
+          <div class="status-row"><span>Pending review</span><strong>{{ totals.pending_reviews }}</strong></div>
+        </div>
+
+        <div class="status-note">
+          <strong>Current story</strong>
+          <p>{{ dashboard_report.analyst_summary }}</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel span-two">
+        <div class="section-label">Quickstart</div>
+        <h2>Cách gửi request nhanh nhất</h2>
+        <pre>{{ quickstart }}</pre>
+      </article>
+
+      <article class="panel">
+        <div class="section-label">Payload Sample</div>
+        <h2>JSON mẫu PaySim</h2>
+        <pre>{{ paysim_example }}</pre>
+      </article>
+
+      <article class="panel">
+        <div class="section-label">Model Context</div>
+        <h2>Những gì nên nói khi demo</h2>
+        <ul>
+          <li>Route thấp được approve tự động để giữ throughput.</li>
+          <li>Route trung bình đi qua agent và có thể đẩy vào review queue để analyst xử lý tiếp.</li>
+          <li>Route cao chỉ block khi score và raw probability cùng đủ mạnh; nếu chưa đủ chắc, hệ thống sẽ hạ xuống review.</li>
+        </ul>
+      </article>
+
+      <article class="panel span-two">
+        <div class="section-label">Dataset Snapshot</div>
+        <h2>Vài dòng dữ liệu đang được dùng để mô phỏng</h2>
+        {% if dataset_preview_rows and dataset_preview_columns %}
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                {% for column in dataset_preview_columns %}
+                <th>{{ column }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in dataset_preview_rows %}
+              <tr>
+                {% for column in dataset_preview_columns %}
+                <td>{{ row[column] }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">Chưa có preview dữ liệu để hiển thị.</div>
+        {% endif %}
+      </article>
+    </section>
+
+    <section class="eval-section">
+      <div class="eval-head">
+        <div class="section-label">Model Evaluation</div>
+        <h2>Metrics và Confusion Matrix trên holdout test</h2>
+      </div>
+
+      <div class="eval-grid">
+        <article class="panel eval-metrics-panel">
+          <div class="section-label">Test set metrics</div>
+          <p class="eval-note">Tập holdout — {{ profile.test_rows }} giao dịch, không tham gia huấn luyện</p>
+          <div class="metrics-grid">
+            <div class="metric-card tone-auc">
+              <span>ROC AUC</span>
+              <strong>{{ offline_metrics.auc }}</strong>
+            </div>
+            <div class="metric-card tone-pr">
+              <span>PR AUC</span>
+              <strong>{{ offline_metrics.pr_auc }}</strong>
+            </div>
+            <div class="metric-card tone-f1">
+              <span>F1 Score</span>
+              <strong>{{ offline_metrics.f1 }}</strong>
+            </div>
+            <div class="metric-card tone-precision">
+              <span>Precision</span>
+              <strong>{{ offline_metrics.precision }}</strong>
+            </div>
+            <div class="metric-card tone-recall">
+              <span>Recall</span>
+              <strong>{{ offline_metrics.recall }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel eval-metrics-panel">
+          <div class="section-label">Validation set metrics</div>
+          <p class="eval-note">Tập validation — {{ profile.validation_rows }} giao dịch, dùng để chọn threshold</p>
+          <div class="metrics-grid">
+            <div class="metric-card tone-auc">
+              <span>ROC AUC</span>
+              <strong>{{ validation_metrics.auc }}</strong>
+            </div>
+            <div class="metric-card tone-pr">
+              <span>PR AUC</span>
+              <strong>{{ validation_metrics.pr_auc }}</strong>
+            </div>
+            <div class="metric-card tone-f1">
+              <span>F1 Score</span>
+              <strong>{{ validation_metrics.f1 }}</strong>
+            </div>
+            <div class="metric-card tone-precision">
+              <span>Precision</span>
+              <strong>{{ validation_metrics.precision }}</strong>
+            </div>
+            <div class="metric-card tone-recall">
+              <span>Recall</span>
+              <strong>{{ validation_metrics.recall }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel confusion-panel">
+          <div class="section-label">Test confusion matrix</div>
+          <p class="eval-note">Threshold {{ profile.selected_threshold }} — dự đoán so với nhãn thật trên tập test</p>
+          <div class="confusion-wrap">
+            <div class="confusion-axis-y">
+              <span>Thật: Fraud</span>
+              <span>Thật: Normal</span>
+            </div>
+            <div class="confusion-grid">
+              <div class="confusion-header"></div>
+              <div class="confusion-header">Dự đoán: Normal</div>
+              <div class="confusion-header">Dự đoán: Fraud</div>
+
+              <div class="confusion-row-label">Thật: Fraud</div>
+              <div class="confusion-cell tone-fn">
+                <span class="cell-label">FN — bỏ sót</span>
+                <strong>{{ test_confusion_matrix.false_negative }}</strong>
+              </div>
+              <div class="confusion-cell tone-tp">
+                <span class="cell-label">TP — chặn đúng</span>
+                <strong>{{ test_confusion_matrix.true_positive }}</strong>
+              </div>
+
+              <div class="confusion-row-label">Thật: Normal</div>
+              <div class="confusion-cell tone-tn">
+                <span class="cell-label">TN — thông đúng</span>
+                <strong>{{ test_confusion_matrix.true_negative }}</strong>
+              </div>
+              <div class="confusion-cell tone-fp">
+                <span class="cell-label">FP — chặn nhầm</span>
+                <strong>{{ test_confusion_matrix.false_positive }}</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel confusion-panel">
+          <div class="section-label">Validation confusion matrix</div>
+          <p class="eval-note">Threshold {{ profile.selected_threshold }} — dự đoán so với nhãn thật trên tập validation</p>
+          <div class="confusion-wrap">
+            <div class="confusion-grid">
+              <div class="confusion-header"></div>
+              <div class="confusion-header">Dự đoán: Normal</div>
+              <div class="confusion-header">Dự đoán: Fraud</div>
+
+              <div class="confusion-row-label">Thật: Fraud</div>
+              <div class="confusion-cell tone-fn">
+                <span class="cell-label">FN — bỏ sót</span>
+                <strong>{{ validation_confusion_matrix.false_negative }}</strong>
+              </div>
+              <div class="confusion-cell tone-tp">
+                <span class="cell-label">TP — chặn đúng</span>
+                <strong>{{ validation_confusion_matrix.true_positive }}</strong>
+              </div>
+
+              <div class="confusion-row-label">Thật: Normal</div>
+              <div class="confusion-cell tone-tn">
+                <span class="cell-label">TN — thông đúng</span>
+                <strong>{{ validation_confusion_matrix.true_negative }}</strong>
+              </div>
+              <div class="confusion-cell tone-fp">
+                <span class="cell-label">FP — chặn nhầm</span>
+                <strong>{{ validation_confusion_matrix.false_positive }}</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="model-info-grid">
+      <article class="panel">
+        <div class="section-label">Model Parameters</div>
+        <h2>Hyperparameter đã chọn</h2>
+        {% if selected_params %}
+        <div class="param-list">
+          {% for k, v in selected_params.items() %}
+          <div class="param-row">
+            <span>{{ k }}</span>
+            <strong>{{ v }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">Chưa có thông tin hyperparameter.</div>
+        {% endif %}
+      </article>
+
+      <article class="panel">
+        <div class="section-label">Dataset Split</div>
+        <h2>Phân chia tập dữ liệu</h2>
+        <div class="split-list">
+          <div class="split-row">
+            <span>Feature count</span>
+            <strong>{{ profile.feature_count }}</strong>
+          </div>
+          <div class="split-row">
+            <span>Sample size used</span>
+            <strong>{{ profile.sample_size }}</strong>
+          </div>
+          <div class="split-row split-divider">
+            <span>Train rows</span>
+            <strong>{{ profile.train_rows }}</strong>
+          </div>
+          <div class="split-row">
+            <span>Validation rows</span>
+            <strong>{{ profile.validation_rows }}</strong>
+          </div>
+          <div class="split-row">
+            <span>Test rows</span>
+            <strong>{{ profile.test_rows }}</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="swagger-shell">
+      <div class="swagger-head">
+        <div>
+          <div class="section-label">Swagger</div>
+          <h2>Khu vực test API trực tiếp</h2>
+        </div>
+        <div class="actions compact-actions">
+          <a class="action" href="/gateway/transaction">Xem help endpoint</a>
+          <a class="action" href="/gateway/transactions">Xem help batch</a>
+        </div>
+      </div>
+      <iframe src="/swagger-ui" title="Swagger tương tác Fraud Flow"></iframe>
+    </section>
+  </main>
+</body>
+</html>

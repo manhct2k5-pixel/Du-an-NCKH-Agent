@@ -1,0 +1,952 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_20000",
+  "random_state": 42,
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "split": {
+    "total_rows": 20000,
+    "train_rows": 14000,
+    "validation_rows": 3000,
+    "test_rows": 3000
+  },
+  "baseline": {
+    "source": "paysim",
+    "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "identity_data_path": null,
+    "artifact_scope": "sample_20000",
+    "random_state": 42,
+    "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+    "split": {
+      "total_rows": 20000,
+      "train_rows": 14000,
+      "validation_rows": 3000,
+      "test_rows": 3000
+    },
+    "models": [
+      {
+        "model_name": "hist_gradient_boosting",
+        "family": "HistGradientBoostingClassifier",
+        "feature_count": 25,
+        "selected_threshold": 0.5,
+        "params": {
+          "learning_rate": 0.08,
+          "max_iter": 220,
+          "max_depth": 6,
+          "min_samples_leaf": 80
+        },
+        "train_seconds": 0.1971,
+        "inference_ms_per_1k_rows": 1.6062,
+        "validation": {
+          "metrics": {
+            "auc": 1.0,
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "pr_auc": 1.0,
+          "confusion_matrix": {
+            "true_negative": 2996,
+            "false_positive": 0,
+            "false_negative": 0,
+            "true_positive": 4
+          }
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.9999158815612382,
+            "f1": 0.9230769230769231,
+            "precision": 1.0,
+            "recall": 0.8571428571428571
+          },
+          "pr_auc": 0.9928571428571428,
+          "confusion_matrix": {
+            "true_negative": 2972,
+            "false_positive": 0,
+            "false_negative": 4,
+            "true_positive": 24
+          }
+        }
+      },
+      {
+        "model_name": "random_forest",
+        "family": "RandomForestClassifier",
+        "feature_count": 25,
+        "selected_threshold": 0.5,
+        "params": {
+          "n_estimators": 120,
+          "max_depth": 12,
+          "min_samples_leaf": 40,
+          "class_weight": "balanced_subsample",
+          "imputer": "median"
+        },
+        "train_seconds": 0.3678,
+        "inference_ms_per_1k_rows": 7.9736,
+        "validation": {
+          "metrics": {
+            "auc": 1.0,
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "pr_auc": 1.0,
+          "confusion_matrix": {
+            "true_negative": 2996,
+            "false_positive": 0,
+            "false_negative": 0,
+            "true_positive": 4
+          }
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.9993871370890214,
+            "f1": 0.9473684210526315,
+            "precision": 0.9310344827586207,
+            "recall": 0.9642857142857143
+          },
+          "pr_auc": 0.9769439421338154,
+          "confusion_matrix": {
+            "true_negative": 2970,
+            "false_positive": 2,
+            "false_negative": 1,
+            "true_positive": 27
+          }
+        }
+      },
+      {
+        "model_name": "xgboost",
+        "family": "XGBClassifier",
+        "feature_count": 25,
+        "selected_threshold": 0.5,
+        "params": {
+          "n_estimators": 220,
+          "max_depth": 5,
+          "learning_rate": 0.08,
+          "subsample": 0.95,
+          "colsample_bytree": 0.9
+        },
+        "train_seconds": 0.8642,
+        "inference_ms_per_1k_rows": 1.1844,
+        "validation": {
+          "metrics": {
+            "auc": 1.0,
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "pr_auc": 1.0,
+          "confusion_matrix": {
+            "true_negative": 2996,
+            "false_positive": 0,
+            "false_negative": 0,
+            "true_positive": 4
+          },
+          "ranking_score": 2.0
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.9984137665833493,
+            "f1": 0.9642857142857143,
+            "precision": 0.9642857142857143,
+            "recall": 0.9642857142857143
+          },
+          "pr_auc": 0.9705357142857143,
+          "confusion_matrix": {
+            "true_negative": 2971,
+            "false_positive": 1,
+            "false_negative": 1,
+            "true_positive": 27
+          }
+        },
+        "search_mode": "candidate_grid"
+      },
+      {
+        "model_name": "logistic_regression",
+        "family": "LogisticRegression",
+        "feature_count": 25,
+        "selected_threshold": 0.7,
+        "params": {
+          "scaler": "StandardScaler",
+          "solver": "lbfgs",
+          "class_weight": "balanced",
+          "max_iter": 500,
+          "tol": 0.0001
+        },
+        "train_seconds": 0.071,
+        "inference_ms_per_1k_rows": 0.6139,
+        "validation": {
+          "metrics": {
+            "auc": 0.9863985313751669,
+            "f1": 0.07317073170731707,
+            "precision": 0.038461538461538464,
+            "recall": 0.75
+          },
+          "pr_auc": 0.5217208734157887,
+          "confusion_matrix": {
+            "true_negative": 2921,
+            "false_positive": 75,
+            "false_negative": 1,
+            "true_positive": 3
+          }
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.9612093828109979,
+            "f1": 0.37681159420289856,
+            "precision": 0.23636363636363636,
+            "recall": 0.9285714285714286
+          },
+          "pr_auc": 0.76447213629373,
+          "confusion_matrix": {
+            "true_negative": 2888,
+            "false_positive": 84,
+            "false_negative": 2,
+            "true_positive": 26
+          }
+        }
+      },
+      {
+        "model_name": "dummy_prior",
+        "family": "DummyClassifier",
+        "feature_count": 25,
+        "selected_threshold": 0.5,
+        "params": {
+          "strategy": "prior"
+        },
+        "train_seconds": 0.0011,
+        "inference_ms_per_1k_rows": 0.1628,
+        "validation": {
+          "metrics": {
+            "auc": 0.5,
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "pr_auc": 0.0013333333333333333,
+          "confusion_matrix": {
+            "true_negative": 2996,
+            "false_positive": 0,
+            "false_negative": 4,
+            "true_positive": 0
+          }
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.5,
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0
+          },
+          "pr_auc": 0.009333333333333334,
+          "confusion_matrix": {
+            "true_negative": 2972,
+            "false_positive": 0,
+            "false_negative": 28,
+            "true_positive": 0
+          }
+        }
+      }
+    ]
+  },
+  "feature_ablation": {
+    "source": "paysim",
+    "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "identity_data_path": null,
+    "artifact_scope": "sample_20000",
+    "random_state": 42,
+    "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+    "fixed_xgboost_params": {
+      "n_estimators": 220,
+      "max_depth": 5,
+      "learning_rate": 0.08,
+      "subsample": 0.95,
+      "colsample_bytree": 0.9
+    },
+    "ablations": [
+      {
+        "name": "full_feature_set",
+        "feature_count": 25,
+        "feature_columns": [
+          "amount_log1p",
+          "oldbalanceOrg",
+          "newbalanceOrig",
+          "oldbalanceDest",
+          "newbalanceDest",
+          "type_encoded",
+          "balance_diff",
+          "amount_ratio",
+          "org_balance_delta_ratio",
+          "hour_of_day",
+          "is_night_tx",
+          "recipient_new_flag",
+          "tx_count_24h",
+          "avg_amount_7d",
+          "device_tx_count_24h",
+          "location_tx_count_24h",
+          "merchant_tx_count_24h",
+          "location_fraud_rate",
+          "ip_fraud_rate",
+          "merchant_fraud_rate",
+          "llm_risk_score",
+          "llm_reason_count",
+          "llm_high_risk_flag",
+          "llm_review_flag",
+          "llm_category_hash"
+        ],
+        "note": "Full engineered feature set.",
+        "selected_threshold": 0.5,
+        "validation_metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "validation_pr_auc": 1.0,
+        "test_metrics": {
+          "auc": 0.9984137665833493,
+          "f1": 0.9642857142857143,
+          "precision": 0.9642857142857143,
+          "recall": 0.9642857142857143
+        },
+        "test_pr_auc": 0.9705357142857143,
+        "train_seconds": 0.1929,
+        "delta_vs_full": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "pr_auc": 0.0
+        }
+      },
+      {
+        "name": "no_online_behavior",
+        "feature_count": 17,
+        "feature_columns": [
+          "amount_log1p",
+          "oldbalanceOrg",
+          "newbalanceOrig",
+          "oldbalanceDest",
+          "newbalanceDest",
+          "type_encoded",
+          "balance_diff",
+          "amount_ratio",
+          "org_balance_delta_ratio",
+          "hour_of_day",
+          "is_night_tx",
+          "recipient_new_flag",
+          "llm_risk_score",
+          "llm_reason_count",
+          "llm_high_risk_flag",
+          "llm_review_flag",
+          "llm_category_hash"
+        ],
+        "note": "Removes velocity and historical risk lookup features.",
+        "selected_threshold": 0.5,
+        "validation_metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "validation_pr_auc": 1.0,
+        "test_metrics": {
+          "auc": 0.999795712363007,
+          "f1": 0.9642857142857143,
+          "precision": 0.9642857142857143,
+          "recall": 0.9642857142857143
+        },
+        "test_pr_auc": 0.9865079365079366,
+        "train_seconds": 0.1723,
+        "delta_vs_full": {
+          "auc": 0.001382,
+          "f1": 0.0,
+          "pr_auc": 0.015972
+        }
+      },
+      {
+        "name": "no_llm_analysis",
+        "feature_count": 20,
+        "feature_columns": [
+          "amount_log1p",
+          "oldbalanceOrg",
+          "newbalanceOrig",
+          "oldbalanceDest",
+          "newbalanceDest",
+          "type_encoded",
+          "balance_diff",
+          "amount_ratio",
+          "org_balance_delta_ratio",
+          "hour_of_day",
+          "is_night_tx",
+          "recipient_new_flag",
+          "tx_count_24h",
+          "avg_amount_7d",
+          "device_tx_count_24h",
+          "location_tx_count_24h",
+          "merchant_tx_count_24h",
+          "location_fraud_rate",
+          "ip_fraud_rate",
+          "merchant_fraud_rate"
+        ],
+        "note": "Removes the LLM-style risk, review, and semantic category features.",
+        "selected_threshold": 0.7,
+        "validation_metrics": {
+          "auc": 1.0,
+          "f1": 0.8888888888888888,
+          "precision": 0.8,
+          "recall": 1.0
+        },
+        "validation_pr_auc": 1.0,
+        "test_metrics": {
+          "auc": 0.9998918477215919,
+          "f1": 0.9473684210526315,
+          "precision": 0.9310344827586207,
+          "recall": 0.9642857142857143
+        },
+        "test_pr_auc": 0.9876092664524342,
+        "train_seconds": 0.1733,
+        "delta_vs_full": {
+          "auc": 0.001478,
+          "f1": -0.016917,
+          "pr_auc": 0.017074
+        }
+      },
+      {
+        "name": "no_contextual_aggregates",
+        "feature_count": 19,
+        "feature_columns": [
+          "amount_log1p",
+          "oldbalanceOrg",
+          "newbalanceOrig",
+          "oldbalanceDest",
+          "newbalanceDest",
+          "type_encoded",
+          "tx_count_24h",
+          "avg_amount_7d",
+          "device_tx_count_24h",
+          "location_tx_count_24h",
+          "merchant_tx_count_24h",
+          "location_fraud_rate",
+          "ip_fraud_rate",
+          "merchant_fraud_rate",
+          "llm_risk_score",
+          "llm_reason_count",
+          "llm_high_risk_flag",
+          "llm_review_flag",
+          "llm_category_hash"
+        ],
+        "note": "Removes aggregate context and entity-hash context features.",
+        "selected_threshold": 0.2,
+        "validation_metrics": {
+          "auc": 0.9999165554072096,
+          "f1": 0.8888888888888888,
+          "precision": 0.8,
+          "recall": 1.0
+        },
+        "validation_pr_auc": 0.95,
+        "test_metrics": {
+          "auc": 0.9887161122860988,
+          "f1": 0.723404255319149,
+          "precision": 0.8947368421052632,
+          "recall": 0.6071428571428571
+        },
+        "test_pr_auc": 0.7406774802316519,
+        "train_seconds": 0.1866,
+        "delta_vs_full": {
+          "auc": -0.009698,
+          "f1": -0.240881,
+          "pr_auc": -0.229858
+        }
+      },
+      {
+        "name": "transaction_core_only",
+        "feature_count": 6,
+        "feature_columns": [
+          "amount_log1p",
+          "oldbalanceOrg",
+          "newbalanceOrig",
+          "oldbalanceDest",
+          "newbalanceDest",
+          "type_encoded"
+        ],
+        "note": "Keeps only direct transaction-side features.",
+        "selected_threshold": 0.3,
+        "validation_metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "validation_pr_auc": 1.0,
+        "test_metrics": {
+          "auc": 0.9911074793308978,
+          "f1": 0.7555555555555555,
+          "precision": 1.0,
+          "recall": 0.6071428571428571
+        },
+        "test_pr_auc": 0.755422132736535,
+        "train_seconds": 0.1586,
+        "delta_vs_full": {
+          "auc": -0.007306,
+          "f1": -0.20873,
+          "pr_auc": -0.215114
+        }
+      }
+    ]
+  },
+  "medium_branch": {
+    "source": "paysim",
+    "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "identity_data_path": null,
+    "artifact_scope": "sample_20000",
+    "selected_threshold": 0.5,
+    "routing_calibration": {
+      "low_quantile": 0.85,
+      "high_quantile": 0.98,
+      "low_quantile_score": 0.00015908063505776227,
+      "high_quantile_score": 0.0010639994870871305,
+      "raw_probability_summary": {
+        "min": 1.23702568544104e-06,
+        "max": 0.9999250173568726,
+        "mean": 0.001768294139765203,
+        "std": 0.03753276169300079,
+        "p50": 3.489576556603424e-05,
+        "p90": 0.00021804201242048293,
+        "p95": 0.00043708443990908563,
+        "p99": 0.0019318704726174474
+      },
+      "operational_score_summary": {
+        "min": 0.002333,
+        "max": 0.999,
+        "mean": 0.125320853,
+        "std": 0.15521266715533472,
+        "p50": 0.065808,
+        "p90": 0.3260625,
+        "p95": 0.42288539999999936,
+        "p99": 0.70026025
+      },
+      "validation_route_share": {
+        "low": 0.85,
+        "medium": 0.148667,
+        "high": 0.001333
+      }
+    },
+    "medium_case_count": 360,
+    "policies": [
+      {
+        "policy_name": "score_threshold_block",
+        "note": "Binary threshold baseline with no routing and no manual review state.",
+        "approve_count": 2972,
+        "review_count": 0,
+        "block_count": 28,
+        "approve_rate": 0.990667,
+        "review_rate": 0.0,
+        "block_rate": 0.009333,
+        "block_precision": 0.9642857142857143,
+        "block_recall": 0.9642857142857143,
+        "block_f1": 0.9642857142857143,
+        "fraud_review_rate": 0.0,
+        "review_fraud_share": 0.0,
+        "false_positive_block_rate": 0.000336,
+        "medium_case_count": 360,
+        "medium_case_share": 0.12
+      },
+      {
+        "policy_name": "route_without_agent",
+        "note": "Original routing but every medium case is held for human review.",
+        "approve_count": 2612,
+        "review_count": 360,
+        "block_count": 28,
+        "approve_rate": 0.870667,
+        "review_rate": 0.12,
+        "block_rate": 0.009333,
+        "block_precision": 0.9642857142857143,
+        "block_recall": 0.9642857142857143,
+        "block_f1": 0.9642857142857143,
+        "fraud_review_rate": 0.035714,
+        "review_fraud_share": 0.002778,
+        "false_positive_block_rate": 0.000336,
+        "medium_case_count": 360,
+        "medium_case_share": 0.12
+      },
+      {
+        "policy_name": "route_medium_auto_approve",
+        "note": "Routing with the medium band auto-approved to show the risk of removing investigation.",
+        "approve_count": 2972,
+        "review_count": 0,
+        "block_count": 28,
+        "approve_rate": 0.990667,
+        "review_rate": 0.0,
+        "block_rate": 0.009333,
+        "block_precision": 0.9642857142857143,
+        "block_recall": 0.9642857142857143,
+        "block_f1": 0.9642857142857143,
+        "fraud_review_rate": 0.0,
+        "review_fraud_share": 0.0,
+        "false_positive_block_rate": 0.000336,
+        "medium_case_count": 360,
+        "medium_case_share": 0.12
+      },
+      {
+        "policy_name": "route_with_medium_agent",
+        "note": "Routing with the offline replay of the current investigator logic on medium cases.",
+        "approve_count": 2789,
+        "review_count": 182,
+        "block_count": 29,
+        "approve_rate": 0.929667,
+        "review_rate": 0.060667,
+        "block_rate": 0.009667,
+        "block_precision": 0.9310344827586207,
+        "block_recall": 0.9642857142857143,
+        "block_f1": 0.9473684210526315,
+        "fraud_review_rate": 0.035714,
+        "review_fraud_share": 0.005495,
+        "false_positive_block_rate": 0.000673,
+        "medium_case_count": 360,
+        "medium_case_share": 0.12
+      }
+    ]
+  },
+  "robustness": {
+    "source": "paysim",
+    "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "identity_data_path": null,
+    "artifact_scope": "sample_20000",
+    "seeds": [
+      42,
+      43
+    ],
+    "bootstrap_iterations": 25,
+    "best_baseline": {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier"
+    },
+    "multi_seed_runs": [
+      {
+        "model_name": "xgboost",
+        "family": "XGBClassifier",
+        "random_state": 42,
+        "selected_threshold": 0.5,
+        "test_metrics": {
+          "auc": 0.9984137665833493,
+          "f1": 0.9642857142857143,
+          "precision": 0.9642857142857143,
+          "recall": 0.9642857142857143,
+          "pr_auc": 0.9705357142857143
+        }
+      },
+      {
+        "model_name": "hist_gradient_boosting",
+        "family": "HistGradientBoostingClassifier",
+        "random_state": 42,
+        "selected_threshold": 0.5,
+        "test_metrics": {
+          "auc": 0.9999158815612382,
+          "f1": 0.9230769230769231,
+          "precision": 1.0,
+          "recall": 0.8571428571428571,
+          "pr_auc": 0.9928571428571428
+        }
+      },
+      {
+        "model_name": "xgboost",
+        "family": "XGBClassifier",
+        "random_state": 43,
+        "selected_threshold": 0.65,
+        "test_metrics": {
+          "auc": 0.9992669678907902,
+          "f1": 0.9642857142857143,
+          "precision": 0.9642857142857143,
+          "recall": 0.9642857142857143,
+          "pr_auc": 0.9755216693418939
+        }
+      },
+      {
+        "model_name": "hist_gradient_boosting",
+        "family": "HistGradientBoostingClassifier",
+        "random_state": 43,
+        "selected_threshold": 0.5,
+        "test_metrics": {
+          "auc": 0.9999519323207074,
+          "f1": 0.8333333333333334,
+          "precision": 1.0,
+          "recall": 0.7142857142857143,
+          "pr_auc": 0.9955357142857142
+        }
+      }
+    ],
+    "multi_seed_summary": [
+      {
+        "model_name": "hist_gradient_boosting",
+        "family": "HistGradientBoostingClassifier",
+        "seeds": [
+          42,
+          43
+        ],
+        "test_metrics": {
+          "auc": {
+            "mean": 0.999934,
+            "std": 1.8e-05,
+            "min": 0.999916,
+            "max": 0.999952
+          },
+          "f1": {
+            "mean": 0.878205,
+            "std": 0.044872,
+            "min": 0.833333,
+            "max": 0.923077
+          },
+          "precision": {
+            "mean": 1.0,
+            "std": 0.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "recall": {
+            "mean": 0.785714,
+            "std": 0.071429,
+            "min": 0.714286,
+            "max": 0.857143
+          },
+          "pr_auc": {
+            "mean": 0.994196,
+            "std": 0.001339,
+            "min": 0.992857,
+            "max": 0.995536
+          }
+        }
+      },
+      {
+        "model_name": "xgboost",
+        "family": "XGBClassifier",
+        "seeds": [
+          42,
+          43
+        ],
+        "test_metrics": {
+          "auc": {
+            "mean": 0.99884,
+            "std": 0.000427,
+            "min": 0.998414,
+            "max": 0.999267
+          },
+          "f1": {
+            "mean": 0.964286,
+            "std": 0.0,
+            "min": 0.964286,
+            "max": 0.964286
+          },
+          "precision": {
+            "mean": 0.964286,
+            "std": 0.0,
+            "min": 0.964286,
+            "max": 0.964286
+          },
+          "recall": {
+            "mean": 0.964286,
+            "std": 0.0,
+            "min": 0.964286,
+            "max": 0.964286
+          },
+          "pr_auc": {
+            "mean": 0.973029,
+            "std": 0.002493,
+            "min": 0.970536,
+            "max": 0.975522
+          }
+        }
+      }
+    ],
+    "confidence_intervals": {
+      "xgboost": {
+        "auc": {
+          "mean": 0.998361,
+          "std": 0.001215,
+          "ci95_low": 0.996186,
+          "ci95_high": 1.0
+        },
+        "pr_auc": {
+          "mean": 0.969591,
+          "std": 0.022514,
+          "ci95_low": 0.927754,
+          "ci95_high": 1.0
+        },
+        "f1": {
+          "mean": 0.965311,
+          "std": 0.019686,
+          "ci95_low": 0.932093,
+          "ci95_high": 1.0
+        },
+        "precision": {
+          "mean": 0.968192,
+          "std": 0.029976,
+          "ci95_low": 0.909091,
+          "ci95_high": 1.0
+        },
+        "recall": {
+          "mean": 0.963366,
+          "std": 0.027341,
+          "ci95_low": 0.912467,
+          "ci95_high": 1.0
+        }
+      },
+      "hist_gradient_boosting": {
+        "auc": {
+          "mean": 0.999882,
+          "std": 0.000103,
+          "ci95_low": 0.999659,
+          "ci95_high": 1.0
+        },
+        "pr_auc": {
+          "mean": 0.989975,
+          "std": 0.008293,
+          "ci95_low": 0.973333,
+          "ci95_high": 1.0
+        },
+        "f1": {
+          "mean": 0.907589,
+          "std": 0.034486,
+          "ci95_low": 0.843697,
+          "ci95_high": 0.96571
+        },
+        "precision": {
+          "mean": 1.0,
+          "std": 0.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "recall": {
+          "mean": 0.832632,
+          "std": 0.057671,
+          "ci95_low": 0.73,
+          "ci95_high": 0.934033
+        }
+      }
+    },
+    "mcnemar_test": {
+      "baseline_model": "hist_gradient_boosting",
+      "better_for_xgboost": 3,
+      "better_for_baseline": 1,
+      "discordant": 4,
+      "chi_square": 0.25,
+      "p_value": 0.617075
+    }
+  },
+  "external_validation": {
+    "available": true,
+    "validation_mode": "frozen_vs_native_benchmark",
+    "source": "ieee",
+    "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_transaction.csv",
+    "identity_data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_identity.csv",
+    "artifact_scope": "sample_20000",
+    "random_state": 42,
+    "split_strategy": "external_all_rows_no_ieee_fit (frozen) / ieee_chronological_70_15_15 (native)",
+    "split": {
+      "evaluation_rows": 20000,
+      "train_rows": 14000,
+      "validation_rows": 3000,
+      "test_rows": 3000
+    },
+    "feature_alignment": {
+      "method": "semantic_proxy_with_mfield_balance_diff",
+      "target_feature_count": 25,
+      "target_features": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "ieee_label_usage": "labels_used_only_after_prediction_for_metrics"
+    },
+    "models": [
+      {
+        "model_name": "xgboost_ieee_retrained",
+        "family": "XGBClassifier",
+        "feature_count": 42,
+        "selected_threshold": 0.65,
+        "frozen_model_source": "ieee_native",
+        "evaluation_mode": "ieee_native_retrained",
+        "params": {
+          "n_estimators": 220,
+          "max_depth": 5,
+          "learning_rate": 0.08,
+          "subsample": 0.95,
+          "colsample_bytree": 0.9
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.7934189249978724,
+            "f1": 0.3888888888888889,
+            "precision": 0.4117647058823529,
+            "recall": 0.3684210526315789
+          },
+          "pr_auc": 0.3462338472872941,
+          "confusion_matrix": {
+            "true_negative": 2826,
+            "false_positive": 60,
+            "false_negative": 72,
+            "true_positive": 42
+          }
+        }
+      },
+      {
+        "model_name": "xgboost_frozen_paysim",
+        "family": "XGBClassifier",
+        "feature_count": 25,
+        "selected_threshold": 0.5,
+        "frozen_model_source": "paysim",
+        "frozen_model_train_rows": 14000,
+        "evaluation_mode": "frozen_model_external_validation",
+        "params": {
+          "n_estimators": 220,
+          "max_depth": 5,
+          "learning_rate": 0.08,
+          "subsample": 0.95,
+          "colsample_bytree": 0.9
+        },
+        "test": {
+          "metrics": {
+            "auc": 0.5306160381121916,
+            "f1": 0.011661807580174927,
+            "precision": 0.020833333333333332,
+            "recall": 0.008097165991902834
+          },
+          "pr_auc": 0.03721568953329709,
+          "confusion_matrix": {
+            "true_negative": 18977,
+            "false_positive": 282,
+            "false_negative": 735,
+            "true_positive": 6
+          }
+        }
+      }
+    ]
+  },
+  "artifacts": {
+    "baseline_comparison_json": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/experiments/sample_20000/research/reports/baseline_comparison.json",
+    "feature_ablation_json": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/experiments/sample_20000/research/reports/feature_ablation.json",
+    "medium_branch_ablation_json": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/experiments/sample_20000/research/reports/medium_branch_ablation.json",
+    "robustness_validation_json": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/experiments/sample_20000/research/reports/robustness_validation.json",
+    "external_validation_json": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/experiments/sample_20000/research/reports/external_validation.json"
+  }
+}

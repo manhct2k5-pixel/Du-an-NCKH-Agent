@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Queue Fraud Flow</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/review_queue.css?v={{ version }}">
+</head>
+<body>
+  <main class="shell">
+    {% include "_app_header.html" %}
+
+    <section class="hero-grid compact-hero">
+      <article class="hero-card">
+        <div class="eyebrow">Manual Review Queue <span class="pill tone-neutral">{{ queue_overview.total }} pending</span></div>
+        <h1>Các giao dịch đang chờ analyst xác minh.</h1>
+        <p class="subtext">Trang này là bản dễ đọc của <code>/reviews/pending</code>. Các case được ưu tiên theo route, score và raw probability để tránh phải đọc JSON dài.</p>
+
+        <div class="actions">
+          <a class="action primary" href="/dashboard/html">Mở dashboard</a>
+          <a class="action" href="/transaction/form">Gửi giao dịch thử</a>
+          <a class="action" href="/reviews/pending.xlsx">Xuất XLSX đầy đủ</a>
+          <a class="action" href="/reviews/pending?format=json&limit=100">Xem JSON 100 case</a>
+        </div>
+      </article>
+
+      <aside class="status-card">
+        <div class="section-label">Queue Summary</div>
+        <div class="status-stack">
+          <div class="status-row"><span>Tổng pending</span><strong>{{ queue_overview.total }}</strong></div>
+          <div class="status-row"><span>Đang hiển thị</span><strong>{{ queue_overview.displayed }}</strong></div>
+          <div class="status-row"><span>Ưu tiên cao</span><strong>{{ queue_overview.priority }}</strong></div>
+          <div class="status-row"><span>Active version</span><strong>{{ deployment.active_version or 'N/A' }}</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="queue-toolbar">
+      <div>
+        <div class="section-label">Display Limit</div>
+        <p>
+          {% if queue_overview.hidden %}
+          Còn {{ queue_overview.hidden }} case chưa render để trang không quá nặng.
+          {% else %}
+          Toàn bộ backlog đang được hiển thị.
+          {% endif %}
+        </p>
+      </div>
+      <div class="limit-actions">
+        <a class="action {% if queue_overview.limit == 20 %}primary{% endif %}" href="/reviews/pending?limit=20">20</a>
+        <a class="action {% if queue_overview.limit == 50 %}primary{% endif %}" href="/reviews/pending?limit=50">50</a>
+        <a class="action {% if queue_overview.limit == 100 %}primary{% endif %}" href="/reviews/pending?limit=100">100</a>
+      </div>
+    </section>
+
+    <section class="queue-list">
+      {% for row in review_queue_cards %}
+      <article class="queue-card {% if row.is_focus %}active{% endif %}">
+        <div class="case-head">
+          <div>
+            <span class="case-id">{{ row.tx_id }}</span>
+            <h2>{{ row.tx_type }} · {{ row.amount }}</h2>
+          </div>
+          <span class="pill tone-{{ row.priority_tone }}">{{ row.priority_label }}</span>
+        </div>
+
+        <p class="case-note">{{ row.note }}</p>
+
+        <div class="metric-row">
+          <span class="route-tag tone-{{ row.route_tone }}">{{ row.route_label }}</span>
+          <span class="route-tag tone-{{ row.action_tone }}">{{ row.action_label }}</span>
+          <span>Score <strong>{{ row.score }}</strong></span>
+          <span>{{ row.timestamp }}</span>
+        </div>
+
+        <div class="card-actions">
+          <a class="action primary" href="/dashboard/html?tx_id={{ row.tx_id }}">Mở trên dashboard</a>
+          <a class="action" href="/reviews/pending?format=json&limit=100">JSON</a>
+        </div>
+      </article>
+      {% else %}
+      <article class="empty-state">
+        <h2>Không có case pending.</h2>
+        <p>Hãy gửi giao dịch qua form hoặc chạy simulate/stream để tạo dữ liệu mới.</p>
+      </article>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

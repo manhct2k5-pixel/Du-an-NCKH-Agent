@@ -1,0 +1,31 @@
+<header class="app-header">
+  <div class="app-brand">
+    <a class="app-home" href="/">Fraud Flow</a>
+    <p>{{ product_story.operations_mode }}</p>
+  </div>
+
+  <div class="app-presence">
+    <span class="app-chip tone-{{ product_story.system_status_tone }}">{{ product_story.system_status_label }}</span>
+    <span class="app-chip">Automation {{ product_story.automation_rate }}</span>
+    <span class="app-chip tone-{{ product_story.queue_health_tone }}">Queue {{ product_story.queue_health_label }}</span>
+    {% if bootstrapped_rows_label is defined and bootstrapped_rows_label %}
+    <span
+      class="app-chip app-chip-tooltip"
+      tabindex="0"
+      title="Warm start from historical transactions"
+      data-tooltip="Warm start from historical transactions"
+      aria-label="Bootstrapped {{ bootstrapped_rows_label }}. Warm start from historical transactions."
+    >
+      Bootstrapped {{ bootstrapped_rows_label }}
+    </span>
+    {% endif %}
+  </div>
+
+  <nav class="app-nav" aria-label="Điều hướng chính">
+    <a class="app-link {% if current_page == 'home' %}active{% endif %}" href="/">Portal</a>
+    <a class="app-link {% if current_page == 'form' %}active{% endif %}" href="/transaction/form">Live Demo</a>
+    <a class="app-link {% if current_page == 'dashboard' %}active{% endif %}" href="/dashboard/html">Control Room</a>
+    <a class="app-link {% if current_page == 'docs' %}active{% endif %}" href="/docs">API Workspace</a>
+    <a class="app-link {% if current_page == 'research' %}active{% endif %}" href="/research">Research</a>
+  </nav>
+</header>

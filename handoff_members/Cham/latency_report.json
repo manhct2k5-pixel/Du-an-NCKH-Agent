@@ -1,0 +1,47 @@
+{
+  "description": "FraudFlow pipeline latency benchmark (post leakage fix)",
+  "timestamp": "2026-04-15T16:05:55Z",
+  "config": {
+    "n_benchmark": 1000,
+    "warmup": 100,
+    "source": "paysim"
+  },
+  "route_distribution": {
+    "low": 887,
+    "medium": 113,
+    "high": 0
+  },
+  "overall": {
+    "n": 1000,
+    "mean_ms": 35.716,
+    "p50_ms": 35.795,
+    "p95_ms": 44.463,
+    "p99_ms": 51.546,
+    "max_ms": 71.081,
+    "throughput_tps": 28.0
+  },
+  "by_route": {
+    "low": {
+      "n": 887,
+      "mean_ms": 35.757,
+      "p50_ms": 35.802,
+      "p95_ms": 44.512,
+      "p99_ms": 51.959,
+      "max_ms": 71.081,
+      "throughput_tps": 28.0
+    },
+    "medium": {
+      "n": 113,
+      "mean_ms": 35.392,
+      "p50_ms": 35.593,
+      "p95_ms": 43.32,
+      "p99_ms": 49.621,
+      "max_ms": 51.281,
+      "throughput_tps": 28.3
+    },
+    "high": {
+      "n": 0,
+      "note": "no samples"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "available": true,
+  "validation_mode": "frozen_vs_native_benchmark",
+  "source": "ieee",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_transaction.csv",
+  "identity_data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_identity.csv",
+  "artifact_scope": "sample_20000",
+  "random_state": 42,
+  "split_strategy": "external_all_rows_no_ieee_fit (frozen) / ieee_chronological_70_15_15 (native)",
+  "split": {
+    "evaluation_rows": 20000,
+    "train_rows": 14000,
+    "validation_rows": 3000,
+    "test_rows": 3000
+  },
+  "feature_alignment": {
+    "method": "semantic_proxy_with_mfield_balance_diff",
+    "target_feature_count": 25,
+    "target_features": [
+      "amount_log1p",
+      "oldbalanceOrg",
+      "newbalanceOrig",
+      "oldbalanceDest",
+      "newbalanceDest",
+      "type_encoded",
+      "balance_diff",
+      "amount_ratio",
+      "org_balance_delta_ratio",
+      "hour_of_day",
+      "is_night_tx",
+      "recipient_new_flag",
+      "tx_count_24h",
+      "avg_amount_7d",
+      "device_tx_count_24h",
+      "location_tx_count_24h",
+      "merchant_tx_count_24h",
+      "location_fraud_rate",
+      "ip_fraud_rate",
+      "merchant_fraud_rate",
+      "llm_risk_score",
+      "llm_reason_count",
+      "llm_high_risk_flag",
+      "llm_review_flag",
+      "llm_category_hash"
+    ],
+    "ieee_label_usage": "labels_used_only_after_prediction_for_metrics"
+  },
+  "models": [
+    {
+      "model_name": "xgboost_ieee_retrained",
+      "family": "XGBClassifier",
+      "feature_count": 42,
+      "selected_threshold": 0.65,
+      "frozen_model_source": "ieee_native",
+      "evaluation_mode": "ieee_native_retrained",
+      "params": {
+        "n_estimators": 220,
+        "max_depth": 5,
+        "learning_rate": 0.08,
+        "subsample": 0.95,
+        "colsample_bytree": 0.9
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.7934189249978724,
+          "f1": 0.3888888888888889,
+          "precision": 0.4117647058823529,
+          "recall": 0.3684210526315789
+        },
+        "pr_auc": 0.3462338472872941,
+        "confusion_matrix": {
+          "true_negative": 2826,
+          "false_positive": 60,
+          "false_negative": 72,
+          "true_positive": 42
+        }
+      }
+    },
+    {
+      "model_name": "xgboost_frozen_paysim",
+      "family": "XGBClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "frozen_model_source": "paysim",
+      "frozen_model_train_rows": 14000,
+      "evaluation_mode": "frozen_model_external_validation",
+      "params": {
+        "n_estimators": 220,
+        "max_depth": 5,
+        "learning_rate": 0.08,
+        "subsample": 0.95,
+        "colsample_bytree": 0.9
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.5306160381121916,
+          "f1": 0.011661807580174927,
+          "precision": 0.020833333333333332,
+          "recall": 0.008097165991902834
+        },
+        "pr_auc": 0.03721568953329709,
+        "confusion_matrix": {
+          "true_negative": 18977,
+          "false_positive": 282,
+          "false_negative": 735,
+          "true_positive": 6
+        }
+      }
+    }
+  ]
+}

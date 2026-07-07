@@ -1,0 +1,238 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_20000",
+  "random_state": 42,
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "split": {
+    "total_rows": 20000,
+    "train_rows": 14000,
+    "validation_rows": 3000,
+    "test_rows": 3000
+  },
+  "models": [
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "learning_rate": 0.08,
+        "max_iter": 220,
+        "max_depth": 6,
+        "min_samples_leaf": 80
+      },
+      "train_seconds": 0.1971,
+      "inference_ms_per_1k_rows": 1.6062,
+      "validation": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 2996,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 4
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.9999158815612382,
+          "f1": 0.9230769230769231,
+          "precision": 1.0,
+          "recall": 0.8571428571428571
+        },
+        "pr_auc": 0.9928571428571428,
+        "confusion_matrix": {
+          "true_negative": 2972,
+          "false_positive": 0,
+          "false_negative": 4,
+          "true_positive": 24
+        }
+      }
+    },
+    {
+      "model_name": "random_forest",
+      "family": "RandomForestClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "n_estimators": 120,
+        "max_depth": 12,
+        "min_samples_leaf": 40,
+        "class_weight": "balanced_subsample",
+        "imputer": "median"
+      },
+      "train_seconds": 0.3678,
+      "inference_ms_per_1k_rows": 7.9736,
+      "validation": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 2996,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 4
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.9993871370890214,
+          "f1": 0.9473684210526315,
+          "precision": 0.9310344827586207,
+          "recall": 0.9642857142857143
+        },
+        "pr_auc": 0.9769439421338154,
+        "confusion_matrix": {
+          "true_negative": 2970,
+          "false_positive": 2,
+          "false_negative": 1,
+          "true_positive": 27
+        }
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "n_estimators": 220,
+        "max_depth": 5,
+        "learning_rate": 0.08,
+        "subsample": 0.95,
+        "colsample_bytree": 0.9
+      },
+      "train_seconds": 0.8642,
+      "inference_ms_per_1k_rows": 1.1844,
+      "validation": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 2996,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 4
+        },
+        "ranking_score": 2.0
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.9984137665833493,
+          "f1": 0.9642857142857143,
+          "precision": 0.9642857142857143,
+          "recall": 0.9642857142857143
+        },
+        "pr_auc": 0.9705357142857143,
+        "confusion_matrix": {
+          "true_negative": 2971,
+          "false_positive": 1,
+          "false_negative": 1,
+          "true_positive": 27
+        }
+      },
+      "search_mode": "candidate_grid"
+    },
+    {
+      "model_name": "logistic_regression",
+      "family": "LogisticRegression",
+      "feature_count": 25,
+      "selected_threshold": 0.7,
+      "params": {
+        "scaler": "StandardScaler",
+        "solver": "lbfgs",
+        "class_weight": "balanced",
+        "max_iter": 500,
+        "tol": 0.0001
+      },
+      "train_seconds": 0.071,
+      "inference_ms_per_1k_rows": 0.6139,
+      "validation": {
+        "metrics": {
+          "auc": 0.9863985313751669,
+          "f1": 0.07317073170731707,
+          "precision": 0.038461538461538464,
+          "recall": 0.75
+        },
+        "pr_auc": 0.5217208734157887,
+        "confusion_matrix": {
+          "true_negative": 2921,
+          "false_positive": 75,
+          "false_negative": 1,
+          "true_positive": 3
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.9612093828109979,
+          "f1": 0.37681159420289856,
+          "precision": 0.23636363636363636,
+          "recall": 0.9285714285714286
+        },
+        "pr_auc": 0.76447213629373,
+        "confusion_matrix": {
+          "true_negative": 2888,
+          "false_positive": 84,
+          "false_negative": 2,
+          "true_positive": 26
+        }
+      }
+    },
+    {
+      "model_name": "dummy_prior",
+      "family": "DummyClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "strategy": "prior"
+      },
+      "train_seconds": 0.0011,
+      "inference_ms_per_1k_rows": 0.1628,
+      "validation": {
+        "metrics": {
+          "auc": 0.5,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0013333333333333333,
+        "confusion_matrix": {
+          "true_negative": 2996,
+          "false_positive": 0,
+          "false_negative": 4,
+          "true_positive": 0
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.5,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.009333333333333334,
+        "confusion_matrix": {
+          "true_negative": 2972,
+          "false_positive": 0,
+          "false_negative": 28,
+          "true_positive": 0
+        }
+      }
+    }
+  ]
+}

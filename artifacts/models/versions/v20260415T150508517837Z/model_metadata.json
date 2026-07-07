@@ -1,0 +1,112 @@
+{
+  "source": "paysim",
+  "data_path": "D:\\fraud_detection\\data\\paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "production",
+  "sample_size_used": 460394,
+  "feature_columns": [
+    "amount_log1p",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "type_encoded",
+    "balance_diff",
+    "amount_ratio",
+    "org_balance_delta_ratio",
+    "hour_of_day",
+    "is_night_tx",
+    "recipient_new_flag",
+    "tx_count_24h",
+    "avg_amount_7d",
+    "device_tx_count_24h",
+    "location_tx_count_24h",
+    "merchant_tx_count_24h",
+    "location_fraud_rate",
+    "ip_fraud_rate",
+    "merchant_fraud_rate",
+    "llm_risk_score",
+    "llm_reason_count",
+    "llm_high_risk_flag",
+    "llm_review_flag",
+    "llm_category_hash"
+  ],
+  "routing_thresholds": {
+    "low": 0.3,
+    "high": 0.85
+  },
+  "train_end": 322275,
+  "val_end": 391334,
+  "selected_threshold": 0.6,
+  "selected_params": {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85
+  },
+  "training_controls": {
+    "max_delta_step": 1
+  },
+  "class_balance": {
+    "positive_count": 429,
+    "negative_count": 321846,
+    "scale_pos_weight": 750.2237762237762
+  },
+  "routing_calibration": {
+    "low_quantile": 0.85,
+    "high_quantile": 0.98,
+    "low_quantile_score": 7.816080324118957e-05,
+    "high_quantile_score": 0.00029883874231018126,
+    "raw_probability_summary": {
+      "min": 4.7598885544175573e-07,
+      "max": 0.9999960660934448,
+      "mean": 0.0010003966744989157,
+      "std": 0.030408840626478195,
+      "p50": 2.0522069462458603e-05,
+      "p90": 0.00010640211257850751,
+      "p95": 0.0001652769569773227,
+      "p99": 0.00048367975978180766
+    },
+    "operational_score_summary": {
+      "min": 0.001827,
+      "max": 0.999,
+      "mean": 0.141561245833273,
+      "std": 0.15216956171728827,
+      "p50": 0.078769,
+      "p90": 0.3511904,
+      "p95": 0.4579061999999996,
+      "p99": 0.70005542
+    },
+    "validation_route_share": {
+      "low": 0.849998,
+      "medium": 0.149061,
+      "high": 0.000941
+    }
+  },
+  "validation_metrics": {
+    "auc": 0.9984650593961278,
+    "f1": 0.9448818897637795,
+    "precision": 0.9375,
+    "recall": 0.9523809523809523
+  },
+  "test_metrics": {
+    "auc": 0.998473614968572,
+    "f1": 0.9908256880733946,
+    "precision": 0.9848024316109423,
+    "recall": 0.9969230769230769
+  },
+  "train_profile": {
+    "amount_log1p_mean": 11.964039394332165,
+    "tx_count_24h_mean": 7.136762082072764e-05,
+    "device_tx_count_24h_mean": 7.547960592661547,
+    "merchant_fraud_rate_mean": 0.0019063860460786586,
+    "fraud_rate": 0.0013311612753083546
+  },
+  "split": {
+    "total_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060
+  }
+}

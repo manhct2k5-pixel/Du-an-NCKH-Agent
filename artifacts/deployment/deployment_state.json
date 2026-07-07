@@ -1,0 +1,15 @@
+{
+  "last_trained_version": "v20260424T074126106494Z",
+  "candidate_version": "v20260424T074126106494Z",
+  "candidate_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/xgboost_fraud.json",
+  "candidate_metadata_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/model_metadata.json",
+  "rollback_version": "v20260424T065818461239Z",
+  "updated_at": "2026-04-24T07:43:58.050233+00:00",
+  "active_version": "v20260424T074126106494Z",
+  "active_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/xgboost_fraud.json",
+  "active_metadata_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/model_metadata.json",
+  "deployment_strategy": "canary_then_full_rollout",
+  "promotion_reason": "Full PaySim production model; IEEE-CIS frozen validation documents domain shift",
+  "candidate_anomaly_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/anomaly_sidecar.joblib",
+  "active_anomaly_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/versions/v20260424T074126106494Z/anomaly_sidecar.joblib"
+}

@@ -1,0 +1,254 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "production",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "bootstrap_iterations": 300,
+  "best_baseline": {
+    "model_name": "hist_gradient_boosting",
+    "family": "HistGradientBoostingClassifier"
+  },
+  "multi_seed_runs": [
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9983827150776428,
+        "f1": 0.993103448275862,
+        "precision": 0.9893129770992366,
+        "recall": 0.9969230769230769,
+        "pr_auc": 0.9970017406400512
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9999321511699818,
+        "f1": 0.9969135802469136,
+        "precision": 1.0,
+        "recall": 0.9938461538461538,
+        "pr_auc": 0.997849385204436
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 43,
+      "selected_threshold": 0.7,
+      "test_metrics": {
+        "auc": 0.9987623266953773,
+        "f1": 0.99079754601227,
+        "precision": 0.9877675840978594,
+        "recall": 0.9938461538461538,
+        "pr_auc": 0.9970987605238817
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 43,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.9998875445560143,
+        "f1": 0.9953632148377125,
+        "precision": 1.0,
+        "recall": 0.9907692307692307,
+        "pr_auc": 0.9961997632554482
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 44,
+      "selected_threshold": 0.7,
+      "test_metrics": {
+        "auc": 0.9988008051004689,
+        "f1": 0.9923312883435583,
+        "precision": 0.9892966360856269,
+        "recall": 0.9953846153846154,
+        "pr_auc": 0.9975486999259158
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 44,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 0.999963466879561,
+        "f1": 0.9984591679506933,
+        "precision": 1.0,
+        "recall": 0.9969230769230769,
+        "pr_auc": 0.9982831244538842
+      }
+    }
+  ],
+  "multi_seed_summary": [
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 0.999928,
+          "std": 3.1e-05,
+          "min": 0.999888,
+          "max": 0.999963
+        },
+        "f1": {
+          "mean": 0.996912,
+          "std": 0.001264,
+          "min": 0.995363,
+          "max": 0.998459
+        },
+        "precision": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "recall": {
+          "mean": 0.993846,
+          "std": 0.002512,
+          "min": 0.990769,
+          "max": 0.996923
+        },
+        "pr_auc": {
+          "mean": 0.997444,
+          "std": 0.000898,
+          "min": 0.9962,
+          "max": 0.998283
+        }
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 0.998649,
+          "std": 0.000189,
+          "min": 0.998383,
+          "max": 0.998801
+        },
+        "f1": {
+          "mean": 0.992077,
+          "std": 0.000958,
+          "min": 0.990798,
+          "max": 0.993103
+        },
+        "precision": {
+          "mean": 0.988792,
+          "std": 0.000725,
+          "min": 0.987768,
+          "max": 0.989313
+        },
+        "recall": {
+          "mean": 0.995385,
+          "std": 0.001256,
+          "min": 0.993846,
+          "max": 0.996923
+        },
+        "pr_auc": {
+          "mean": 0.997216,
+          "std": 0.000238,
+          "min": 0.997002,
+          "max": 0.997549
+        }
+      }
+    }
+  ],
+  "confidence_intervals": {
+    "xgboost": {
+      "auc": {
+        "mean": 0.998521,
+        "std": 0.001411,
+        "ci95_low": 0.995236,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 0.997184,
+        "std": 0.001865,
+        "ci95_low": 0.993166,
+        "ci95_high": 0.99995
+      },
+      "f1": {
+        "mean": 0.993245,
+        "std": 0.002095,
+        "ci95_low": 0.98913,
+        "ci95_high": 0.996811
+      },
+      "precision": {
+        "mean": 0.989416,
+        "std": 0.003791,
+        "ci95_low": 0.982163,
+        "ci95_high": 0.995663
+      },
+      "recall": {
+        "mean": 0.997113,
+        "std": 0.001971,
+        "ci95_low": 0.99287,
+        "ci95_high": 1.0
+      }
+    },
+    "hist_gradient_boosting": {
+      "auc": {
+        "mean": 0.999933,
+        "std": 4.5e-05,
+        "ci95_low": 0.999827,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 0.99787,
+        "std": 0.001407,
+        "ci95_low": 0.994689,
+        "ci95_high": 1.0
+      },
+      "f1": {
+        "mean": 0.996945,
+        "std": 0.001627,
+        "ci95_low": 0.993251,
+        "ci95_high": 0.999257
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "recall": {
+        "mean": 0.993915,
+        "std": 0.00323,
+        "ci95_low": 0.986593,
+        "ci95_high": 0.998514
+      }
+    }
+  },
+  "mcnemar_test": {
+    "baseline_model": "hist_gradient_boosting",
+    "better_for_xgboost": 2,
+    "better_for_baseline": 7,
+    "discordant": 9,
+    "chi_square": 1.777778,
+    "p_value": 0.182422
+  }
+}

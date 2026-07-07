@@ -1,0 +1,130 @@
+{
+  "base_model": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+  "base_model_source": "paysim",
+  "ieee_data_path": "data/train_transaction.csv",
+  "adapt_fraction": 0.1,
+  "adapt_rows": 59054,
+  "test_rows": 531486,
+  "feature_alignment": {
+    "method": "semantic_proxy_with_mfield_balance_diff",
+    "target_feature_count": 25,
+    "target_features": [
+      "amount_log1p",
+      "oldbalanceOrg",
+      "newbalanceOrig",
+      "oldbalanceDest",
+      "newbalanceDest",
+      "type_encoded",
+      "balance_diff",
+      "amount_ratio",
+      "org_balance_delta_ratio",
+      "hour_of_day",
+      "is_night_tx",
+      "recipient_new_flag",
+      "tx_count_24h",
+      "avg_amount_7d",
+      "device_tx_count_24h",
+      "location_tx_count_24h",
+      "merchant_tx_count_24h",
+      "location_fraud_rate",
+      "ip_fraud_rate",
+      "merchant_fraud_rate",
+      "llm_risk_score",
+      "llm_reason_count",
+      "llm_high_risk_flag",
+      "llm_review_flag",
+      "llm_category_hash"
+    ],
+    "source_feature_count": 42
+  },
+  "feature_columns": [
+    "amount_log1p",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "type_encoded",
+    "balance_diff",
+    "amount_ratio",
+    "org_balance_delta_ratio",
+    "hour_of_day",
+    "is_night_tx",
+    "recipient_new_flag",
+    "tx_count_24h",
+    "avg_amount_7d",
+    "device_tx_count_24h",
+    "location_tx_count_24h",
+    "merchant_tx_count_24h",
+    "location_fraud_rate",
+    "ip_fraud_rate",
+    "merchant_fraud_rate",
+    "llm_risk_score",
+    "llm_reason_count",
+    "llm_high_risk_flag",
+    "llm_review_flag",
+    "llm_category_hash"
+  ],
+  "feature_count": 25,
+  "best_num_boost_round": 100,
+  "adapt_params": {
+    "objective": "binary:logistic",
+    "eval_metric": "logloss",
+    "seed": 42,
+    "tree_method": "hist",
+    "scale_pos_weight": 35.17381316998468,
+    "max_delta_step": 1,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85
+  },
+  "adapt_val": {
+    "metrics": {
+      "auc": 0.6872142675363988,
+      "f1": 0.16018306636155608,
+      "precision": 0.09838369641602249,
+      "recall": 0.4307692307692308
+    },
+    "pr_auc": 0.06468546094245792,
+    "confusion_matrix": {
+      "true_negative": 10203,
+      "false_positive": 1283,
+      "false_negative": 185,
+      "true_positive": 140
+    }
+  },
+  "test": {
+    "metrics": {
+      "auc": 0.6773685462938888,
+      "f1": 0.18943732618826906,
+      "precision": 0.12490580571696502,
+      "recall": 0.39191887347625054
+    },
+    "pr_auc": 0.0825769062019355,
+    "confusion_matrix": {
+      "true_negative": 460196,
+      "false_positive": 52258,
+      "false_negative": 11573,
+      "true_positive": 7459
+    }
+  },
+  "adapt_val_metrics": {
+    "auc": 0.6872142675363988,
+    "f1": 0.16018306636155608,
+    "precision": 0.09838369641602249,
+    "recall": 0.4307692307692308
+  },
+  "test_metrics": {
+    "auc": 0.6773685462938888,
+    "f1": 0.18943732618826906,
+    "precision": 0.12490580571696502,
+    "recall": 0.39191887347625054
+  },
+  "selected_threshold": 0.65,
+  "adapted_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_adapted_ieee.json",
+  "class_balance": {
+    "positive_count": 1306,
+    "negative_count": 45937,
+    "scale_pos_weight": 35.17381316998468
+  }
+}

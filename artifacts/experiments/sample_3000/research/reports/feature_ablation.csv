@@ -1,0 +1,6 @@
+name,feature_count,test_auc,test_pr_auc,test_f1,delta_auc,delta_f1,delta_pr_auc,note
+full_feature_set,25,1.0,1.0,0.8333333333333334,0.0,0.0,0.0,Full engineered feature set.
+no_online_behavior,17,1.0,1.0,0.7692307692307693,0.0,-0.064103,0.0,Removes velocity and historical risk lookup features.
+no_llm_analysis,20,0.9995505617977528,0.9666666666666667,0.7692307692307693,-0.000449,-0.064103,-0.033333,"Removes the LLM-style risk, review, and semantic category features."
+no_contextual_aggregates,19,0.9496629213483145,0.6432142857142857,0.5714285714285714,-0.050337,-0.261905,-0.356786,Removes aggregate context and entity-hash context features.
+transaction_core_only,6,0.913932584269663,0.47926760563380283,0.5714285714285714,-0.086067,-0.261905,-0.520732,Keeps only direct transaction-side features.

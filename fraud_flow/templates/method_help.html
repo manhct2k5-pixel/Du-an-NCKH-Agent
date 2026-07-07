@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/docs_portal.css?v={{ version }}">
+</head>
+<body>
+  <main class="shell">
+    {% include "_app_header.html" %}
+
+    <section class="hero-grid compact-hero">
+      <article class="hero-card">
+        <div class="eyebrow">Endpoint Guide <span class="pill tone-neutral">{{ method }}</span></div>
+        <h1>{{ title }}</h1>
+        <p class="subtext">{{ subtitle }}</p>
+
+        <div class="actions">
+          <a class="action primary" href="/docs">Mở docs portal</a>
+          <a class="action" href="/swagger-ui">Mở Swagger</a>
+          <a class="action" href="/transaction/form">Mở form giao dịch</a>
+        </div>
+      </article>
+
+      <aside class="status-card">
+        <div class="section-label">Endpoint Status</div>
+        <div class="status-stack">
+          <div class="status-row"><span>Path</span><strong>{{ endpoint_path }}</strong></div>
+          <div class="status-row"><span>Method</span><strong>{{ method }}</strong></div>
+          <div class="status-row"><span>Source</span><strong>{{ profile.source|upper }}</strong></div>
+          <div class="status-row"><span>Active version</span><strong>{{ deployment.active_version or 'N/A' }}</strong></div>
+          <div class="status-row"><span>Avg latency</span><strong>{{ live_metrics.avg_ms }}</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="content-grid method-grid">
+      <article class="panel">
+        <div class="section-label">How To Use</div>
+        <h2>3 bước đúng để test endpoint này</h2>
+        <ol>
+          <li>Mở Swagger hoặc docs portal, không gọi trực tiếp bằng GET từ thanh địa chỉ.</li>
+          <li>Dùng đúng method <code>{{ method }}</code> với payload JSON mẫu.</li>
+          <li>Quan sát response rồi đối chiếu với dashboard nếu cần kể lại case.</li>
+        </ol>
+      </article>
+
+      <article class="panel">
+        <div class="section-label">Example Payload</div>
+        <h2>Mẫu JSON để thử nhanh</h2>
+        <pre>{{ example_payload }}</pre>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

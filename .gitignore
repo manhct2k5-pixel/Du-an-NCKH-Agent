@@ -1,0 +1,31 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local environments
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Local editor/assistant state
+.vscode/
+.claude/
+.codex
+
+# Large datasets and downloaded competition files
+data/*.csv
+data/ieee-fraud-detection/
+
+# Generated runtime logs and queues
+artifacts/logs/
+artifacts/redis/
+handoff_members/**/predictions.jsonl
+handoff_members/**/manual_review_queue.jsonl
+
+# OS files
+.DS_Store
+Thumbs.db

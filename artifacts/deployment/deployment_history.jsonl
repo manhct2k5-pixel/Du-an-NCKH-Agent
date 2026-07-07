@@ -1,0 +1,60 @@
+{"event": "register_candidate", "version_id": "v20260328T172535826252Z", "timestamp": "2026-03-28T17:25:35.881913+00:00", "previous_active": null}
+{"event": "promote_candidate", "version_id": "v20260328T172535826252Z", "timestamp": "2026-03-28T17:25:35.906779+00:00", "reason": "Train-and-simulate workflow promoted the freshly trained candidate.", "rollback_version": "v20260328T172535826252Z"}
+{"event": "register_candidate", "version_id": "v20260328T172615026559Z", "timestamp": "2026-03-28T17:26:15.087914+00:00", "previous_active": "v20260328T172535826252Z"}
+{"event": "promote_candidate", "version_id": "v20260328T172615026559Z", "timestamp": "2026-03-28T17:26:15.115014+00:00", "reason": "Train-and-simulate workflow promoted the freshly trained candidate.", "rollback_version": "v20260328T172535826252Z"}
+{"event": "register_candidate", "version_id": "v20260328T172655192785Z", "timestamp": "2026-03-28T17:26:55.252718+00:00", "previous_active": "v20260328T172615026559Z"}
+{"event": "promote_candidate", "version_id": "v20260328T172655192785Z", "timestamp": "2026-03-28T17:26:55.294966+00:00", "reason": "Train-and-simulate workflow promoted the freshly trained candidate.", "rollback_version": "v20260328T172615026559Z"}
+{"event": "register_candidate", "version_id": "v20260328T174859258050Z", "timestamp": "2026-03-28T17:48:59.320183+00:00", "previous_active": "v20260328T172655192785Z"}
+{"event": "promote_candidate", "version_id": "v20260328T174859258050Z", "timestamp": "2026-03-28T17:49:28.233556+00:00", "reason": "Promote IEEE-backed model after source-aware refactor.", "rollback_version": "v20260328T172655192785Z"}
+{"event": "register_candidate", "version_id": "v20260329T042456086366Z", "timestamp": "2026-03-29T04:24:56.169031+00:00", "previous_active": "v20260328T174859258050Z"}
+{"event": "register_candidate", "version_id": "v20260329T042752539921Z", "timestamp": "2026-03-29T04:27:52.622324+00:00", "previous_active": "v20260328T174859258050Z"}
+{"event": "promote_candidate", "version_id": "v20260329T042752539921Z", "timestamp": "2026-03-29T04:28:12.042225+00:00", "reason": "Promote full IEEE dataset training for research evaluation.", "rollback_version": "v20260328T174859258050Z"}
+{"event": "register_candidate", "version_id": "v20260329T054417752758Z", "timestamp": "2026-03-29T05:44:17.844772+00:00", "previous_active": "v20260329T042752539921Z"}
+{"event": "promote_candidate", "version_id": "v20260329T054417752758Z", "timestamp": "2026-03-29T05:49:42.479628+00:00", "reason": "Research-ready model", "rollback_version": "v20260329T042752539921Z"}
+{"event": "register_candidate", "version_id": "v20260329T062809177102Z", "timestamp": "2026-03-29T06:28:09.241657+00:00", "previous_active": "v20260329T054417752758Z"}
+{"event": "promote_candidate", "version_id": "v20260329T062809177102Z", "timestamp": "2026-03-29T06:28:31.995085+00:00", "reason": "Switch active model to PaySim-first LLM-feature fraud pipeline.", "rollback_version": "v20260329T054417752758Z"}
+{"event": "register_candidate", "version_id": "v20260329T065912452433Z", "timestamp": "2026-03-29T06:59:12.526340+00:00", "previous_active": "v20260329T062809177102Z"}
+{"event": "promote_candidate", "version_id": "v20260329T065912452433Z", "timestamp": "2026-03-29T07:01:21.864043+00:00", "reason": "Research-ready model", "rollback_version": "v20260329T062809177102Z"}
+{"event": "register_candidate", "version_id": "v20260329T070542644642Z", "timestamp": "2026-03-29T07:05:42.714843+00:00", "previous_active": "v20260329T065912452433Z"}
+{"event": "promote_candidate", "version_id": "v20260329T070542644642Z", "timestamp": "2026-03-29T07:07:48.656691+00:00", "reason": "Research-ready model", "rollback_version": "v20260329T065912452433Z"}
+{"event": "promote_candidate", "version_id": "v20260329T070542644642Z", "timestamp": "2026-03-29T11:39:25.116583+00:00", "reason": "Initial deployment after training", "rollback_version": "v20260329T070542644642Z"}
+{"event": "register_candidate", "version_id": "v20260329T120528964120Z", "timestamp": "2026-03-29T12:05:29.044237+00:00", "previous_active": "v20260329T070542644642Z"}
+{"event": "promote_candidate", "version_id": "v20260329T120528964120Z", "timestamp": "2026-03-29T12:11:08.699700+00:00", "reason": "Research-ready model", "rollback_version": "v20260329T070542644642Z"}
+{"event": "register_candidate", "version_id": "v20260331T082115507541Z", "timestamp": "2026-03-31T08:21:15.576438+00:00", "previous_active": "v20260329T120528964120Z"}
+{"event": "promote_candidate", "version_id": "v20260331T082115507541Z", "timestamp": "2026-03-31T08:23:40.845515+00:00", "reason": "Research-ready model", "rollback_version": "v20260329T120528964120Z"}
+{"event": "register_candidate", "version_id": "v20260331T133247741172Z", "timestamp": "2026-03-31T13:32:47.811635+00:00", "previous_active": "v20260331T082115507541Z"}
+{"event": "promote_candidate", "version_id": "v20260331T133247741172Z", "timestamp": "2026-03-31T13:35:16.919479+00:00", "reason": "Research-ready model", "rollback_version": "v20260331T082115507541Z"}
+{"event": "register_candidate", "version_id": "v20260401T153500612094Z", "timestamp": "2026-04-01T15:35:00.692556+00:00", "previous_active": "v20260331T133247741172Z"}
+{"event": "promote_candidate", "version_id": "v20260401T153500612094Z", "timestamp": "2026-04-01T15:41:53.300343+00:00", "reason": "Research-ready model", "rollback_version": "v20260331T133247741172Z"}
+{"event": "register_candidate", "version_id": "v20260407T153148510182Z", "timestamp": "2026-04-07T15:31:48.571999+00:00", "previous_active": "v20260401T153500612094Z"}
+{"event": "register_candidate", "version_id": "v20260407T153716789737Z", "timestamp": "2026-04-07T15:37:16.859359+00:00", "previous_active": "v20260401T153500612094Z"}
+{"event": "register_candidate", "version_id": "v20260407T154359616126Z", "timestamp": "2026-04-07T15:43:59.689764+00:00", "previous_active": "v20260401T153500612094Z"}
+{"event": "promote_candidate", "version_id": "v20260407T154359616126Z", "timestamp": "2026-04-07T15:50:37.863220+00:00", "reason": "Research-ready model", "rollback_version": "v20260401T153500612094Z"}
+{"event": "register_candidate", "version_id": "v20260408T023743580710Z", "timestamp": "2026-04-08T02:37:43.664549+00:00", "previous_active": "v20260407T154359616126Z"}
+{"event": "promote_candidate", "version_id": "v20260408T023743580710Z", "timestamp": "2026-04-08T02:44:15.415176+00:00", "reason": "Research-ready model", "rollback_version": "v20260407T154359616126Z"}
+{"event": "register_candidate", "version_id": "v20260408T033005771135Z", "timestamp": "2026-04-08T03:30:05.839902+00:00", "previous_active": "v20260408T023743580710Z"}
+{"event": "promote_candidate", "version_id": "v20260408T033005771135Z", "timestamp": "2026-04-08T03:36:48.656343+00:00", "reason": "Research-ready model", "rollback_version": "v20260408T023743580710Z"}
+{"event": "register_candidate", "version_id": "v20260414T031713739796Z", "timestamp": "2026-04-14T03:17:13.841289+00:00", "previous_active": "v20260408T033005771135Z"}
+{"event": "promote_candidate", "version_id": "v20260414T031713739796Z", "timestamp": "2026-04-14T03:24:37.960792+00:00", "reason": "Research-ready model", "rollback_version": "v20260408T033005771135Z"}
+{"event": "register_candidate", "version_id": "v20260414T142722905846Z", "timestamp": "2026-04-14T14:27:23.033119+00:00", "previous_active": "v20260414T031713739796Z"}
+{"event": "promote_candidate", "version_id": "v20260414T142722905846Z", "timestamp": "2026-04-14T14:39:44.883344+00:00", "reason": "Research-ready model", "rollback_version": "v20260414T031713739796Z"}
+{"event": "register_candidate", "version_id": "v20260414T163453372176Z", "timestamp": "2026-04-14T16:34:53.376589+00:00", "previous_active": "v20260414T142722905846Z"}
+{"event": "promote_candidate", "version_id": "v20260414T163453372176Z", "timestamp": "2026-04-14T16:41:15.687851+00:00", "reason": "Anomaly sidecar integrated", "rollback_version": "v20260414T142722905846Z"}
+{"event": "register_candidate", "version_id": "v20260414T164605140350Z", "timestamp": "2026-04-14T16:46:05.237847+00:00", "previous_active": "v20260414T163453372176Z"}
+{"event": "promote_candidate", "version_id": "v20260414T164605140350Z", "timestamp": "2026-04-14T16:46:18.326375+00:00", "reason": "Anomaly sidecar integrated - WSL build", "rollback_version": "v20260414T163453372176Z"}
+{"event": "register_candidate", "version_id": "v20260415T150508517837Z", "timestamp": "2026-04-15T15:05:08.523961+00:00", "previous_active": "v20260414T164605140350Z"}
+{"event": "promote_candidate", "version_id": "v20260415T150508517837Z", "timestamp": "2026-04-15T15:40:31.490999+00:00", "reason": "Post-leakage-fix clean run", "rollback_version": "v20260414T164605140350Z"}
+{"event": "register_candidate", "version_id": "v20260417T034316212104Z", "timestamp": "2026-04-17T03:43:16.213050+00:00", "previous_active": "v20260415T150508517837Z"}
+{"event": "promote_candidate", "version_id": "v20260417T034316212104Z", "timestamp": "2026-04-17T03:54:49.473193+00:00", "reason": "Use latest Ubuntu clean run", "rollback_version": "v20260415T150508517837Z"}
+{"event": "register_candidate", "version_id": "v20260417T095618258902Z", "timestamp": "2026-04-17T09:56:18.261235+00:00", "previous_active": "v20260417T034316212104Z"}
+{"event": "promote_candidate", "version_id": "v20260417T095618258902Z", "timestamp": "2026-04-17T09:56:18.886929+00:00", "reason": "PaySim model validated with IEEE-CIS external validation", "rollback_version": "v20260417T034316212104Z"}
+{"event": "register_candidate", "version_id": "v20260417T101732307255Z", "timestamp": "2026-04-17T10:17:32.308341+00:00", "previous_active": "v20260417T095618258902Z"}
+{"event": "promote_candidate", "version_id": "v20260417T101732307255Z", "timestamp": "2026-04-17T10:17:32.883373+00:00", "reason": "Full PaySim production model", "rollback_version": "v20260417T095618258902Z"}
+{"event": "register_candidate", "version_id": "v20260420T053341630222Z", "timestamp": "2026-04-20T05:33:41.631700+00:00", "previous_active": "v20260417T101732307255Z"}
+{"event": "promote_candidate", "version_id": "v20260420T053341630222Z", "timestamp": "2026-04-20T05:34:03.554794+00:00", "reason": "Adaptive P95 anomaly threshold from validation scores", "rollback_version": "v20260417T101732307255Z"}
+{"event": "register_candidate", "version_id": "v20260420T143656173520Z", "timestamp": "2026-04-20T14:36:56.174916+00:00", "previous_active": "v20260420T053341630222Z"}
+{"event": "promote_candidate", "version_id": "v20260420T143656173520Z", "timestamp": "2026-04-20T14:39:18.759394+00:00", "reason": "Full PaySim production model; IEEE-CIS frozen validation documents domain shift", "rollback_version": "v20260420T053341630222Z"}
+{"event": "register_candidate", "version_id": "v20260424T065818461239Z", "timestamp": "2026-04-24T06:58:18.462257+00:00", "previous_active": "v20260420T143656173520Z"}
+{"event": "promote_candidate", "version_id": "v20260424T065818461239Z", "timestamp": "2026-04-24T07:00:46.857014+00:00", "reason": "Full PaySim production model; IEEE-CIS frozen validation documents domain shift", "rollback_version": "v20260420T143656173520Z"}
+{"event": "register_candidate", "version_id": "v20260424T074126106494Z", "timestamp": "2026-04-24T07:41:26.109575+00:00", "previous_active": "v20260424T065818461239Z"}
+{"event": "promote_candidate", "version_id": "v20260424T074126106494Z", "timestamp": "2026-04-24T07:43:58.050233+00:00", "reason": "Full PaySim production model; IEEE-CIS frozen validation documents domain shift", "rollback_version": "v20260424T065818461239Z"}

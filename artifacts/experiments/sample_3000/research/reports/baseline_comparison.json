@@ -1,0 +1,238 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_3000",
+  "random_state": 42,
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "split": {
+    "total_rows": 3000,
+    "train_rows": 2100,
+    "validation_rows": 450,
+    "test_rows": 450
+  },
+  "models": [
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "learning_rate": 0.08,
+        "max_iter": 220,
+        "max_depth": 6,
+        "min_samples_leaf": 80
+      },
+      "train_seconds": 0.1313,
+      "inference_ms_per_1k_rows": 6.0983,
+      "validation": {
+        "metrics": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0,
+        "confusion_matrix": {
+          "true_negative": 450,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 0
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 445,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 5
+        }
+      }
+    },
+    {
+      "model_name": "random_forest",
+      "family": "RandomForestClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "n_estimators": 120,
+        "max_depth": 12,
+        "min_samples_leaf": 40,
+        "class_weight": "balanced_subsample",
+        "imputer": "median"
+      },
+      "train_seconds": 0.1797,
+      "inference_ms_per_1k_rows": 52.1002,
+      "validation": {
+        "metrics": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0,
+        "confusion_matrix": {
+          "true_negative": 449,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 0
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 0.8888888888888888,
+          "precision": 1.0,
+          "recall": 0.8
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 445,
+          "false_positive": 0,
+          "false_negative": 1,
+          "true_positive": 4
+        }
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "n_estimators": 160,
+        "max_depth": 4,
+        "learning_rate": 0.08,
+        "subsample": 0.9,
+        "colsample_bytree": 0.9
+      },
+      "train_seconds": 0.5201,
+      "inference_ms_per_1k_rows": 4.4644,
+      "validation": {
+        "metrics": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0,
+        "confusion_matrix": {
+          "true_negative": 449,
+          "false_positive": 1,
+          "false_negative": 0,
+          "true_positive": 0
+        },
+        "ranking_score": 0.0
+      },
+      "test": {
+        "metrics": {
+          "auc": 1.0,
+          "f1": 0.8333333333333334,
+          "precision": 0.7142857142857143,
+          "recall": 1.0
+        },
+        "pr_auc": 1.0,
+        "confusion_matrix": {
+          "true_negative": 443,
+          "false_positive": 2,
+          "false_negative": 0,
+          "true_positive": 5
+        }
+      },
+      "search_mode": "candidate_grid"
+    },
+    {
+      "model_name": "logistic_regression",
+      "family": "LogisticRegression",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "scaler": "StandardScaler",
+        "solver": "lbfgs",
+        "class_weight": "balanced",
+        "max_iter": 500,
+        "tol": 0.0001
+      },
+      "train_seconds": 0.0124,
+      "inference_ms_per_1k_rows": 3.2675,
+      "validation": {
+        "metrics": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0,
+        "confusion_matrix": {
+          "true_negative": 441,
+          "false_positive": 9,
+          "false_negative": 0,
+          "true_positive": 0
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.9991011235955056,
+          "f1": 0.35714285714285715,
+          "precision": 0.21739130434782608,
+          "recall": 1.0
+        },
+        "pr_auc": 0.9428571428571428,
+        "confusion_matrix": {
+          "true_negative": 427,
+          "false_positive": 18,
+          "false_negative": 0,
+          "true_positive": 5
+        }
+      }
+    },
+    {
+      "model_name": "dummy_prior",
+      "family": "DummyClassifier",
+      "feature_count": 25,
+      "selected_threshold": 0.5,
+      "params": {
+        "strategy": "prior"
+      },
+      "train_seconds": 0.0005,
+      "inference_ms_per_1k_rows": 0.8584,
+      "validation": {
+        "metrics": {
+          "auc": 0.0,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.0,
+        "confusion_matrix": {
+          "true_negative": 450,
+          "false_positive": 0,
+          "false_negative": 0,
+          "true_positive": 0
+        }
+      },
+      "test": {
+        "metrics": {
+          "auc": 0.5,
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pr_auc": 0.011111111111111112,
+        "confusion_matrix": {
+          "true_negative": 445,
+          "false_positive": 0,
+          "false_negative": 5,
+          "true_positive": 0
+        }
+      }
+    }
+  ]
+}

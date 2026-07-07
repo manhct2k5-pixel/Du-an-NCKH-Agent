@@ -1,0 +1,196 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_3000",
+  "seeds": [
+    42
+  ],
+  "bootstrap_iterations": 10,
+  "best_baseline": {
+    "model_name": "hist_gradient_boosting",
+    "family": "HistGradientBoostingClassifier"
+  },
+  "multi_seed_runs": [
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 1.0,
+        "f1": 0.8333333333333334,
+        "precision": 0.7142857142857143,
+        "recall": 1.0,
+        "pr_auc": 1.0
+      }
+    },
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "random_state": 42,
+      "selected_threshold": 0.5,
+      "test_metrics": {
+        "auc": 1.0,
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "pr_auc": 1.0
+      }
+    }
+  ],
+  "multi_seed_summary": [
+    {
+      "model_name": "hist_gradient_boosting",
+      "family": "HistGradientBoostingClassifier",
+      "seeds": [
+        42
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "f1": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "precision": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "recall": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "pr_auc": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      }
+    },
+    {
+      "model_name": "xgboost",
+      "family": "XGBClassifier",
+      "seeds": [
+        42
+      ],
+      "test_metrics": {
+        "auc": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "f1": {
+          "mean": 0.833333,
+          "std": 0.0,
+          "min": 0.833333,
+          "max": 0.833333
+        },
+        "precision": {
+          "mean": 0.714286,
+          "std": 0.0,
+          "min": 0.714286,
+          "max": 0.714286
+        },
+        "recall": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "pr_auc": {
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0
+        }
+      }
+    }
+  ],
+  "confidence_intervals": {
+    "xgboost": {
+      "auc": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "f1": {
+        "mean": 0.754103,
+        "std": 0.121139,
+        "ci95_low": 0.516071,
+        "ci95_high": 0.897403
+      },
+      "precision": {
+        "mean": 0.619405,
+        "std": 0.146026,
+        "ci95_low": 0.348333,
+        "ci95_high": 0.814583
+      },
+      "recall": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      }
+    },
+    "hist_gradient_boosting": {
+      "auc": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "pr_auc": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "f1": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "precision": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      },
+      "recall": {
+        "mean": 1.0,
+        "std": 0.0,
+        "ci95_low": 1.0,
+        "ci95_high": 1.0
+      }
+    }
+  },
+  "mcnemar_test": {
+    "baseline_model": "hist_gradient_boosting",
+    "better_for_xgboost": 0,
+    "better_for_baseline": 2,
+    "discordant": 2,
+    "chi_square": 0.5,
+    "p_value": 0.4795
+  }
+}

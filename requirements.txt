@@ -1,0 +1,33 @@
+# Python >= 3.11 required (tested on 3.13.2)
+#
+# NOTE: redislite (Linux/macOS only) is needed only for the online simulation
+# commands (simulate, stream, serve). For train + research it is NOT required.
+# On Windows, use WSL or provide REDIS_URL env var pointing to a Redis instance.
+
+# Core ML
+numpy==2.2.5
+pandas==2.2.3
+scikit-learn==1.8.0
+xgboost==3.2.0
+shap==0.51.0
+scipy==1.17.1
+joblib==1.5.3
+
+# LangChain (heuristic agent -- no external LLM calls required)
+langchain==1.2.13
+langchain-core==1.2.23
+langchain-community==0.4.1
+langchain-classic==1.0.3
+
+# API & validation
+pydantic==2.12.5
+fastapi==0.135.3
+uvicorn==0.44.0
+jinja2==3.1.6
+
+# Redis client (required for online pipeline)
+redis==7.4.0
+redislite==6.2.912183  # Linux/macOS only; used by simulate/stream/serve when REDIS_URL is not set
+
+# Testing
+pytest==8.4.1

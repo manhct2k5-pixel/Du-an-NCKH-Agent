@@ -1,0 +1,48 @@
+{
+  "description": "Before vs. after data leakage fix comparison",
+  "sample_size": 150000,
+  "source": "paysim",
+  "leaky_pipeline": {
+    "val_metrics": {
+      "auc": 0.993937,
+      "pr_auc": 0.937955,
+      "f1": 0.967742,
+      "precision": 1.0,
+      "recall": 0.9375
+    },
+    "test_metrics": {
+      "auc": 0.999999,
+      "pr_auc": 0.999934,
+      "f1": 0.995327,
+      "precision": 0.990698,
+      "recall": 1.0
+    },
+    "selected_threshold": 0.7,
+    "train_seconds": 0.77
+  },
+  "fixed_pipeline": {
+    "val_metrics": {
+      "auc": 0.993932,
+      "pr_auc": 0.937955,
+      "f1": 0.967742,
+      "precision": 1.0,
+      "recall": 0.9375
+    },
+    "test_metrics": {
+      "auc": 0.999999,
+      "pr_auc": 0.999934,
+      "f1": 0.997658,
+      "precision": 0.995327,
+      "recall": 1.0
+    },
+    "selected_threshold": 0.7,
+    "train_seconds": 0.54
+  },
+  "delta_leaky_minus_fixed": {
+    "test_auc": 0.0,
+    "test_f1": -0.002331,
+    "test_pr_auc": 0.0,
+    "test_precision": -0.004629,
+    "test_recall": 0.0
+  }
+}

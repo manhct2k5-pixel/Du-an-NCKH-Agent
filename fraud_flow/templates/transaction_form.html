@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nhập Giao Dịch Fraud Flow</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/transaction_form.css?v={{ version }}">
+</head>
+<body>
+  <main class="shell">
+    {% include "_app_header.html" %}
+
+    <section class="hero-grid">
+      <article class="hero-card">
+        <div class="eyebrow">Realtime Transaction Demo <span class="pill tone-neutral">{{ profile.source|upper }}</span></div>
+        <h1>Nhập một giao dịch và xem pipeline phản ứng ngay trên màn hình.</h1>
+        <p class="subtext">Màn này dành cho live demo: gửi một transaction thật, nhận score, route, quyết định cuối cùng và explanation có thể kể lại ngay cho người xem.</p>
+
+        <div class="actions">
+          <a class="action primary" href="/dashboard/html">Mở dashboard</a>
+          <a class="action" href="/docs">Mở docs portal</a>
+          <a class="action" href="/">Về trang chủ</a>
+        </div>
+      </article>
+
+      <aside class="status-card">
+        <div class="section-label">Gateway Status</div>
+        <div class="status-stack">
+          <div class="status-row"><span>Active version</span><strong>{{ deployment.active_version or 'N/A' }}</strong></div>
+          <div class="status-row"><span>Avg latency</span><strong>{{ live_metrics.avg_ms }}</strong></div>
+          <div class="status-row"><span>Pending review</span><strong>{{ totals.pending_reviews }}</strong></div>
+          <div class="status-row"><span>Precision block</span><strong>{{ live_metrics.precision_block }}</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="demo-strip">
+      {% for item in product_story.demo_playbook %}
+      <article class="demo-step">
+        <span>{{ item.step }}</span>
+        <strong>{{ item.title }}</strong>
+        <p>{{ item.detail }}</p>
+      </article>
+      {% endfor %}
+    </section>
+
+    <section class="workspace">
+      <article class="panel form-panel">
+        <div class="section-label">Input Transaction</div>
+        <h2>Form demo PaySim</h2>
+
+        <form id="transaction-form" class="form-grid">
+          <label>
+            <span>Loại giao dịch</span>
+            <select name="tx_type">
+              <option value="TRANSFER" selected>TRANSFER</option>
+              <option value="CASH_OUT">CASH_OUT</option>
+            </select>
+          </label>
+          <label>
+            <span>Số tiền</span>
+            <input name="amount" type="number" step="0.01" value="{{ example.amount }}">
+          </label>
+          <label class="wide">
+            <span>Timestamp</span>
+            <input name="timestamp" type="text" value="{{ example.timestamp }}">
+          </label>
+          <label>
+            <span>Card ID</span>
+            <input name="card_id" type="text" value="{{ example.extras.card_id }}">
+          </label>
+          <label>
+            <span>Merchant ID</span>
+            <input name="merchant_id" type="text" value="{{ example.extras.merchant_id }}">
+          </label>
+          <label>
+            <span>Device ID</span>
+            <input name="device_id" type="text" value="{{ example.extras.device_id }}">
+          </label>
+          <label>
+            <span>Location ID</span>
+            <input name="location_id" type="text" value="{{ example.extras.location_id }}">
+          </label>
+          <label class="wide">
+            <span>IP Address</span>
+            <input name="ip_address" type="text" value="{{ example.extras.ip_address }}">
+          </label>
+          <label>
+            <span>Old Balance Org</span>
+            <input name="oldbalanceOrg" type="number" step="0.01" value="{{ example.oldbalanceOrg }}">
+          </label>
+          <label>
+            <span>New Balance Orig</span>
+            <input name="newbalanceOrig" type="number" step="0.01" value="{{ example.newbalanceOrig }}">
+          </label>
+          <label>
+            <span>Old Balance Dest</span>
+            <input name="oldbalanceDest" type="number" step="0.01" value="{{ example.oldbalanceDest }}">
+          </label>
+          <label>
+            <span>New Balance Dest</span>
+            <input name="newbalanceDest" type="number" step="0.01" value="{{ example.newbalanceDest }}">
+          </label>
+          <label>
+            <span>Nhãn thật</span>
+            <select name="is_fraud">
+              <option value="">Không điền</option>
+              <option value="0" selected>0 - bình thường</option>
+              <option value="1">1 - gian lận</option>
+            </select>
+          </label>
+          <div class="button-row wide">
+            <button type="button" id="reset-sample" class="ghost">Nạp lại mẫu</button>
+            <button type="submit" class="primary">Gửi giao dịch</button>
+          </div>
+        </form>
+      </article>
+
+      <aside class="side-stack">
+        <article class="panel preview-panel">
+          <div class="section-label">Payload Preview</div>
+          <h2>JSON gửi đi</h2>
+          <pre id="payload-preview">{{ example_json }}</pre>
+        </article>
+
+        <article class="panel tips-panel">
+          <div class="section-label">Demo Notes</div>
+          <h2>Nên nói gì khi thao tác</h2>
+          <ul>
+            <li>Điền xong là payload đổi ngay ở khung bên cạnh.</li>
+            <li>Submit xong sẽ có score, route và quyết định cuối cùng.</li>
+            <li>Nếu muốn kể sâu hơn, chuyển sang dashboard để xem reasoning trace.</li>
+          </ul>
+        </article>
+      </aside>
+    </section>
+
+    <section class="panel result-panel">
+      <div class="section-label">Model Response</div>
+      <h2>Kết quả trả về từ pipeline</h2>
+
+      <div id="result-empty" class="empty">Chưa có giao dịch nào được gửi. Hãy bấm <strong>Gửi giao dịch</strong> để xem mô hình phản ứng.</div>
+
+        <div id="result-shell" class="hidden">
+          <div class="decision-grid">
+          <article id="decision-card" class="decision-card tone-neutral">
+            <span class="decision-kicker">Final decision</span>
+            <strong id="summary-action">-</strong>
+            <p id="final-note">-</p>
+            <div class="decision-pills">
+              <span id="summary-route-pill" class="pill tone-neutral">Route -</span>
+              <span id="summary-raw-pill" class="pill tone-neutral">Raw -</span>
+            </div>
+          </article>
+
+          <div class="summary-grid">
+            <div class="summary-card">
+              <span class="label">Score</span>
+              <strong id="summary-score">-</strong>
+            </div>
+            <div class="summary-card">
+              <span class="label">Raw probability</span>
+              <strong id="summary-raw">-</strong>
+            </div>
+            <div class="summary-card">
+              <span class="label">Route</span>
+              <strong id="summary-route">-</strong>
+            </div>
+            <div class="summary-card">
+              <span class="label">Latency</span>
+              <strong id="summary-latency">-</strong>
+            </div>
+          </div>
+        </div>
+
+          <div class="result-grid">
+            <article class="result-card">
+              <div class="section-label">Human Explanation</div>
+              <p id="human-explanation">-</p>
+            </article>
+          <article class="result-card">
+            <div class="section-label">Analyst Report</div>
+            <p id="analyst-report">-</p>
+          </article>
+            <article class="result-card wide-card">
+              <div class="section-label">Dashboard Summary</div>
+              <p id="dashboard-summary">-</p>
+            </article>
+          </div>
+
+          <div class="result-actions">
+            <a id="open-dashboard-case" class="action primary" href="/dashboard/html">Mở case này trên dashboard</a>
+            <a class="action" href="/docs">Chứng minh API qua docs</a>
+          </div>
+        </div>
+      </section>
+  </main>
+  <script>
+    window.__PAYSIM_EXAMPLE__ = {{ example_json | safe }};
+  </script>
+  <script src="/static/js/transaction_form.js?v={{ version }}"></script>
+</body>
+</html>

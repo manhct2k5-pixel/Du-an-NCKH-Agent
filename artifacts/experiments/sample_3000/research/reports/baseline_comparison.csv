@@ -1,0 +1,6 @@
+model_name,family,selected_threshold,validation_auc,test_auc,test_pr_auc,test_f1,test_precision,test_recall,train_seconds
+hist_gradient_boosting,HistGradientBoostingClassifier,0.5,0.0,1.0,1.0,1.0,1.0,1.0,0.1313
+random_forest,RandomForestClassifier,0.5,0.0,1.0,1.0,0.8888888888888888,1.0,0.8,0.1797
+xgboost,XGBClassifier,0.5,0.0,1.0,1.0,0.8333333333333334,0.7142857142857143,1.0,0.5201
+logistic_regression,LogisticRegression,0.5,0.0,0.9991011235955056,0.9428571428571428,0.35714285714285715,0.21739130434782608,1.0,0.0124
+dummy_prior,DummyClassifier,0.5,0.0,0.5,0.011111111111111112,0.0,0.0,0.0,0.0005

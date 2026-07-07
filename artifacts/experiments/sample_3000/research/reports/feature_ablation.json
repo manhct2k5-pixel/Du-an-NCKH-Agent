@@ -1,0 +1,244 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_3000",
+  "random_state": 42,
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "fixed_xgboost_params": {
+    "n_estimators": 160,
+    "max_depth": 4,
+    "learning_rate": 0.08,
+    "subsample": 0.9,
+    "colsample_bytree": 0.9
+  },
+  "ablations": [
+    {
+      "name": "full_feature_set",
+      "feature_count": 25,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Full engineered feature set.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "validation_pr_auc": 0.0,
+      "test_metrics": {
+        "auc": 1.0,
+        "f1": 0.8333333333333334,
+        "precision": 0.7142857142857143,
+        "recall": 1.0
+      },
+      "test_pr_auc": 1.0,
+      "train_seconds": 0.0885,
+      "delta_vs_full": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "pr_auc": 0.0
+      }
+    },
+    {
+      "name": "no_online_behavior",
+      "feature_count": 17,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Removes velocity and historical risk lookup features.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "validation_pr_auc": 0.0,
+      "test_metrics": {
+        "auc": 1.0,
+        "f1": 0.7692307692307693,
+        "precision": 0.625,
+        "recall": 1.0
+      },
+      "test_pr_auc": 1.0,
+      "train_seconds": 0.0845,
+      "delta_vs_full": {
+        "auc": 0.0,
+        "f1": -0.064103,
+        "pr_auc": 0.0
+      }
+    },
+    {
+      "name": "no_llm_analysis",
+      "feature_count": 20,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate"
+      ],
+      "note": "Removes the LLM-style risk, review, and semantic category features.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "validation_pr_auc": 0.0,
+      "test_metrics": {
+        "auc": 0.9995505617977528,
+        "f1": 0.7692307692307693,
+        "precision": 0.625,
+        "recall": 1.0
+      },
+      "test_pr_auc": 0.9666666666666667,
+      "train_seconds": 0.0862,
+      "delta_vs_full": {
+        "auc": -0.000449,
+        "f1": -0.064103,
+        "pr_auc": -0.033333
+      }
+    },
+    {
+      "name": "no_contextual_aggregates",
+      "feature_count": 19,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Removes aggregate context and entity-hash context features.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "validation_pr_auc": 0.0,
+      "test_metrics": {
+        "auc": 0.9496629213483145,
+        "f1": 0.5714285714285714,
+        "precision": 1.0,
+        "recall": 0.4
+      },
+      "test_pr_auc": 0.6432142857142857,
+      "train_seconds": 0.0865,
+      "delta_vs_full": {
+        "auc": -0.050337,
+        "f1": -0.261905,
+        "pr_auc": -0.356786
+      }
+    },
+    {
+      "name": "transaction_core_only",
+      "feature_count": 6,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded"
+      ],
+      "note": "Keeps only direct transaction-side features.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "validation_pr_auc": 0.0,
+      "test_metrics": {
+        "auc": 0.913932584269663,
+        "f1": 0.5714285714285714,
+        "precision": 1.0,
+        "recall": 0.4
+      },
+      "test_pr_auc": 0.47926760563380283,
+      "train_seconds": 0.0805,
+      "delta_vs_full": {
+        "auc": -0.086067,
+        "f1": -0.261905,
+        "pr_auc": -0.520732
+      }
+    }
+  ]
+}

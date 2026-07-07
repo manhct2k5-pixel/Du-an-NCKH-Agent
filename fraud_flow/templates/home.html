@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cổng Gian Lận Fraud Flow</title>
+  <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/home.css?v={{ version }}">
+</head>
+<body>
+  <main class="shell">
+    {% include "_app_header.html" %}
+
+    <section class="hero-grid">
+      <article class="hero-card">
+        <div class="eyebrow">Fraud Flow Portal <span class="pill tone-neutral">{{ profile.source|upper }}</span></div>
+        <h1>Một cổng vào gọn, luồng quyết định rõ ràng.</h1>
+        <p class="subtitle">{{ dashboard_report.executive_summary }}</p>
+
+        <div class="hero-actions">
+          <a class="action primary" href="/transaction/form">Mở transaction form</a>
+          <a class="action" href="/dashboard/html">Mở dashboard</a>
+          <a class="action" href="/docs">Mở docs portal</a>
+        </div>
+
+      </article>
+
+      <aside class="status-card">
+        <div class="section-label">Control Snapshot</div>
+        <div class="status-stack">
+          <div class="status-row">
+            <span>Source</span>
+            <strong>{{ profile.source|upper }}</strong>
+          </div>
+          <div class="status-row">
+            <span>Threshold chọn</span>
+            <strong>{{ profile.selected_threshold }}</strong>
+          </div>
+          <div class="status-row">
+            <span>Precision block</span>
+            <strong>{{ live_metrics.precision_block }}</strong>
+          </div>
+          <div class="status-row">
+            <span>Recall block</span>
+            <strong>{{ live_metrics.recall_block }}</strong>
+          </div>
+          <div class="status-row">
+            <span>F1 block</span>
+            <strong>{{ live_metrics.f1_block }}</strong>
+          </div>
+          <div class="status-row">
+            <span>P95 latency</span>
+            <strong>{{ live_metrics.p95_ms }}</strong>
+          </div>
+        </div>
+
+        <div class="status-note">
+          <strong>Flow hiện tại</strong>
+          <p>Transaction đi qua model để lấy score, sau đó route thành approve, review queue hoặc block. Dashboard dùng để nhìn cả case spotlight lẫn backlog analyst phải xử lý.</p>
+        </div>
+      </aside>
+    </section>
+
+  </main>
+</body>
+</html>

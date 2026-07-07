@@ -1,0 +1,113 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "sample_20000",
+  "selected_threshold": 0.5,
+  "routing_calibration": {
+    "low_quantile": 0.85,
+    "high_quantile": 0.98,
+    "low_quantile_score": 0.00015908063505776227,
+    "high_quantile_score": 0.0010639994870871305,
+    "raw_probability_summary": {
+      "min": 1.23702568544104e-06,
+      "max": 0.9999250173568726,
+      "mean": 0.001768294139765203,
+      "std": 0.03753276169300079,
+      "p50": 3.489576556603424e-05,
+      "p90": 0.00021804201242048293,
+      "p95": 0.00043708443990908563,
+      "p99": 0.0019318704726174474
+    },
+    "operational_score_summary": {
+      "min": 0.002333,
+      "max": 0.999,
+      "mean": 0.125320853,
+      "std": 0.15521266715533472,
+      "p50": 0.065808,
+      "p90": 0.3260625,
+      "p95": 0.42288539999999936,
+      "p99": 0.70026025
+    },
+    "validation_route_share": {
+      "low": 0.85,
+      "medium": 0.148667,
+      "high": 0.001333
+    }
+  },
+  "medium_case_count": 360,
+  "policies": [
+    {
+      "policy_name": "score_threshold_block",
+      "note": "Binary threshold baseline with no routing and no manual review state.",
+      "approve_count": 2972,
+      "review_count": 0,
+      "block_count": 28,
+      "approve_rate": 0.990667,
+      "review_rate": 0.0,
+      "block_rate": 0.009333,
+      "block_precision": 0.9642857142857143,
+      "block_recall": 0.9642857142857143,
+      "block_f1": 0.9642857142857143,
+      "fraud_review_rate": 0.0,
+      "review_fraud_share": 0.0,
+      "false_positive_block_rate": 0.000336,
+      "medium_case_count": 360,
+      "medium_case_share": 0.12
+    },
+    {
+      "policy_name": "route_without_agent",
+      "note": "Original routing but every medium case is held for human review.",
+      "approve_count": 2612,
+      "review_count": 360,
+      "block_count": 28,
+      "approve_rate": 0.870667,
+      "review_rate": 0.12,
+      "block_rate": 0.009333,
+      "block_precision": 0.9642857142857143,
+      "block_recall": 0.9642857142857143,
+      "block_f1": 0.9642857142857143,
+      "fraud_review_rate": 0.035714,
+      "review_fraud_share": 0.002778,
+      "false_positive_block_rate": 0.000336,
+      "medium_case_count": 360,
+      "medium_case_share": 0.12
+    },
+    {
+      "policy_name": "route_medium_auto_approve",
+      "note": "Routing with the medium band auto-approved to show the risk of removing investigation.",
+      "approve_count": 2972,
+      "review_count": 0,
+      "block_count": 28,
+      "approve_rate": 0.990667,
+      "review_rate": 0.0,
+      "block_rate": 0.009333,
+      "block_precision": 0.9642857142857143,
+      "block_recall": 0.9642857142857143,
+      "block_f1": 0.9642857142857143,
+      "fraud_review_rate": 0.0,
+      "review_fraud_share": 0.0,
+      "false_positive_block_rate": 0.000336,
+      "medium_case_count": 360,
+      "medium_case_share": 0.12
+    },
+    {
+      "policy_name": "route_with_medium_agent",
+      "note": "Routing with the offline replay of the current investigator logic on medium cases.",
+      "approve_count": 2789,
+      "review_count": 182,
+      "block_count": 29,
+      "approve_rate": 0.929667,
+      "review_rate": 0.060667,
+      "block_rate": 0.009667,
+      "block_precision": 0.9310344827586207,
+      "block_recall": 0.9642857142857143,
+      "block_f1": 0.9473684210526315,
+      "fraud_review_rate": 0.035714,
+      "review_fraud_share": 0.005495,
+      "false_positive_block_rate": 0.000673,
+      "medium_case_count": 360,
+      "medium_case_share": 0.12
+    }
+  ]
+}

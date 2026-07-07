@@ -1,0 +1,3 @@
+model_name,family,validation_mode,selected_threshold,test_auc,test_pr_auc,test_f1,test_precision,test_recall
+xgboost_ieee_retrained,XGBClassifier,ieee_native_retrained,0.7,0.8415061172159675,0.32623864397226787,0.33284407813029243,0.25528229996536195,0.47810574116120663
+xgboost_frozen_paysim,XGBClassifier,frozen_model_external_validation,0.5,0.6285168244881104,0.05315292936646154,0.020140247879973906,0.06390685640362224,0.011953733726951556

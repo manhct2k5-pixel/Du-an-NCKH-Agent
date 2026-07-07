@@ -1,0 +1,244 @@
+{
+  "source": "paysim",
+  "data_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "identity_data_path": null,
+  "artifact_scope": "production",
+  "random_state": 42,
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "fixed_xgboost_params": {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85
+  },
+  "ablations": [
+    {
+      "name": "full_feature_set",
+      "feature_count": 25,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Full engineered feature set.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.9994133545353906,
+        "f1": 0.96,
+        "precision": 0.967741935483871,
+        "recall": 0.9523809523809523
+      },
+      "validation_pr_auc": 0.961260409954726,
+      "test_metrics": {
+        "auc": 0.9983827150776428,
+        "f1": 0.993103448275862,
+        "precision": 0.9893129770992366,
+        "recall": 0.9969230769230769
+      },
+      "test_pr_auc": 0.9970017406400512,
+      "train_seconds": 2.0363,
+      "delta_vs_full": {
+        "auc": 0.0,
+        "f1": 0.0,
+        "pr_auc": 0.0
+      }
+    },
+    {
+      "name": "no_online_behavior",
+      "feature_count": 17,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Removes velocity and historical risk lookup features.",
+      "selected_threshold": 0.65,
+      "validation_metrics": {
+        "auc": 0.9994730543385538,
+        "f1": 0.9375,
+        "precision": 0.9230769230769231,
+        "recall": 0.9523809523809523
+      },
+      "validation_pr_auc": 0.9661858157666408,
+      "test_metrics": {
+        "auc": 0.9984086559544827,
+        "f1": 0.9899923017705927,
+        "precision": 0.9907550077041603,
+        "recall": 0.9892307692307692
+      },
+      "test_pr_auc": 0.9967407558963038,
+      "train_seconds": 1.7446,
+      "delta_vs_full": {
+        "auc": 2.6e-05,
+        "f1": -0.003111,
+        "pr_auc": -0.000261
+      }
+    },
+    {
+      "name": "no_llm_analysis",
+      "feature_count": 20,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "balance_diff",
+        "amount_ratio",
+        "org_balance_delta_ratio",
+        "hour_of_day",
+        "is_night_tx",
+        "recipient_new_flag",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate"
+      ],
+      "note": "Removes the LLM-style risk, review, and semantic category features.",
+      "selected_threshold": 0.5,
+      "validation_metrics": {
+        "auc": 0.99726669224901,
+        "f1": 0.8391608391608392,
+        "precision": 0.75,
+        "recall": 0.9523809523809523
+      },
+      "validation_pr_auc": 0.9206890889659554,
+      "test_metrics": {
+        "auc": 0.9986469589466227,
+        "f1": 0.9704321455648218,
+        "precision": 0.9566517189835575,
+        "recall": 0.9846153846153847
+      },
+      "test_pr_auc": 0.9952047809970387,
+      "train_seconds": 1.9358,
+      "delta_vs_full": {
+        "auc": 0.000264,
+        "f1": -0.022671,
+        "pr_auc": -0.001797
+      }
+    },
+    {
+      "name": "no_contextual_aggregates",
+      "feature_count": 19,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded",
+        "tx_count_24h",
+        "avg_amount_7d",
+        "device_tx_count_24h",
+        "location_tx_count_24h",
+        "merchant_tx_count_24h",
+        "location_fraud_rate",
+        "ip_fraud_rate",
+        "merchant_fraud_rate",
+        "llm_risk_score",
+        "llm_reason_count",
+        "llm_high_risk_flag",
+        "llm_review_flag",
+        "llm_category_hash"
+      ],
+      "note": "Removes aggregate context and entity-hash context features.",
+      "selected_threshold": 0.7,
+      "validation_metrics": {
+        "auc": 0.9913201777512752,
+        "f1": 0.4392523364485981,
+        "precision": 0.31125827814569534,
+        "recall": 0.746031746031746
+      },
+      "validation_pr_auc": 0.7400000093668835,
+      "test_metrics": {
+        "auc": 0.996902297234997,
+        "f1": 0.8530805687203792,
+        "precision": 0.8766233766233766,
+        "recall": 0.8307692307692308
+      },
+      "test_pr_auc": 0.9200482675822834,
+      "train_seconds": 1.9434,
+      "delta_vs_full": {
+        "auc": -0.00148,
+        "f1": -0.140023,
+        "pr_auc": -0.076953
+      }
+    },
+    {
+      "name": "transaction_core_only",
+      "feature_count": 6,
+      "feature_columns": [
+        "amount_log1p",
+        "oldbalanceOrg",
+        "newbalanceOrig",
+        "oldbalanceDest",
+        "newbalanceDest",
+        "type_encoded"
+      ],
+      "note": "Keeps only direct transaction-side features.",
+      "selected_threshold": 0.7,
+      "validation_metrics": {
+        "auc": 0.9968712241887498,
+        "f1": 0.33540372670807456,
+        "precision": 0.2084942084942085,
+        "recall": 0.8571428571428571
+      },
+      "validation_pr_auc": 0.7433411657370148,
+      "test_metrics": {
+        "auc": 0.9972326920265819,
+        "f1": 0.8117977528089888,
+        "precision": 0.7467700258397932,
+        "recall": 0.8892307692307693
+      },
+      "test_pr_auc": 0.9296777640918964,
+      "train_seconds": 1.3678,
+      "delta_vs_full": {
+        "auc": -0.00115,
+        "f1": -0.181306,
+        "pr_auc": -0.067324
+      }
+    }
+  ]
+}

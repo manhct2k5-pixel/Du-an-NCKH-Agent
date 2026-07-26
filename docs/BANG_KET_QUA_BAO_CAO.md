@@ -84,10 +84,11 @@ Confusion matrix test:
 
 | Model | Mode | Test AUC | PR-AUC | F1 | Precision | Recall |
 |---|---|---:|---:|---:|---:|---:|
+| XGBoost IEEE optimized | Native optimized, 328 IEEE features | 0.906399 | 0.523571 | 0.504229 | 0.582166 | 0.444697 |
 | XGBoost train lại trên IEEE-CIS | Native, 42 IEEE features | 0.841506 | 0.326239 | 0.332844 | 0.255282 | 0.478106 |
 | Frozen PaySim XGBoost | Frozen, 25 PaySim features aligned | 0.628517 | 0.053153 | 0.020140 | 0.063907 | 0.011954 |
 
-Ghi chú để viết báo cáo: frozen PaySim AUC `0.6285` trên IEEE-CIS là bằng chứng domain shift/schema shift, không phải bằng chứng tổng quát hóa trực tiếp.
+Ghi chú để viết báo cáo: frozen PaySim AUC `0.6285` trên IEEE-CIS là bằng chứng domain shift/schema shift, không phải bằng chứng tổng quát hóa trực tiếp. Cấu hình IEEE optimized dùng thêm `V1`-`V339`, interaction features, train-only frequency encoding và validation PR-curve threshold tuning; ablation cho thấy bỏ target encoding giúp giảm overfitting trên split thời gian.
 
 ---
 
@@ -98,8 +99,9 @@ Ghi chú để viết báo cáo: frozen PaySim AUC `0.6285` trên IEEE-CIS là b
 | Frozen PaySim XGBoost | Không adapt | 25 PaySim-aligned | 590,540 | 0.628517 | 0.053153 | 0.020140 | 0.063907 | 0.011954 |
 | Transfer-adapted XGBoost | Adapt 10% IEEE, test 90% | 25 PaySim-aligned | 531,486 | 0.677369 | 0.082577 | 0.189437 | 0.124906 | 0.391919 |
 | IEEE-native XGBoost | Train lại trên IEEE | 42 IEEE-native | 88,581 | 0.841506 | 0.326239 | 0.332844 | 0.255282 | 0.478106 |
+| IEEE optimized XGBoost | Train lại trên IEEE | 328 IEEE-native optimized | 88,581 | 0.906399 | 0.523571 | 0.504229 | 0.582166 | 0.444697 |
 
-Ghi chú: transfer learning cải thiện AUC so với frozen PaySim (`0.6285` → `0.6774`) nhưng vẫn thấp hơn train native (`0.8415`).
+Ghi chú: transfer learning cải thiện AUC so với frozen PaySim (`0.6285` → `0.6774`) nhưng vẫn thấp hơn train native (`0.8415`). Khi tối ưu riêng cho IEEE-CIS, F1 tăng từ `0.3328` lên `0.5042`, Precision tăng từ `0.2553` lên `0.5822`, và AUC tăng từ `0.8415` lên `0.9064`.
 
 ---
 
@@ -146,4 +148,4 @@ Ghi chú: transfer learning cải thiện AUC so với frozen PaySim (`0.6285` �
 
 ## 10. Đoạn diễn giải ngắn
 
-Trên tập holdout test PaySim gồm 69,060 giao dịch, XGBoost đạt AUC `0.998383`, PR-AUC `0.997002`, F1 `0.993103`, Precision `0.989313` và Recall `0.996923`. Research suite cho thấy HistGradientBoosting là baseline offline mạnh nhất, nhưng XGBoost được giữ làm model triển khai vì phù hợp với SHAP explanation và pipeline vận hành hiện tại. External validation trên IEEE-CIS cho thấy frozen PaySim model đạt AUC `0.628517`, thấp hơn IEEE-native retrained benchmark `0.841506`. Transfer learning với 10% IEEE-CIS cải thiện AUC lên `0.677369`, nên kết quả IEEE-CIS cần được trình bày như bằng chứng domain shift và hướng giảm domain shift một phần, không phải tổng quát hóa trực tiếp.
+Trên tập holdout test PaySim gồm 69,060 giao dịch, XGBoost đạt AUC `0.998383`, PR-AUC `0.997002`, F1 `0.993103`, Precision `0.989313` và Recall `0.996923`. Research suite cho thấy HistGradientBoosting là baseline offline mạnh nhất, nhưng XGBoost được giữ làm model triển khai vì phù hợp với SHAP explanation và pipeline vận hành hiện tại. External validation trên IEEE-CIS cho thấy frozen PaySim model đạt AUC `0.628517`, thấp hơn IEEE-native retrained benchmark `0.841506`. Transfer learning với 10% IEEE-CIS cải thiện AUC lên `0.677369`, nên kết quả IEEE-CIS cần được trình bày như bằng chứng domain shift và hướng giảm domain shift một phần, không phải tổng quát hóa trực tiếp. Cấu hình IEEE optimized dùng 328 feature native đạt F1 `0.504229`, Precision `0.582166`, PR-AUC `0.523571` và AUC `0.906399`, cải thiện đáng kể so với bản IEEE-native 42 feature.

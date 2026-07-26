@@ -309,15 +309,29 @@ def build_evaluation_markdown(report: dict[str, object]) -> str:
 def find_best_threshold(y_true: pd.Series, proba: np.ndarray) -> tuple[float, dict[str, float]]:
     best_threshold = 0.5
     best_metrics = classification_metrics(y_true, proba, threshold=best_threshold)
-    best_f1 = best_metrics["f1"]
+    if len(set(y_true)) < 2:
+        return best_threshold, best_metrics
 
-    for threshold in APP_CONFIG.training.threshold_grid:
-        metrics = classification_metrics(y_true, proba, threshold=threshold)
-        if metrics["f1"] > best_f1:
-            best_threshold = threshold
-            best_metrics = metrics
-            best_f1 = metrics["f1"]
+    positive_count = int((y_true == 1).sum())
+    if positive_count < 200:
+        best_f1 = best_metrics["f1"]
+        for threshold in APP_CONFIG.training.threshold_grid:
+            metrics = classification_metrics(y_true, proba, threshold=threshold)
+            if metrics["f1"] > best_f1:
+                best_threshold = threshold
+                best_metrics = metrics
+                best_f1 = metrics["f1"]
+        return best_threshold, best_metrics
 
+    precision, recall, thresholds = precision_recall_curve(y_true, proba)
+    if len(thresholds) == 0:
+        return best_threshold, best_metrics
+
+    # precision/recall has one extra point without a corresponding threshold.
+    f1_scores = (2 * precision[:-1] * recall[:-1]) / np.maximum(precision[:-1] + recall[:-1], 1e-12)
+    best_idx = int(np.nanargmax(f1_scores))
+    best_threshold = float(thresholds[best_idx])
+    best_metrics = classification_metrics(y_true, proba, threshold=best_threshold)
     return best_threshold, best_metrics
 
 

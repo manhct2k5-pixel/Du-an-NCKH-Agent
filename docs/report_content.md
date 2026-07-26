@@ -144,6 +144,42 @@ bash run.sh
 
 **Phát hiện:** Contextual aggregate features (balance deltas, amount ratios) là nhóm quan trọng nhất. LLM-style features tăng F1 thêm ~2.3%. Velocity features tăng F1 nhỏ (~0.3%) nhưng cần thiết cho real-time risk awareness.
 
+### 4.3 IEEE-CIS optimized benchmark
+
+Để cải thiện kết quả trên IEEE-CIS, nhóm bổ sung một benchmark riêng cho IEEE-CIS thay vì chỉ dùng 42 đặc trưng ban đầu. Cấu hình mới đọc `train_transaction.csv` và `train_identity.csv`, khai thác thêm nhóm `V1` đến `V339`, tạo đặc trưng thời gian, missingness, email/device/card interaction, sau đó dùng train-only frequency encoding cho categorical features. Thử nghiệm ablation cho thấy target encoding làm mô hình quá khớp hơn trên split thời gian, nên cấu hình cuối loại bỏ nhóm target-encoded features. Dữ liệu vẫn được chia theo thời gian 70/15/15.
+
+Artifact: `artifacts/reports/ieee_optimized_report.json`, `artifacts/reports/ieee_optimized_ablation.json`, `artifacts/reports/ieee_optimized_robustness.json`, `artifacts/reports/ieee_optimized_sidecar.json` và các biểu đồ `artifacts/reports/plots/ieee_optimized_*.png`.
+
+> **Chạy để xác nhận:**
+> ```bash
+> .venv/bin/python scripts/ieee_cis_optimized_benchmark.py
+> ```
+
+| Model | Feature count | Accuracy | AUC | PR-AUC | F1 | Precision | Recall |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| IEEE-native XGBoost cũ | 42 | 0.9333 | 0.8415 | 0.3262 | 0.3328 | 0.2553 | 0.4781 |
+| XGBoost optimized candidate 1 | 328 | 0.9699 | 0.8989 | 0.5006 | 0.4904 | 0.5961 | 0.4165 |
+| XGBoost optimized candidate 2 | 328 | 0.9688 | 0.9042 | 0.5164 | 0.4961 | 0.5672 | 0.4408 |
+| **XGBoost optimized candidate 4** | 328 | **0.9696** | **0.9064** | **0.5236** | **0.5042** | 0.5822 | 0.4447 |
+| Soft-voting ensemble | 328 | 0.9695 | 0.9029 | 0.5129 | 0.4971 | 0.5835 | 0.4330 |
+
+Candidate 4 được chọn làm cấu hình chính vì có validation F1 và validation PR-AUC tốt nhất. So với IEEE-native 42 features, F1 tăng từ `0.3328` lên `0.5042`, Precision tăng từ `0.2553` lên `0.5822`, PR-AUC tăng từ `0.3262` lên `0.5236`, và AUC tăng từ `0.8415` lên `0.9064`.
+
+**Ablation IEEE-CIS optimized:**
+
+| Cấu hình | Feature count | AUC | PR-AUC | F1 | Precision | Recall | Delta F1 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Full optimized | 365 | 0.8479 | 0.4419 | 0.4703 | 0.6041 | 0.3850 | 0.0000 |
+| No V features | 145 | 0.8436 | 0.4060 | 0.4330 | 0.5593 | 0.3532 | -0.0373 |
+| Top 120 V features | 265 | 0.8502 | 0.4346 | 0.4525 | 0.5639 | 0.3779 | -0.0178 |
+| **No target encoding** | 328 | **0.9064** | **0.5236** | **0.5042** | 0.5822 | **0.4447** | **+0.0339** |
+| No frequency encoding | 328 | 0.8701 | 0.4739 | 0.4821 | 0.5633 | 0.4213 | +0.0118 |
+| No interaction encoding | 353 | 0.9004 | 0.5102 | 0.4883 | 0.5507 | 0.4385 | +0.0180 |
+
+**Robustness theo seed 42, 43, 44:** AUC `0.905934 ± 0.000595`, PR-AUC `0.522084 ± 0.001978`, F1 `0.499390 ± 0.003739`, Precision `0.557999 ± 0.024805`, Recall `0.452914 ± 0.011621`.
+
+**Anomaly sidecar trên IEEE-CIS:** sidecar bắt thêm fraud bị classifier bỏ sót nhưng làm Precision giảm mạnh nếu dùng OR-policy trực tiếp. Trên test, classifier-only F1 `0.5042`, OR-policy F1 `0.3026`, Recall tăng từ `0.4447` lên `0.5232` nhưng Precision giảm từ `0.5822` xuống `0.2128`. Vì vậy sidecar phù hợp làm tín hiệu đưa vào hàng đợi review, không nên dùng để auto-block toàn bộ.
+
 ---
 
 ## 5. Rủi ro / Blocker còn lại

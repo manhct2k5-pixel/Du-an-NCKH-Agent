@@ -1,0 +1,252 @@
+{
+  "source": "ieee",
+  "validation_mode": "ieee_optimized_feature_ablation",
+  "base_params": {
+    "n_estimators": 450,
+    "max_depth": 7,
+    "learning_rate": 0.035,
+    "subsample": 0.85,
+    "colsample_bytree": 0.7,
+    "min_child_weight": 8,
+    "reg_alpha": 0.25,
+    "reg_lambda": 3.0,
+    "scale_pos_weight": 16.460586050350802,
+    "scale_pos_weight_multiplier": 0.6
+  },
+  "ablations": [
+    {
+      "name": "full_optimized",
+      "description": "Full 365-feature optimized IEEE-CIS feature set.",
+      "feature_count": 365,
+      "selected_threshold": 0.8067664504051208,
+      "test": {
+        "metrics": {
+          "accuracy": 0.9698129395694336,
+          "auc": 0.8479321589994268,
+          "pr_auc": 0.4418889335688802,
+          "f1": 0.4702852614896989,
+          "precision": 0.6040712468193384,
+          "recall": 0.3850145961725592
+        },
+        "confusion_matrix": {
+          "true_negative": 84720,
+          "false_positive": 778,
+          "false_negative": 1896,
+          "true_positive": 1187
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.9729738883056186,
+          "auc": 0.8780193914262315,
+          "pr_auc": 0.5145098219486299,
+          "f1": 0.51985559566787,
+          "precision": 0.6666666666666666,
+          "recall": 0.4260355029585799
+        },
+        "confusion_matrix": {
+          "true_negative": 84891,
+          "false_positive": 648,
+          "false_negative": 1746,
+          "true_positive": 1296
+        }
+      },
+      "delta_f1_vs_full": 0.0
+    },
+    {
+      "name": "no_v_features",
+      "description": "Remove V1-V339 features.",
+      "feature_count": 145,
+      "selected_threshold": 0.8004316687583923,
+      "test": {
+        "metrics": {
+          "accuracy": 0.9678034793014303,
+          "auc": 0.8435774469635902,
+          "pr_auc": 0.4059957509507052,
+          "f1": 0.4330019880715706,
+          "precision": 0.559322033898305,
+          "recall": 0.3532273759325332
+        },
+        "confusion_matrix": {
+          "true_negative": 84640,
+          "false_positive": 858,
+          "false_negative": 1994,
+          "true_positive": 1089
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.9721836511215723,
+          "auc": 0.8747958886134725,
+          "pr_auc": 0.49454332382153054,
+          "f1": 0.5072,
+          "precision": 0.6475995914198162,
+          "recall": 0.4168310322156476
+        },
+        "confusion_matrix": {
+          "true_negative": 84849,
+          "false_positive": 690,
+          "false_negative": 1774,
+          "true_positive": 1268
+        }
+      },
+      "delta_f1_vs_full": -0.037283273418128315
+    },
+    {
+      "name": "top_120_v_features",
+      "description": "Keep only the strongest 120 V features.",
+      "feature_count": 265,
+      "selected_threshold": 0.80079185962677,
+      "test": {
+        "metrics": {
+          "accuracy": 0.968176019688195,
+          "auc": 0.8501703252896975,
+          "pr_auc": 0.43458790849366447,
+          "f1": 0.45251505146630416,
+          "precision": 0.563891577928364,
+          "recall": 0.3778786895880636
+        },
+        "confusion_matrix": {
+          "true_negative": 84597,
+          "false_positive": 901,
+          "false_negative": 1918,
+          "true_positive": 1165
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.9719578690689877,
+          "auc": 0.877921299364015,
+          "pr_auc": 0.5058232858167198,
+          "f1": 0.5119842829076621,
+          "precision": 0.63623046875,
+          "recall": 0.42833662064431294
+        },
+        "confusion_matrix": {
+          "true_negative": 84794,
+          "false_positive": 745,
+          "false_negative": 1739,
+          "true_positive": 1303
+        }
+      },
+      "delta_f1_vs_full": -0.01777021002339474
+    },
+    {
+      "name": "no_target_encoding",
+      "description": "Remove train-only target encoding columns.",
+      "feature_count": 328,
+      "selected_threshold": 0.7437319755554199,
+      "test": {
+        "metrics": {
+          "accuracy": 0.9695645793115906,
+          "auc": 0.9063988875252156,
+          "pr_auc": 0.5235711746773812,
+          "f1": 0.5042294961382862,
+          "precision": 0.5821656050955414,
+          "recall": 0.4446967239701589
+        },
+        "confusion_matrix": {
+          "true_negative": 84514,
+          "false_positive": 984,
+          "false_negative": 1712,
+          "true_positive": 1371
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.972996466510877,
+          "auc": 0.9192010232149818,
+          "pr_auc": 0.5634853150482295,
+          "f1": 0.5371517027863777,
+          "precision": 0.6528692380056444,
+          "recall": 0.45627876397107164
+        },
+        "confusion_matrix": {
+          "true_negative": 84801,
+          "false_positive": 738,
+          "false_negative": 1654,
+          "true_positive": 1388
+        }
+      },
+      "delta_f1_vs_full": 0.03394423464858726
+    },
+    {
+      "name": "no_frequency_encoding",
+      "description": "Remove frequency encoding columns.",
+      "feature_count": 328,
+      "selected_threshold": 0.7968992590904236,
+      "test": {
+        "metrics": {
+          "accuracy": 0.9684921145618135,
+          "auc": 0.8700519268661803,
+          "pr_auc": 0.4739167230371332,
+          "f1": 0.4820931527185007,
+          "precision": 0.5633130962705984,
+          "recall": 0.421342847875446
+        },
+        "confusion_matrix": {
+          "true_negative": 84491,
+          "false_positive": 1007,
+          "false_negative": 1784,
+          "true_positive": 1299
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.9715288831690769,
+          "auc": 0.8978311268393525,
+          "pr_auc": 0.5402166375464204,
+          "f1": 0.5289503175196115,
+          "precision": 0.6124567474048442,
+          "recall": 0.46548323471400394
+        },
+        "confusion_matrix": {
+          "true_negative": 84643,
+          "false_positive": 896,
+          "false_negative": 1626,
+          "true_positive": 1416
+        }
+      },
+      "delta_f1_vs_full": 0.01180789122880177
+    },
+    {
+      "name": "no_interaction_encoding",
+      "description": "Remove encoded interaction features.",
+      "feature_count": 353,
+      "selected_threshold": 0.7208124995231628,
+      "test": {
+        "metrics": {
+          "accuracy": 0.9680066831487565,
+          "auc": 0.9004338319173723,
+          "pr_auc": 0.5101989309446209,
+          "f1": 0.48826291079812206,
+          "precision": 0.5507128309572301,
+          "recall": 0.43853389555627637
+        },
+        "confusion_matrix": {
+          "true_negative": 84395,
+          "false_positive": 1103,
+          "false_negative": 1731,
+          "true_positive": 1352
+        }
+      },
+      "validation": {
+        "metrics": {
+          "accuracy": 0.9710208735507615,
+          "auc": 0.9120060802667116,
+          "pr_auc": 0.5457858091801492,
+          "f1": 0.5259464450600184,
+          "precision": 0.6000842815002108,
+          "recall": 0.46811308349769887
+        },
+        "confusion_matrix": {
+          "true_negative": 84590,
+          "false_positive": 949,
+          "false_negative": 1618,
+          "true_positive": 1424
+        }
+      },
+      "delta_f1_vs_full": 0.01797764930842316
+    }
+  ]
+}

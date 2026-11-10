@@ -1,0 +1,114 @@
+{
+  "provenance": {
+    "generated_at": "2026-10-10T14:42:29.119846+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "code_sha256": {
+      "fraud_flow/research.py": "b4084e86b8657df99a87be403e3dba3324d6b688c1c53c6c30a608bd1c686a6a",
+      "scripts/run_b8_ablation.py": "2c303d7f638a0f25c3572202e94437c277d32823ec613bfcd377a4b965a64c2b"
+    },
+    "random_state": 42,
+    "dataset_source": "paysim",
+    "dataset_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "dataset_sha256": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498",
+    "dataset_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060,
+    "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+    "leakage_control_protocol": "Chronological PaySim split after TRANSFER+CASH_OUT filtering. Training rows update activity and label-based historical risk state. Validation and test rows update activity sequentially only; their labels never update historical fraud-rate state before feature construction or policy decisions.",
+    "experiment_version": "b8-v2-dependency-aware-leakage-aligned"
+  },
+  "experiment_name": "deterministic offline medium-branch investigation replay",
+  "full_react_runtime_executed": false,
+  "classifier_predictions_changed": false,
+  "classifier_test_probability_sha256": "a1f3d7710a18ee615cac9ec944aa7351905ec33c2a7efadf6cdfdfd384361e13",
+  "same_held_out_test_set": true,
+  "low_high_route_actions_fixed": true,
+  "selected_classifier_threshold": 0.5,
+  "routing_calibration": {
+    "low_quantile": 0.85,
+    "high_quantile": 0.98,
+    "low_quantile_score": 8.068120223470032e-05,
+    "high_quantile_score": 0.0003051041276194155,
+    "raw_probability_summary": {
+      "min": 6.935265446372796e-07,
+      "max": 0.9999958276748657,
+      "mean": 0.000979467062279582,
+      "std": 0.029942866414785385,
+      "p50": 2.1707206542487256e-05,
+      "p90": 0.00011097176320618019,
+      "p95": 0.00017510111501906067,
+      "p99": 0.0004990110755898058
+    },
+    "operational_score_summary": {
+      "min": 0.002579,
+      "max": 0.999,
+      "mean": 0.1429459853458637,
+      "std": 0.15316397071122506,
+      "p50": 0.080715,
+      "p90": 0.353988,
+      "p95": 0.46828949999999986,
+      "p99": 0.70005842
+    },
+    "validation_route_share": {
+      "low": 0.849998,
+      "medium": 0.149104,
+      "high": 0.000898
+    }
+  },
+  "history_protocol": {
+    "training": "activity and labels warm-start FeatureStore",
+    "validation": "activity-only warm-start; validation labels are not consumed",
+    "test": "lookup and decision first, then activity-only update; test labels are never consumed"
+  },
+  "medium_case_count": 14181,
+  "policies": [
+    {
+      "policy": "all_medium_manual_review",
+      "approve_count": 54224,
+      "review_count": 14181,
+      "block_count": 655,
+      "approve_rate": 0.785172,
+      "review_rate": 0.205343,
+      "block_rate": 0.009485,
+      "block_precision": 0.9893129770992366,
+      "block_recall": 0.9969230769230769,
+      "block_f1": 0.993103448275862,
+      "fraud_review_count": 1,
+      "fraud_review_rate": 0.001538,
+      "review_fraud_share": 7.1e-05,
+      "false_positive_blocks": 7,
+      "false_positive_block_rate": 0.000102,
+      "medium_case_count": 14181,
+      "medium_case_share": 0.205343,
+      "manual_review_reduction_count": 0,
+      "manual_review_reduction_rate": 0.0,
+      "classifier_predictions_changed": false,
+      "note": "All medium-risk cases are sent to manual review; low/high actions remain fixed."
+    },
+    {
+      "policy": "deterministic_offline_investigation_replay",
+      "approve_count": 61994,
+      "review_count": 6383,
+      "block_count": 683,
+      "approve_rate": 0.897683,
+      "review_rate": 0.092427,
+      "block_rate": 0.00989,
+      "block_precision": 0.9487554904831625,
+      "block_recall": 0.9969230769230769,
+      "block_f1": 0.9722430607651913,
+      "fraud_review_count": 1,
+      "fraud_review_rate": 0.001538,
+      "review_fraud_share": 0.000157,
+      "false_positive_blocks": 35,
+      "false_positive_block_rate": 0.000512,
+      "medium_case_count": 14181,
+      "medium_case_share": 0.205343,
+      "manual_review_reduction_count": 7798,
+      "manual_review_reduction_rate": 0.549891,
+      "classifier_predictions_changed": false,
+      "note": "Deterministic offline investigator policy runs only on medium cases; this does not execute ReActInvestigator."
+    }
+  ]
+}

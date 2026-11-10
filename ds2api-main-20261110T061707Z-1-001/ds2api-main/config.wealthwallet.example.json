@@ -1,0 +1,44 @@
+{
+  "keys": [
+    "your-local-client-key"
+  ],
+  "api_keys": [
+    {
+      "key": "your-local-client-key",
+      "name": "WealthWallet AI Stylist",
+      "remark": "Used by backend-java StoreAssistantAiService"
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DeepSeek account for stylist",
+      "email": "your-deepseek-email@example.com",
+      "password": "your-deepseek-password"
+    }
+  ],
+  "model_aliases": {
+    "deepseek-v4-flash": "deepseek-v4-flash",
+    "deepseek-v4-pro": "deepseek-v4-pro",
+    "gpt-4o-mini": "deepseek-v4-flash"
+  },
+  "current_input_file": {
+    "enabled": false,
+    "min_chars": 0
+  },
+  "thinking_injection": {
+    "enabled": false,
+    "prompt": ""
+  },
+  "embeddings": {
+    "provider": "deterministic"
+  },
+  "runtime": {
+    "account_max_inflight": 2,
+    "account_max_queue": 0,
+    "global_max_inflight": 0,
+    "token_refresh_interval_hours": 6
+  },
+  "auto_delete": {
+    "mode": "none"
+  }
+}

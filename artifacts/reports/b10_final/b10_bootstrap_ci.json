@@ -1,0 +1,116 @@
+{
+  "schema_version": "b10-stratified-bootstrap-v1",
+  "B10_STATUS": "PASS",
+  "ci_interpretation": "nonparametric stratified percentile bootstrap confidence intervals conditional on the fixed fitted production model and the observed held-out test-set class composition",
+  "training_pipeline_uncertainty": false,
+  "prediction_provenance_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/reports/b10_final/b10_prediction_provenance.json",
+  "prediction_provenance_sha256": "cddd8be95511cab95cb03d36cdcdfb10d3af7dcea317ca74f3358cae4c2d0189",
+  "bootstrap": {
+    "type": "stratified nonparametric bootstrap",
+    "iterations": 2000,
+    "random_seed": 42,
+    "sampling": "within-class sampling with replacement",
+    "class_counts_per_replicate": {
+      "fraud_per_replicate": 650,
+      "legitimate_per_replicate": 68410,
+      "total_per_replicate": 69060
+    },
+    "probability_vector_regenerated_per_replicate": false,
+    "model_refit_inside_bootstrap": false,
+    "ci_method": "percentile bootstrap",
+    "ci_percentiles": [
+      2.5,
+      97.5
+    ],
+    "quantile_interpolation": "NumPy default linear method",
+    "normal_approximation": false
+  },
+  "metrics": {
+    "auc": {
+      "point_estimate": 0.9983827150776428,
+      "bootstrap_mean": 0.9983673266616442,
+      "bootstrap_population_sd": 0.0015420914359937498,
+      "ci95_low": 0.9952713267291107,
+      "ci95_high": 0.9999996176897215
+    },
+    "pr_auc": {
+      "point_estimate": 0.9970017406400512,
+      "bootstrap_mean": 0.9969620698564483,
+      "bootstrap_population_sd": 0.0020904236082865345,
+      "ci95_low": 0.992546899838475,
+      "ci95_high": 0.9999598708634057
+    },
+    "f1": {
+      "point_estimate": 0.993103448275862,
+      "bootstrap_mean": 0.993161284818031,
+      "bootstrap_population_sd": 0.0022958233801349814,
+      "ci95_low": 0.9885228961647714,
+      "ci95_high": 0.9969325153374233
+    },
+    "precision": {
+      "point_estimate": 0.9893129770992366,
+      "bootstrap_mean": 0.9894810269971376,
+      "bootstrap_population_sd": 0.003852824345287306,
+      "ci95_low": 0.9817351598173516,
+      "ci95_high": 0.9969135802469136
+    },
+    "recall": {
+      "point_estimate": 0.9969230769230769,
+      "bootstrap_mean": 0.9968784615384616,
+      "bootstrap_population_sd": 0.002206048168266072,
+      "ci95_low": 0.9923076923076923,
+      "ci95_high": 1.0
+    }
+  },
+  "interval_checks": {
+    "auc": {
+      "point_estimate_inside_ci": true,
+      "ci_inside_unit_interval": true
+    },
+    "pr_auc": {
+      "point_estimate_inside_ci": true,
+      "ci_inside_unit_interval": true
+    },
+    "f1": {
+      "point_estimate_inside_ci": true,
+      "ci_inside_unit_interval": true
+    },
+    "precision": {
+      "point_estimate_inside_ci": true,
+      "ci_inside_unit_interval": true
+    },
+    "recall": {
+      "point_estimate_inside_ci": true,
+      "ci_inside_unit_interval": true
+    }
+  },
+  "b9_across_seed_mean_population_sd": {
+    "auc": {
+      "mean": 0.9986486156244964,
+      "population_sd": 0.00018867515739557264
+    },
+    "pr_auc": {
+      "mean": 0.9972164003632829,
+      "population_sd": 0.00023828619201725262
+    },
+    "f1": {
+      "mean": 0.9913326303746312,
+      "population_sd": 0.0012897245272231583
+    },
+    "precision": {
+      "mean": 0.985807817066266,
+      "population_sd": 0.002552503327425876
+    },
+    "recall": {
+      "mean": 0.9969230769230769,
+      "population_sd": 0.0
+    }
+  },
+  "uncertainty_separation": {
+    "B9": "across-seed stochastic variation",
+    "B10": "held-out test-sample uncertainty conditional on one fitted model",
+    "pooled": false
+  },
+  "MCNEMAR_FINAL_USE": "NO",
+  "p_values_created": false
+}

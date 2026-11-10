@@ -2,6 +2,55 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
+import sys
+
+
+def configure_api_environment(env_file: str | None = None) -> None:
+    """Load local credentials only for explicitly requested API commands."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        raise SystemExit("Chưa cài SDK. Chạy: .venv/bin/python -m pip install -r requirements-openai.txt") from None
+
+    path = Path(env_file) if env_file else Path(__file__).resolve().parent / ".env"
+    if env_file and not path.is_file():
+        raise SystemExit("Không tìm thấy file cấu hình --env-file.")
+    load_dotenv(path, override=False)
+    from fraud_flow.llm_provider import provider_configuration
+
+    try:
+        configuration = provider_configuration()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from None
+    if not configuration["api_key_configured"]:
+        raise SystemExit(f"Chưa có {configuration['key_env']}. Điền key vào .env tại thư mục gốc dự án rồi chạy lại; không gửi key vào chat.")
+    if not configuration["dependency_installed"]:
+        raise SystemExit("Chưa cài SDK. Chạy: .venv/bin/python -m pip install -r requirements-openai.txt")
+
+
+def check_llm_api(env_file: str | None = None) -> None:
+    """Make one explicit API request with synthetic text, without runtime logs."""
+    configure_api_environment(env_file)
+    from langchain_core.output_parsers import StrOutputParser
+    from fraud_flow.llm_provider import build_decision_llm
+    from fraud_flow.llm_runtime import ModelCallRecorder, execution_summary
+
+    model = build_decision_llm()
+    recorder = ModelCallRecorder(model)
+    try:
+        response = StrOutputParser().invoke(model.invoke(
+            "Chỉ trả lời đúng chuỗi: API_OK", config={"callbacks": [recorder]},
+        ))
+    except Exception as exc:
+        print(json.dumps({"status": "error", "error_type": type(exc).__name__,
+                          "http_status": getattr(exc, "status_code", None),
+                          "execution": execution_summary({"api_check": recorder})}, ensure_ascii=False), file=sys.stderr)
+        raise SystemExit(1) from None
+    result = execution_summary({"api_check": recorder})
+    print(json.dumps({"status": "ok", "response": response, "execution": result}, ensure_ascii=False, indent=2))
+    if not result["external_response_observed"]:
+        raise SystemExit(1)
 
 
 def parse_seed_list(raw: str | None) -> list[int] | None:
@@ -123,6 +172,11 @@ def build_parser() -> argparse.ArgumentParser:
     serve_parser = subparsers.add_parser("serve", help="Run the local payment-gateway and review service.")
     serve_parser.add_argument("--host", type=str, default="127.0.0.1")
     serve_parser.add_argument("--port", type=int, default=8000)
+    serve_parser.add_argument("--llm-api", action="store_true", help="Load .env and require an API backend; never silently use heuristic.")
+    serve_parser.add_argument("--env-file", type=str, default=None, help="Optional .env path; used with --llm-api.")
+
+    llm_check_parser = subparsers.add_parser("llm-check", help="Make one real API request and report observed execution.")
+    llm_check_parser.add_argument("--env-file", type=str, default=None)
 
     all_parser = subparsers.add_parser("all", help="Train first, then simulate the live flow.")
     all_parser.add_argument("--sample-size", type=int, default=None, help="Optional row limit after filtering.")
@@ -147,6 +201,10 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.command == "llm-check":
+        check_llm_api(args.env_file)
+        return
 
     if args.command == "train":
         from fraud_flow.training import train_model
@@ -292,6 +350,10 @@ def main() -> None:
         return
 
     if args.command == "serve":
+        if args.env_file and not args.llm_api:
+            parser.error("--env-file cần đi cùng --llm-api.")
+        if args.llm_api:
+            configure_api_environment(args.env_file)
         import uvicorn
 
         from fraud_flow.service import create_app

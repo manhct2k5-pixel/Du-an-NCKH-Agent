@@ -1,0 +1,64 @@
+{
+  "experiment": "frozen_paysim_to_ieee",
+  "protocol": {
+    "production_model_loaded": true,
+    "frozen_model_retrained": false,
+    "alignment_method": "semantic_proxy_with_empirical_cdf_fitted_on_unlabeled_ieee_covariates",
+    "alignment_fit_scope": "full_ieee_covariates_without_labels",
+    "ieee_labels_available_during_feature_construction": false,
+    "test_used_for_model_selection": false,
+    "test_label_leakage": false,
+    "test_evaluations": 1
+  },
+  "threshold": 0.5,
+  "train_rows": 322275,
+  "validation_rows": 69059,
+  "test_rows": 590540,
+  "feature_count": 25,
+  "metrics": {
+    "auc": 0.6260447267256386,
+    "pr_auc": 0.05190944323221457,
+    "f1": 0.02011646373742721,
+    "precision": 0.06343091936312276,
+    "recall": 0.011953733726951556,
+    "confusion_matrix": {
+      "true_negative": 566230,
+      "false_positive": 3647,
+      "false_negative": 20416,
+      "true_positive": 247
+    }
+  },
+  "model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+  "provenance": {
+    "generated_at": "2026-10-11T12:39:52.187592+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "dataset_paths": {
+      "ieee_transaction": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_transaction.csv",
+      "ieee_identity": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_identity.csv",
+      "paysim_reference": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv"
+    },
+    "dataset_sha256": {
+      "ieee_transaction": "3a5c83ab6b3cc13dcabe5ffa9f522307fd5f7f7b6e6f6a60c32284ca6283d642",
+      "ieee_identity": "b63c725d8377be90a995268d97f347c17d456b95db45807adcf9f59cd603c37c",
+      "paysim_reference": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498"
+    },
+    "production_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+    "production_model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+    "code_sha256": {
+      "composite": "085e7c78d3114350bea597d0fbe50c0165228845c371cd14339920f91e0a76b3",
+      "files": {
+        "scripts/run_b12_final.py": "7d802b5d511c382165162b08d780fdd9ac016ea3ee1d74d7171b80a79050da50",
+        "scripts/ieee_cis_optimized_benchmark.py": "48e439e1b46ef58927dea93ad3f2840560acb157984b4095910aef7c8d57dbf7",
+        "fraud_flow/config.py": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1",
+        "fraud_flow/features.py": "83ddb3f634daed961a216ea1cac053aac38d2e6272e2db3fb5eba4fa385ad1a9",
+        "fraud_flow/feature_store.py": "f524dd2e43a5aec7a161af2e642de4478c556d07f2abbcaf7b19c31a6cb8bd5e",
+        "fraud_flow/llm_features.py": "307cc0984287998a81620544f8a04fc7274a6fbc1b35e9f22bf3a63a95baad92",
+        "fraud_flow/schema.py": "987448560d8851f0518374afa282ad787d7eed6c13daed9be3c19372c7d73cbc"
+      }
+    },
+    "exact_command": "'/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python' scripts/run_b12_final.py",
+    "artifact_scope": "b12_final_only",
+    "random_state": 42
+  }
+}

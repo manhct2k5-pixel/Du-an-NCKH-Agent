@@ -7,7 +7,7 @@ File này chỉ dùng để demo nhanh trước thầy, không giải thích dà
 Trong terminal:
 
 ```bash
-cd "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection"
+cd Du-an-NCKH-Agent
 source .venv/bin/activate
 python3 run_fraud_flow.py serve
 ```

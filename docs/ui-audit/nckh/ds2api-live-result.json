@@ -1,0 +1,77 @@
+{
+  "checked_at": "2026-11-10T06:49:52.288Z",
+  "live_request": true,
+  "isolated_transaction_runtime": true,
+  "model": "deepseek-v4-flash",
+  "route": "medium",
+  "score": 0.700115,
+  "raw_probability": 0.0006879878346808255,
+  "action": "review",
+  "end_to_end_latency_ms": 16942.181406000145,
+  "execution": {
+    "stages": {
+      "react": {
+        "backend": "ds2api",
+        "model": "deepseek-v4-flash",
+        "attempts": 5,
+        "successful_responses": 5,
+        "failures": 0
+      },
+      "decision": {
+        "backend": "ds2api",
+        "model": "deepseek-v4-flash",
+        "attempts": 1,
+        "successful_responses": 1,
+        "failures": 0
+      },
+      "retry": {
+        "backend": "ds2api",
+        "model": "deepseek-v4-flash",
+        "attempts": 0,
+        "successful_responses": 0,
+        "failures": 0
+      }
+    },
+    "external_responses": 6,
+    "heuristic_responses": 0,
+    "external_response_observed": true,
+    "providers_observed": [
+      "ds2api"
+    ],
+    "tools_executed": [
+      "get_card_history",
+      "check_ip_blacklist",
+      "verify_device_id",
+      "query_merchant_risk"
+    ],
+    "react_parser_errors": 0,
+    "confidence_kind": "model_reported_uncalibrated"
+  },
+  "explanation": "Giữ để xác minh. Điểm vận hành 0.700 thuộc nhánh trung bình; xác suất gốc XGBoost 0.0688%. Thiết bị chưa có giao dịch trong cửa sổ 24 giờ; công cụ thiết bị đề nghị xác minh bổ sung. Chốt xác minh sau điều tra để analyst kiểm tra thêm trước khi kết luận.",
+  "label": "ds2api · LLM qua API: đã nhận phản hồi trong giao dịch này.",
+  "checks": [
+    {
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    }
+  ],
+  "page_errors": [],
+  "checked_at_local": "2026-11-10T13:52:13.035030+07:00",
+  "connection_type": "DeepSeek Web through local DS2API, not the official paid API",
+  "smoke_test": {
+    "http_status": 200,
+    "response": "API_OK",
+    "sdk_backend": "ds2api"
+  }
+}

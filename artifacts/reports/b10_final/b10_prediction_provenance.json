@@ -1,0 +1,110 @@
+{
+  "schema_version": "b10-fixed-production-predictions-v1",
+  "generated_at": "2026-10-10T16:26:27.781587+00:00",
+  "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+  "git_dirty": true,
+  "dataset_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+  "dataset_sha256": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498",
+  "model_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+  "model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+  "metadata_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/model_metadata.json",
+  "metadata_sha256": "accf3619d88e9c60553d6909e86c75dcc1a2c34127e59e342e37574ffb54baf2",
+  "code_sha256": "c641d194c52e917ba138bf1cca316941f53095e2383e559840a27372c2f0c3cc",
+  "code_file_sha256": {
+    "scripts/run_b10_statistical_validation.py": "b32f2d0f5db7a627bdfb64cd67baa8882794989e96bdd5e85a272ae9ae293e8d",
+    "fraud_flow/training.py": "81dbb42e80ce1510dc4744aa7660f104ebfa8315d2510ff87cafc6643b5a9187",
+    "fraud_flow/config.py": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1",
+    "fraud_flow/features.py": "83ddb3f634daed961a216ea1cac053aac38d2e6272e2db3fb5eba4fa385ad1a9",
+    "fraud_flow/feature_store.py": "f524dd2e43a5aec7a161af2e642de4478c556d07f2abbcaf7b19c31a6cb8bd5e"
+  },
+  "y_test_sha256": "add42fbe72b39b9f021fa23341e99511d64e9f0687b22705345e1212a0f03578",
+  "y_test_hash_encoding": {
+    "dtype": "|i1",
+    "shape": [
+      69060
+    ],
+    "byte_order": "little-endian canonical array bytes in C order"
+  },
+  "test_probability_vector_sha256": "f946970c0269f6012b3d308d33d5703d5b39ddc50d11a6e3251b367c6948ddfe",
+  "test_probability_vector_hash_encoding": {
+    "dtype": "<f4",
+    "shape": [
+      69060
+    ],
+    "byte_order": "little-endian canonical array bytes in C order"
+  },
+  "test_rows": 69060,
+  "fraud_rows": 650,
+  "legitimate_rows": 68410,
+  "feature_count": 25,
+  "feature_columns": [
+    "amount_log1p",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "type_encoded",
+    "balance_diff",
+    "amount_ratio",
+    "org_balance_delta_ratio",
+    "hour_of_day",
+    "is_night_tx",
+    "recipient_new_flag",
+    "tx_count_24h",
+    "avg_amount_7d",
+    "device_tx_count_24h",
+    "location_tx_count_24h",
+    "merchant_tx_count_24h",
+    "location_fraud_rate",
+    "ip_fraud_rate",
+    "merchant_fraud_rate",
+    "llm_risk_score",
+    "llm_reason_count",
+    "llm_high_risk_flag",
+    "llm_review_flag",
+    "llm_category_hash"
+  ],
+  "threshold": 0.5,
+  "model_parameters": {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85,
+    "max_delta_step": 1,
+    "tree_method": "hist",
+    "scale_pos_weight": 750.2237762237762
+  },
+  "model_runtime": {
+    "objective": "binary:logistic",
+    "num_features": 25,
+    "num_boosted_rounds": 260
+  },
+  "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+  "shuffle": false,
+  "split": {
+    "total_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060,
+    "train_end": 322275,
+    "val_end": 391334
+  },
+  "leakage_control": "Training rows update historical activity and fraud-rate state. Validation/test rows use the state frozen after training and do not contribute labels during feature construction.",
+  "prediction_inference_calls": 1,
+  "test_probability_vector_fixed_before_bootstrap": true,
+  "production_metrics": {
+    "auc": 0.9983827150776428,
+    "pr_auc": 0.9970017406400512,
+    "f1": 0.993103448275862,
+    "precision": 0.9893129770992366,
+    "recall": 0.9969230769230769
+  },
+  "confusion_matrix": {
+    "TN": 68403,
+    "FP": 7,
+    "FN": 2,
+    "TP": 648
+  },
+  "production_metrics_reproduced": true
+}

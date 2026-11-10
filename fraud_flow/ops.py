@@ -9,7 +9,10 @@ from typing import Any
 import pandas as pd
 
 from .config import APP_CONFIG
+from .log_reader import LogChangedError, LogSnapshot, ReviewRow, log_snapshot
+from .report_paths import existing_report_path
 from .narratives import FEATURE_LABELS, REASON_LABELS, build_dashboard_report, build_transaction_narrative
+from .llm_runtime import execution_label
 from .web_ui import UI_VERSION, render_template
 
 
@@ -121,6 +124,8 @@ def _route_tone(route: str) -> str:
 
 
 def _review_priority_bucket(row: dict[str, Any]) -> int:
+    if isinstance(row, ReviewRow):
+        return row.summary["_priority"][0]
     prediction = row.get("prediction", {})
     route = str(prediction.get("route", ""))
     score = float(prediction.get("score", 0.0) or 0.0)
@@ -133,6 +138,8 @@ def _review_priority_bucket(row: dict[str, Any]) -> int:
 
 
 def _review_priority_key(row: dict[str, Any]) -> tuple[int, float, str, str]:
+    if isinstance(row, ReviewRow):
+        return row.summary["_priority"]
     prediction = row.get("prediction", {})
     event = row.get("event", {})
     return (
@@ -245,46 +252,13 @@ def _summarize_observation(observation: dict[str, Any]) -> str:
     return " | ".join(fallback) if fallback else "Tool chạy xong nhưng chưa có tín hiệu nổi bật để hiển thị."
 
 
-def _build_signal_lists(
-    prediction: dict[str, Any],
-    reason_labels: list[str],
-    evidence: list[str],
-) -> tuple[list[str], list[str]]:
-    strengths: list[str] = []
-    concerns: list[str] = []
-
-    for label in reason_labels[:2]:
-        concerns.append(f"Agent flag: {label}.")
-
-    for item in prediction.get("explanation", [])[:5]:
-        feature = _friendly_feature(str(item.get("feature", "unknown_feature")))
-        impact = float(item.get("impact", 0.0))
-        line = f"{feature} {'giảm' if impact < 0 else 'tăng'} score rủi ro ({impact:+.4f})."
-        if impact < 0 and len(strengths) < 3:
-            strengths.append(line)
-        elif impact > 0 and len(concerns) < 4:
-            concerns.append(line)
-
-    filtered_evidence = [item for item in evidence if not str(item).startswith("SHAP signal:")]
-    for item in filtered_evidence[:3]:
-        if len(concerns) >= 4:
-            break
-        concerns.append(item)
-
-    if not strengths:
-        strengths.append("Chưa có feature nào đẩy score rủi ro tăng mạnh trong top tín hiệu.")
-    if not concerns:
-        concerns.append("Chưa xuất hiện cờ cảnh báo nổi bật ngoài score tổng hợp.")
-    return strengths[:3], concerns[:3]
-
-
 def _build_workflow_nodes(row: dict[str, Any]) -> list[dict[str, str]]:
     event = row["event"]
     prediction = row["prediction"]
     route = prediction.get("route", "unknown")
-    final_action = row.get("final_action") or row.get("agent", {}).get("action", "review")
-    final_note = row.get("final_note") or row.get("agent", {}).get("reviewer_note", "")
-    structured = row.get("agent", {}).get("agent_output", {}).get("structured_output", {})
+    final_action = row.get("final_action") or (row.get("agent") or {}).get("action", "review")
+    final_note = row.get("final_note") or (row.get("agent") or {}).get("reviewer_note", "")
+    structured = (row.get("agent") or {}).get("agent_output", {}).get("structured_output", {})
     monitoring_flags = row.get("monitoring_flags", []) or []
 
     nodes = [
@@ -304,7 +278,7 @@ def _build_workflow_nodes(row: dict[str, Any]) -> list[dict[str, str]]:
         nodes.append(
             {
                 "title": "Agent Review",
-                "detail": structured.get("summary") or row["agent"].get("reviewer_note", "Đã gom evidence từ tools."),
+                "detail": execution_label(row["agent"]),
                 "state": "warning",
             }
         )
@@ -340,19 +314,19 @@ def _build_workflow_nodes(row: dict[str, Any]) -> list[dict[str, str]]:
 def _build_llm_trace(row: dict[str, Any], narrative: dict[str, str]) -> list[dict[str, str]]:
     prediction = row["prediction"]
     route = str(prediction.get("route", "unknown"))
-    final_action = row.get("final_action") or row.get("agent", {}).get("action", "review")
-    final_note = row.get("final_note") or row.get("agent", {}).get("reviewer_note", "")
+    final_action = row.get("final_action") or (row.get("agent") or {}).get("action", "review")
+    final_note = row.get("final_note") or (row.get("agent") or {}).get("reviewer_note", "")
     agent = row.get("agent") or {}
     structured = agent.get("agent_output", {}).get("structured_output", {})
     intermediate_steps = list(agent.get("intermediate_steps") or agent.get("agent_output", {}).get("intermediate_steps", []) or [])
     confidence = structured.get("confidence")
-    confidence_text = f"Confidence {float(confidence):.1%}" if confidence is not None else "Confidence N/A"
+    confidence_text = "Confidence tự đánh giá, chưa hiệu chuẩn; không phải xác suất gian lận" if confidence is not None else "Không có confidence"
 
     trace = [
         {
             "kind": "llm",
-            "label": "LLM THOUGHT",
-            "title": "Reasoning summary",
+            "label": "GIẢI THÍCH",
+            "title": execution_label(row.get("agent")),
             "body": narrative.get("human_readable_explanation", "Chưa có giải thích tự nhiên cho case này."),
             "meta": (
                 f"Score {float(prediction.get('score', 0.0)):.3f} | "
@@ -363,6 +337,10 @@ def _build_llm_trace(row: dict[str, Any], narrative: dict[str, str]) -> list[dic
     ]
 
     for step in intermediate_steps[:4]:
+        if step.get("tool") == "_Exception":
+            trace.append({"kind": "note", "label": "ĐỊNH DẠNG", "title": "Agent được yêu cầu sửa định dạng ReAct",
+                          "body": "Phản hồi chưa đúng định dạng; lượt này không phải truy vấn công cụ.", "meta": "Parser recovery"})
+            continue
         trace.append(
             {
                 "kind": "done",
@@ -373,7 +351,7 @@ def _build_llm_trace(row: dict[str, Any], narrative: dict[str, str]) -> list[dic
             }
         )
 
-    evidence = list(structured.get("evidence", []) or [])
+    evidence = [item["text"] for item in narrative.get("supporting_evidence", []) + narrative.get("mitigating_evidence", [])]
     if evidence:
         trace.append(
             {
@@ -402,8 +380,8 @@ def _adapt_queue_row(row: dict[str, Any]) -> dict[str, Any]:
         "event": row["event"],
         "lookup": {},
         "prediction": row["prediction"],
-        "final_action": row.get("agent", {}).get("action", "review"),
-        "final_note": row.get("agent", {}).get("reviewer_note", ""),
+        "final_action": (row.get("agent") or {}).get("action", "review"),
+        "final_note": (row.get("agent") or {}).get("reviewer_note", ""),
         "agent": row.get("agent"),
         "narrative": {
             "human_readable_explanation": row.get("human_readable_explanation", ""),
@@ -432,10 +410,14 @@ def _build_review_queue_cards(
     limit: int = DEFAULT_REVIEW_QUEUE_CARD_LIMIT,
 ) -> list[dict[str, Any]]:
     cards: list[dict[str, Any]] = []
-    for row in sorted(pending_reviews, key=_review_priority_key, reverse=True)[:limit]:
+    ordered = sorted(pending_reviews, key=_review_priority_key, reverse=True)
+    selected = next((row for row in ordered if row["event"]["tx_id"] == focus_tx_id), None)
+    if selected is not None:
+        ordered = [selected] + [row for row in ordered if row is not selected]
+    for row in ordered[:limit]:
         prediction = row.get("prediction", {})
         event = row.get("event", {})
-        action = row.get("agent", {}).get("action", "review")
+        action = (row.get("agent") or {}).get("action", "review")
         bucket = _review_priority_bucket(row)
         cards.append(
             {
@@ -503,6 +485,15 @@ def _find_focus_row_by_tx_id(
     if not focus_tx_id:
         return None
 
+    if isinstance(predictions, LogSnapshot):
+        row = predictions.find(focus_tx_id)
+        if row is not None:
+            return row
+        for row in reversed(pending_reviews):
+            if row["event"]["tx_id"] == focus_tx_id:
+                return _adapt_queue_row(row)
+        return None
+
     for row in reversed(predictions):
         if row["event"]["tx_id"] == focus_tx_id:
             return row
@@ -527,11 +518,17 @@ def _select_focus_row(
     if pending_reviews:
         target = max(pending_reviews, key=_review_priority_key)
         target_id = target["event"]["tx_id"]
+        if isinstance(predictions, LogSnapshot):
+            return predictions.find(target_id) or _adapt_queue_row(target)
         for row in reversed(predictions):
             if row["event"]["tx_id"] == target_id:
                 return row
         return _adapt_queue_row(target)
 
+    if isinstance(predictions, LogSnapshot):
+        if predictions.latest_agent is not None:
+            return predictions[predictions.latest_agent]
+        return predictions[-1] if predictions else None
     for row in reversed(predictions):
         if row.get("agent"):
             return row
@@ -675,9 +672,9 @@ def _build_focus_case(row: dict[str, Any] | None) -> dict[str, Any]:
     event = row["event"]
     prediction = row["prediction"]
     route = str(prediction.get("route", "unknown"))
-    final_action = row.get("final_action") or row.get("agent", {}).get("action", "review")
-    final_note = row.get("final_note") or row.get("agent", {}).get("reviewer_note", "")
-    narrative = row.get("narrative") or build_transaction_narrative(
+    final_action = row.get("final_action") or (row.get("agent") or {}).get("action", "review")
+    final_note = row.get("final_note") or (row.get("agent") or {}).get("reviewer_note", "")
+    narrative = build_transaction_narrative(
         event=event,
         lookup=row.get("lookup", {}),
         prediction=prediction,
@@ -685,10 +682,19 @@ def _build_focus_case(row: dict[str, Any] | None) -> dict[str, Any]:
         final_note=final_note,
         agent=row.get("agent"),
     )
-    structured = row.get("agent", {}).get("agent_output", {}).get("structured_output", {})
-    reason_labels = [_friendly_reason(code) for code in list(structured.get("reason_codes", []) or [])]
-    evidence = list(structured.get("evidence", []) or [])
-    key_strengths, key_concerns = _build_signal_lists(prediction, reason_labels, evidence)
+    structured = (row.get("agent") or {}).get("agent_output", {}).get("structured_output", {})
+    codes = list(narrative.get("reason_codes", []))
+    reason_labels = [_friendly_reason(code) for code in codes if code != "device_step_up" or "new_device" not in codes]
+    key_strengths = [item["text"] for item in narrative["mitigating_evidence"]]
+    key_concerns = [item["text"] for item in narrative["supporting_evidence"]]
+    for item in narrative["model_evidence"]:
+        text = f"SHAP: {item['label']} đóng góp {item['direction']} đầu ra mô hình ({item['impact']:+.4f})."
+        if item["impact"] < 0:
+            key_strengths.append(text)
+        elif item["impact"] > 0:
+            key_concerns.append(text)
+    key_strengths = key_strengths[:3] or ["Chưa có bằng chứng giảm lo ngại trong kết quả tra cứu."]
+    key_concerns = key_concerns[:3] or ["Chưa có tín hiệu bổ sung ngoài điểm mô hình."]
 
     return {
         "tx_id": event.get("tx_id", "N/A"),
@@ -723,7 +729,7 @@ def _build_focus_case(row: dict[str, Any] | None) -> dict[str, Any]:
         "key_concerns": key_concerns,
         "workflow_nodes": _build_workflow_nodes(row),
         "llm_trace": _build_llm_trace(row, narrative),
-        "llm_mode": "ReAct / agent reasoning trace" if row.get("agent") else "Auto decision trace",
+        "llm_mode": execution_label(row.get("agent")),
         "monitoring_flags": row.get("monitoring_flags", []) or [],
     }
 
@@ -768,7 +774,7 @@ def _format_latency(latency: dict[str, Any], key: str) -> str:
 
 
 def _prediction_row_for_dashboard(row: dict[str, Any]) -> dict[str, Any]:
-    narrative = row.get("narrative") or build_transaction_narrative(
+    narrative = build_transaction_narrative(
         event=row["event"],
         lookup=row.get("lookup", {}),
         prediction=row["prediction"],
@@ -831,18 +837,29 @@ def submit_manual_review(
 
 
 def build_dashboard_data(*, focus_tx_id: str | None = None, queue_limit: int | None = None) -> dict[str, Any]:
+    for attempt in range(3):
+        try:
+            return _build_dashboard_data(focus_tx_id=focus_tx_id, queue_limit=queue_limit)
+        except LogChangedError:
+            if attempt == 2:
+                raise
+
+
+def _build_dashboard_data(*, focus_tx_id: str | None = None, queue_limit: int | None = None) -> dict[str, Any]:
     training = _load_json(APP_CONFIG.outputs.training_report_path)
     simulation = _load_json(APP_CONFIG.outputs.simulation_report_path)
     deployment = _load_json(APP_CONFIG.outputs.deployment_state_path)
     active_metadata_path = Path(deployment["active_metadata_path"]) if deployment.get("active_metadata_path") else None
     active_metadata = _load_json(active_metadata_path)
 
-    predictions = load_jsonl(APP_CONFIG.outputs.prediction_log_path)
-    feedback = load_jsonl(APP_CONFIG.outputs.feedback_log_path)
-    pending_reviews = read_pending_reviews()
-    review_decisions = load_jsonl(APP_CONFIG.outputs.manual_review_decisions_path)
-    high_risk = load_jsonl(APP_CONFIG.outputs.high_risk_log_path)
-    drift_alerts = load_jsonl(APP_CONFIG.outputs.drift_alert_log_path)[-10:]
+    predictions = log_snapshot(APP_CONFIG.outputs.prediction_log_path, "predictions")
+    feedback = log_snapshot(APP_CONFIG.outputs.feedback_log_path)
+    review_decisions = log_snapshot(APP_CONFIG.outputs.manual_review_decisions_path)[:]
+    decided_ids = {row["tx_id"] for row in review_decisions}
+    queued = log_snapshot(APP_CONFIG.outputs.manual_review_queue_path, "reviews")
+    pending_reviews = queued.review_rows(decided_ids)
+    high_risk = log_snapshot(APP_CONFIG.outputs.high_risk_log_path)
+    drift_alerts = log_snapshot(APP_CONFIG.outputs.drift_alert_log_path)[-10:]
 
     route_counter = Counter(row["prediction"]["route"] for row in predictions[-500:])
     action_counter = Counter(row["final_action"] for row in predictions[-500:])
@@ -1118,10 +1135,16 @@ def build_research_data() -> dict[str, Any]:
         sign = "+" if v > 0 else ""
         return f"{sign}{v:.4f}"
 
-    baseline_raw = _load_json(APP_CONFIG.outputs.baseline_comparison_path)
-    ablation_raw = _load_json(APP_CONFIG.outputs.feature_ablation_path)
-    robustness_raw = _load_json(APP_CONFIG.outputs.robustness_validation_path)
-    external_raw = _load_json(APP_CONFIG.outputs.external_validation_path)
+    report_paths = [
+        APP_CONFIG.outputs.baseline_comparison_path,
+        APP_CONFIG.outputs.feature_ablation_path,
+        APP_CONFIG.outputs.robustness_validation_path,
+        APP_CONFIG.outputs.external_validation_path,
+    ]
+    resolved_paths = [existing_report_path(path) for path in report_paths]
+    baseline_raw, ablation_raw, robustness_raw, external_raw = [
+        _load_json(path) for path in resolved_paths
+    ]
 
     research_ready = bool(
         baseline_raw.get("models")
@@ -1230,6 +1253,7 @@ def build_research_data() -> dict[str, Any]:
 
     return {
         "research_ready": research_ready,
+        "research_archived": any(current != resolved for current, resolved in zip(report_paths, resolved_paths)),
         "source": baseline_raw.get("source", "N/A"),
         "split": split,
         "baseline_rows": baseline_rows,

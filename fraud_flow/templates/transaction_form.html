@@ -3,202 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nhập Giao Dịch Fraud Flow</title>
+  <title>Trình diễn giao dịch · Fraud Flow NCKH</title>
   <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
   <link rel="stylesheet" href="/static/css/transaction_form.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/research_demo.css?v={{ version }}">
+  <script defer src="/static/js/ui_shell.js?v={{ version }}"></script>
 </head>
 <body>
   <main class="shell">
     {% include "_app_header.html" %}
-
-    <section class="hero-grid">
-      <article class="hero-card">
-        <div class="eyebrow">Realtime Transaction Demo <span class="pill tone-neutral">{{ profile.source|upper }}</span></div>
-        <h1>Nhập một giao dịch và xem pipeline phản ứng ngay trên màn hình.</h1>
-        <p class="subtext">Màn này dành cho live demo: gửi một transaction thật, nhận score, route, quyết định cuối cùng và explanation có thể kể lại ngay cho người xem.</p>
-
-        <div class="actions">
-          <a class="action primary" href="/dashboard/html">Mở dashboard</a>
-          <a class="action" href="/docs">Mở docs portal</a>
-          <a class="action" href="/">Về trang chủ</a>
+    <header class="demo-intro">
+      <div class="section-label">Trình diễn NCKH · PaySim</div>
+      <h1>Từ giao dịch đến quyết định có thể giải thích.</h1>
+      <p>Chọn kịch bản và xem điểm XGBoost, SHAP cùng vai trò của agent.</p>
+      <p class="presentation-note">{{ agent_mode }} · <a href="/llm/status" target="_blank" rel="noopener">Xem trạng thái thực thi</a></p>
+    </header>
+    <div class="demo-layout">
+      <section class="panel form-panel" aria-labelledby="input-title">
+        <div class="section-label">01 · Dữ liệu đầu vào</div>
+        <h2 id="input-title">Chọn kịch bản minh họa</h2>
+        <div class="scenario-grid" role="group" aria-label="Kịch bản rủi ro dự kiến">
+          {% for scenario in demo_scenarios %}
+          <button type="button" class="scenario-button" data-scenario="{{ scenario.key }}" aria-pressed="false"><strong>{{ scenario.label }}</strong><small>{{ scenario.key|upper }}</small></button>
+          {% endfor %}
         </div>
-      </article>
-
-      <aside class="status-card">
-        <div class="section-label">Gateway Status</div>
-        <div class="status-stack">
-          <div class="status-row"><span>Active version</span><strong>{{ deployment.active_version or 'N/A' }}</strong></div>
-          <div class="status-row"><span>Avg latency</span><strong>{{ live_metrics.avg_ms }}</strong></div>
-          <div class="status-row"><span>Pending review</span><strong>{{ totals.pending_reviews }}</strong></div>
-          <div class="status-row"><span>Precision block</span><strong>{{ live_metrics.precision_block }}</strong></div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="demo-strip">
-      {% for item in product_story.demo_playbook %}
-      <article class="demo-step">
-        <span>{{ item.step }}</span>
-        <strong>{{ item.title }}</strong>
-        <p>{{ item.detail }}</p>
-      </article>
-      {% endfor %}
-    </section>
-
-    <section class="workspace">
-      <article class="panel form-panel">
-        <div class="section-label">Input Transaction</div>
-        <h2>Form demo PaySim</h2>
-
-        <form id="transaction-form" class="form-grid">
-          <label>
-            <span>Loại giao dịch</span>
-            <select name="tx_type">
-              <option value="TRANSFER" selected>TRANSFER</option>
-              <option value="CASH_OUT">CASH_OUT</option>
-            </select>
-          </label>
-          <label>
-            <span>Số tiền</span>
-            <input name="amount" type="number" step="0.01" value="{{ example.amount }}">
-          </label>
-          <label class="wide">
-            <span>Timestamp</span>
-            <input name="timestamp" type="text" value="{{ example.timestamp }}">
-          </label>
-          <label>
-            <span>Card ID</span>
-            <input name="card_id" type="text" value="{{ example.extras.card_id }}">
-          </label>
-          <label>
-            <span>Merchant ID</span>
-            <input name="merchant_id" type="text" value="{{ example.extras.merchant_id }}">
-          </label>
-          <label>
-            <span>Device ID</span>
-            <input name="device_id" type="text" value="{{ example.extras.device_id }}">
-          </label>
-          <label>
-            <span>Location ID</span>
-            <input name="location_id" type="text" value="{{ example.extras.location_id }}">
-          </label>
-          <label class="wide">
-            <span>IP Address</span>
-            <input name="ip_address" type="text" value="{{ example.extras.ip_address }}">
-          </label>
-          <label>
-            <span>Old Balance Org</span>
-            <input name="oldbalanceOrg" type="number" step="0.01" value="{{ example.oldbalanceOrg }}">
-          </label>
-          <label>
-            <span>New Balance Orig</span>
-            <input name="newbalanceOrig" type="number" step="0.01" value="{{ example.newbalanceOrig }}">
-          </label>
-          <label>
-            <span>Old Balance Dest</span>
-            <input name="oldbalanceDest" type="number" step="0.01" value="{{ example.oldbalanceDest }}">
-          </label>
-          <label>
-            <span>New Balance Dest</span>
-            <input name="newbalanceDest" type="number" step="0.01" value="{{ example.newbalanceDest }}">
-          </label>
-          <label>
-            <span>Nhãn thật</span>
-            <select name="is_fraud">
-              <option value="">Không điền</option>
-              <option value="0" selected>0 - bình thường</option>
-              <option value="1">1 - gian lận</option>
-            </select>
-          </label>
-          <div class="button-row wide">
-            <button type="button" id="reset-sample" class="ghost">Nạp lại mẫu</button>
-            <button type="submit" class="primary">Gửi giao dịch</button>
-          </div>
+        <p id="scenario-note" class="presentation-note"></p>
+        <p class="presentation-note">Kết quả được tính thật; lịch sử online có thể làm đổi nhánh dự kiến.</p>
+        <form id="transaction-form" class="form-grid" aria-busy="false" novalidate>
+          <div class="button-row wide"><button type="button" id="reset-sample" class="ghost">Nạp lại kịch bản</button><button type="submit" id="submit-transaction" class="primary">Chạy giao dịch</button></div>
+          <label><span>Loại giao dịch</span><select name="tx_type"><option value="TRANSFER">TRANSFER</option><option value="CASH_OUT">CASH_OUT</option></select></label>
+          <label><span>Số tiền (đơn vị dữ liệu PaySim)</span><input name="amount" type="number" min="0" step="0.01" required></label>
+          <label class="wide"><span>Thời điểm · ISO 8601</span><input name="timestamp" type="text" required placeholder="2025-01-01T14:00:00+00:00"></label>
+          <label><span>Số dư người gửi trước giao dịch</span><input name="oldbalanceOrg" type="number" min="0" step="0.01" required></label>
+          <label><span>Số dư người gửi sau giao dịch</span><input name="newbalanceOrig" type="number" min="0" step="0.01" required></label>
+          <label><span>Số dư người nhận trước giao dịch</span><input name="oldbalanceDest" type="number" min="0" step="0.01" required></label>
+          <label><span>Số dư người nhận sau giao dịch</span><input name="newbalanceDest" type="number" min="0" step="0.01" required></label>
+          <label class="wide"><span>Nhãn thật để đối chiếu (tùy chọn)</span><select name="is_fraud"><option value="">Chưa biết nhãn</option><option value="0">0 · Bình thường</option><option value="1">1 · Gian lận</option></select></label>
+          <details class="advanced-panel wide">
+            <summary>Định danh và ngữ cảnh giao dịch</summary>
+            <div class="form-grid">
+              {% for name, label in [('card_id','Mã thẻ'),('merchant_id','Mã đơn vị nhận'),('device_id','Mã thiết bị'),('location_id','Mã khu vực'),('ip_address','Địa chỉ IP')] %}
+              <label><span>{{ label }}</span><input name="{{ name }}" type="text" required></label>
+              {% endfor %}
+            </div>
+          </details>
         </form>
-      </article>
-
-      <aside class="side-stack">
-        <article class="panel preview-panel">
-          <div class="section-label">Payload Preview</div>
-          <h2>JSON gửi đi</h2>
-          <pre id="payload-preview">{{ example_json }}</pre>
-        </article>
-
-        <article class="panel tips-panel">
-          <div class="section-label">Demo Notes</div>
-          <h2>Nên nói gì khi thao tác</h2>
-          <ul>
-            <li>Điền xong là payload đổi ngay ở khung bên cạnh.</li>
-            <li>Submit xong sẽ có score, route và quyết định cuối cùng.</li>
-            <li>Nếu muốn kể sâu hơn, chuyển sang dashboard để xem reasoning trace.</li>
-          </ul>
-        </article>
-      </aside>
-    </section>
-
-    <section class="panel result-panel">
-      <div class="section-label">Model Response</div>
-      <h2>Kết quả trả về từ pipeline</h2>
-
-      <div id="result-empty" class="empty">Chưa có giao dịch nào được gửi. Hãy bấm <strong>Gửi giao dịch</strong> để xem mô hình phản ứng.</div>
-
+        <p id="form-status" class="form-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        <details class="advanced-panel"><summary>JSON gửi đi và cấu hình mô hình</summary><pre id="payload-preview"></pre><p class="presentation-note">Model: {{ deployment.active_version or 'Chưa có' }} · {{ profile.feature_count }} đặc trưng · ngưỡng phân lớp {{ profile.selected_threshold }}. Nhãn thật chỉ dùng để đối chiếu; không dùng để tạo đặc trưng cho giao dịch này.</p></details>
+      </section>
+      <section class="panel result-panel" aria-labelledby="result-title">
+        <div class="section-label">02 · Luồng xử lý thực tế</div>
+        <h2 id="result-title" tabindex="-1">Kết quả của giao dịch</h2>
+        <div id="result-empty" class="empty">Chọn kịch bản và bấm <strong>Chạy giao dịch</strong>. Dữ liệu demo được ghi riêng với kết quả holdout trong phần Nghiên cứu.</div>
         <div id="result-shell" class="hidden">
-          <div class="decision-grid">
+          <ol class="process-flow" aria-label="Các bước đã thực hiện">
+            <li id="flow-input"><strong>1. Đầu vào</strong><span>Giao dịch hợp lệ</span></li>
+            <li id="flow-features"><strong>2. Đặc trưng</strong><span>Tra lịch sử online</span></li>
+            <li id="flow-model"><strong>3. XGBoost + SHAP</strong><span>Chấm điểm và giải thích</span></li>
+            <li id="flow-agent"><strong>4. Điều tra</strong><span id="agent-step-text">ReAct ở nhánh medium</span></li>
+            <li id="flow-decision"><strong>5. Quyết định</strong><span id="decision-step-text">Thông qua / Xác minh / Chặn</span></li>
+          </ol>
           <article id="decision-card" class="decision-card tone-neutral">
-            <span class="decision-kicker">Final decision</span>
-            <strong id="summary-action">-</strong>
-            <p id="final-note">-</p>
-            <div class="decision-pills">
-              <span id="summary-route-pill" class="pill tone-neutral">Route -</span>
-              <span id="summary-raw-pill" class="pill tone-neutral">Raw -</span>
-            </div>
+            <span class="decision-kicker">Quyết định cuối cùng</span><strong id="summary-action">—</strong><p id="final-note">—</p>
+            <div class="decision-pills"><span id="summary-route-pill" class="pill tone-neutral">Nhánh —</span><span id="summary-raw-pill" class="pill tone-neutral">Xác suất gốc —</span></div>
           </article>
-
           <div class="summary-grid">
-            <div class="summary-card">
-              <span class="label">Score</span>
-              <strong id="summary-score">-</strong>
-            </div>
-            <div class="summary-card">
-              <span class="label">Raw probability</span>
-              <strong id="summary-raw">-</strong>
-            </div>
-            <div class="summary-card">
-              <span class="label">Route</span>
-              <strong id="summary-route">-</strong>
-            </div>
-            <div class="summary-card">
-              <span class="label">Latency</span>
-              <strong id="summary-latency">-</strong>
-            </div>
+            <div class="summary-card"><span class="label">Điểm vận hành</span><strong id="summary-score">—</strong></div>
+            <div class="summary-card"><span class="label">Xác suất gốc XGBoost</span><strong id="summary-raw">—</strong></div>
+            <div class="summary-card"><span class="label">Nhánh</span><strong id="summary-route">—</strong></div>
+            <div class="summary-card"><span class="label">Thời gian giao dịch này</span><strong id="summary-latency">—</strong></div>
           </div>
-        </div>
-
+          <p class="presentation-note">Điểm vận hành dùng để phân luồng sau hiệu chỉnh; không đồng nhất với xác suất gốc của XGBoost.</p>
+          <article class="result-card"><div class="section-label">Agent có thực sự chạy?</div><p id="execution-status">—</p><p id="execution-counts" class="presentation-note"></p><p class="presentation-note">Lời giải thích hiển thị được hệ thống tổng hợp từ dữ kiện và quyết định cuối. Nội dung gốc của agent được lưu riêng để đối chiếu.</p></article>
           <div class="result-grid">
-            <article class="result-card">
-              <div class="section-label">Human Explanation</div>
-              <p id="human-explanation">-</p>
-            </article>
-          <article class="result-card">
-            <div class="section-label">Analyst Report</div>
-            <p id="analyst-report">-</p>
-          </article>
-            <article class="result-card wide-card">
-              <div class="section-label">Dashboard Summary</div>
-              <p id="dashboard-summary">-</p>
-            </article>
+            <article class="result-card"><div class="section-label">Giải thích quyết định</div><p id="human-explanation">—</p></article>
+            <article class="result-card"><div class="section-label">Tín hiệu bất thường</div><p id="anomaly-explanation">—</p></article>
           </div>
-
-          <div class="result-actions">
-            <a id="open-dashboard-case" class="action primary" href="/dashboard/html">Mở case này trên dashboard</a>
-            <a class="action" href="/docs">Chứng minh API qua docs</a>
-          </div>
+          <details class="advanced-panel"><summary>Bằng chứng, SHAP và nội dung đối chiếu</summary><h3>Tín hiệu cần chú ý</h3><ul id="supporting-evidence"></ul><h3>Bằng chứng đối chiếu</h3><ul id="mitigating-evidence"></ul><h3>Đóng góp SHAP</h3><ul id="model-evidence"></ul><p class="presentation-note">SHAP là đóng góp trên thang đầu ra mô hình, không phải phần trăm xác suất. Confidence của agent chưa được hiệu chuẩn. Demo runtime và deterministic offline replay trong B8/B11 là các phép kiểm tra riêng.</p><p id="analyst-report">—</p><p id="dashboard-summary">—</p><details><summary>JSON thực thi và đầu ra gốc của agent</summary><pre id="agent-audit-json"></pre></details></details>
+          <div class="result-actions"><a id="open-dashboard-case" class="action primary" href="/dashboard/html">Xem bằng chứng trên giám sát</a><a id="open-review-case" class="action" href="/reviews/pending">Xác minh giao dịch này</a></div>
         </div>
       </section>
+    </div>
   </main>
-  <script>
-    window.__PAYSIM_EXAMPLE__ = {{ example_json | safe }};
-  </script>
+  <script>window.__DEMO_SCENARIOS__ = {{ demo_scenarios | tojson }};</script>
   <script src="/static/js/transaction_form.js?v={{ version }}"></script>
 </body>
 </html>

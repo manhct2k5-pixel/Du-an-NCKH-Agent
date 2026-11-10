@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-11-10T13:33:08.178007+07:00",
+  "source_folder": "ds2api-main-20261110T061707Z-1-001/ds2api-main",
+  "runtime": "provided Linux amd64 binary, isolated config copy",
+  "health_http_status": 200,
+  "readiness_http_status": 200,
+  "models_http_status": 200,
+  "chat_http_status": 401,
+  "model": "deepseek-v4-flash",
+  "external_model_response_observed": false,
+  "error_code": "authentication_failed",
+  "error_message": "login failed: RISK_DEVICE_DETECTED",
+  "login_mode": "email/password from supplied account; no session token initially configured",
+  "next_step": "User signs in normally and supplies their own existing web session token locally. No automatic login retries after device-risk rejection.",
+  "fraudflow_connection_changed": true,
+  "subsequent_result": "Resolved using authenticated browser session token; see ds2api-live-result.json"
+}

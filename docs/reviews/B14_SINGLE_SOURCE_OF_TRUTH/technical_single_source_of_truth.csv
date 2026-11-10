@@ -1,0 +1,165 @@
+category,metric,final_value,unit,status,source_artifact,notes
+dataset,total_rows,460394,rows,FINAL,artifacts/reports/evaluation_report.json,split.total_rows
+dataset,fraud_rows,1142,rows,FINAL,artifacts/reports/evaluation_report.json,Derived as 429 train + 63 validation + 650 test
+dataset,legitimate_rows,459252,rows,FINAL,artifacts/reports/evaluation_report.json,Derived as 321846 train + 68996 validation + 68410 test
+dataset,train_rows,322275,rows,FINAL,artifacts/reports/evaluation_report.json,split.train_rows
+dataset,train_fraud,429,rows,FINAL,artifacts/reports/evaluation_report.json,class_balance.positive_count
+dataset,train_legitimate,321846,rows,FINAL,artifacts/reports/evaluation_report.json,class_balance.negative_count
+dataset,validation_rows,69059,rows,FINAL,artifacts/reports/evaluation_report.json,split.validation_rows
+dataset,validation_fraud,63,rows,FINAL,artifacts/reports/evaluation_report.json,validation.confusion_matrix false_negative + true_positive
+dataset,validation_legitimate,68996,rows,FINAL,artifacts/reports/evaluation_report.json,validation.confusion_matrix true_negative + false_positive
+dataset,test_rows,69060,rows,FINAL,artifacts/reports/evaluation_report.json,split.test_rows
+dataset,test_fraud,650,rows,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix false_negative + true_positive
+dataset,test_legitimate,68410,rows,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix true_negative + false_positive
+dataset,feature_count,25,features,FINAL,artifacts/reports/evaluation_report.json,Length of feature_columns
+dataset,split_strategy,chronological_by_step_after_TRANSFER_CASH_OUT_filter,text,FINAL,artifacts/reports/evaluation_report.json,split_strategy
+preprocessing,transaction_filter,TRANSFER and CASH_OUT,text,FINAL,artifacts/reports/evaluation_report.json,Encoded in split_strategy
+preprocessing,chronological_split,true,boolean,FINAL,artifacts/reports/evaluation_report.json,split_strategy
+preprocessing,shuffle,false,boolean,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,protocol.shuffle
+preprocessing,leakage_control,"Train labels may update history; validation/test labels never update historical fraud-rate state before feature construction or decisions",text,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,provenance.leakage_control_protocol
+xgboost,n_estimators,260,trees,FINAL,artifacts/reports/evaluation_report.json,selected_params.n_estimators
+xgboost,max_depth,6,levels,FINAL,artifacts/reports/evaluation_report.json,selected_params.max_depth
+xgboost,learning_rate,0.06,fraction,FINAL,artifacts/reports/evaluation_report.json,selected_params.learning_rate
+xgboost,subsample,0.9,fraction,FINAL,artifacts/reports/evaluation_report.json,selected_params.subsample
+xgboost,colsample_bytree,0.85,fraction,FINAL,artifacts/reports/evaluation_report.json,selected_params.colsample_bytree
+xgboost,scale_pos_weight,750.2237762237762,ratio,FINAL,artifacts/reports/evaluation_report.json,class_balance.scale_pos_weight
+xgboost,max_delta_step,1,value,FINAL,artifacts/reports/evaluation_report.json,training_controls.max_delta_step
+xgboost,tree_method,hist,text,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,protocol.fixed_hyperparameters.tree_method
+xgboost,n_jobs,4,threads,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,protocol.fixed_runtime_controls.n_jobs
+xgboost,random_state,42,seed,FINAL,artifacts/reports/evaluation_report.json,random_state
+xgboost,classification_threshold,0.5,probability,FINAL,artifacts/reports/evaluation_report.json,selected_threshold
+routing,low_threshold,0.3,operational_score,FINAL,artifacts/reports/evaluation_report.json,routing_thresholds.low
+routing,high_threshold,0.85,operational_score,FINAL,artifacts/reports/evaluation_report.json,routing_thresholds.high
+routing,high_raw_probability_floor,0.05,raw_probability,FINAL,fraud_flow/config.py,RoutingThresholds.high_raw_probability_floor
+primary_paysim,AUC,0.9983827150776428,score,FINAL,artifacts/reports/evaluation_report.json,test.roc_auc
+primary_paysim,PR_AUC,0.9970017406400512,score,FINAL,artifacts/reports/evaluation_report.json,test.pr_auc
+primary_paysim,F1,0.993103448275862,score,FINAL,artifacts/reports/evaluation_report.json,test.metrics.f1
+primary_paysim,Precision,0.9893129770992366,score,FINAL,artifacts/reports/evaluation_report.json,test.metrics.precision
+primary_paysim,Recall,0.9969230769230769,score,FINAL,artifacts/reports/evaluation_report.json,test.metrics.recall
+primary_paysim,TN,68403,count,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix.true_negative
+primary_paysim,FP,7,count,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix.false_positive
+primary_paysim,FN,2,count,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix.false_negative
+primary_paysim,TP,648,count,FINAL,artifacts/reports/evaluation_report.json,test.confusion_matrix.true_positive
+baseline_hist_gradient_boosting,AUC,0.9999321511699818,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=hist_gradient_boosting].test.metrics.auc
+baseline_hist_gradient_boosting,PR_AUC,0.997849385204436,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=hist_gradient_boosting].test.pr_auc
+baseline_hist_gradient_boosting,F1,0.9969135802469136,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=hist_gradient_boosting].test.metrics.f1
+baseline_hist_gradient_boosting,Precision,1.0,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=hist_gradient_boosting].test.metrics.precision
+baseline_hist_gradient_boosting,Recall,0.9938461538461538,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=hist_gradient_boosting].test.metrics.recall
+baseline_random_forest,AUC,0.9998431740748653,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=random_forest].test.metrics.auc
+baseline_random_forest,PR_AUC,0.9975016124891384,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=random_forest].test.pr_auc
+baseline_random_forest,F1,0.9953775038520801,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=random_forest].test.metrics.f1
+baseline_random_forest,Precision,0.9969135802469136,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=random_forest].test.metrics.precision
+baseline_random_forest,Recall,0.9938461538461538,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=random_forest].test.metrics.recall
+baseline_xgboost,AUC,0.9983827150776428,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=xgboost].test.metrics.auc
+baseline_xgboost,PR_AUC,0.9970017406400512,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=xgboost].test.pr_auc
+baseline_xgboost,F1,0.993103448275862,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=xgboost].test.metrics.f1
+baseline_xgboost,Precision,0.9893129770992366,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=xgboost].test.metrics.precision
+baseline_xgboost,Recall,0.9969230769230769,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=xgboost].test.metrics.recall
+baseline_logistic_regression,AUC,0.9963643641842734,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=logistic_regression].test.metrics.auc
+baseline_logistic_regression,PR_AUC,0.8844123778149597,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=logistic_regression].test.pr_auc
+baseline_logistic_regression,F1,0.4857477547832878,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=logistic_regression].test.metrics.f1
+baseline_logistic_regression,Precision,0.32548403976975404,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=logistic_regression].test.metrics.precision
+baseline_logistic_regression,Recall,0.9569230769230769,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=logistic_regression].test.metrics.recall
+baseline_dummy,AUC,0.5,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=dummy_prior].test.metrics.auc
+baseline_dummy,PR_AUC,0.009412105415580654,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=dummy_prior].test.pr_auc
+baseline_dummy,F1,0.0,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=dummy_prior].test.metrics.f1
+baseline_dummy,Precision,0.0,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=dummy_prior].test.metrics.precision
+baseline_dummy,Recall,0.0,score,FINAL,artifacts/reports/baseline_comparison.json,models[model_name=dummy_prior].test.metrics.recall
+ablation_full_feature_set,feature_count,25,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=full_feature_set].feature_count
+ablation_full_feature_set,threshold,0.5,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=full_feature_set].selected_threshold
+ablation_full_feature_set,test_F1,0.993103448275862,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=full_feature_set].test_f1
+ablation_full_feature_set,delta_F1,0.0,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=full_feature_set].delta_f1_vs_full
+ablation_no_online_behavior,feature_count,17,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior].feature_count
+ablation_no_online_behavior,threshold,0.65,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior].selected_threshold
+ablation_no_online_behavior,test_F1,0.9899923017705927,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior].test_f1
+ablation_no_online_behavior,delta_F1,-0.003111,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior].delta_f1_vs_full
+ablation_no_llm_analysis,feature_count,20,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_llm_analysis].feature_count
+ablation_no_llm_analysis,threshold,0.5,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_llm_analysis].selected_threshold
+ablation_no_llm_analysis,test_F1,0.9704321455648218,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_llm_analysis].test_f1
+ablation_no_llm_analysis,delta_F1,-0.022671,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_llm_analysis].delta_f1_vs_full
+ablation_no_contextual_aggregates,feature_count,19,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_aggregates].feature_count
+ablation_no_contextual_aggregates,threshold,0.7,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_aggregates].selected_threshold
+ablation_no_contextual_aggregates,test_F1,0.8530805687203792,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_aggregates].test_f1
+ablation_no_contextual_aggregates,delta_F1,-0.140023,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_aggregates].delta_f1_vs_full
+ablation_transaction_core_only,feature_count,6,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=transaction_core_only].feature_count
+ablation_transaction_core_only,threshold,0.7,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=transaction_core_only].selected_threshold
+ablation_transaction_core_only,test_F1,0.8117977528089888,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=transaction_core_only].test_f1
+ablation_transaction_core_only,delta_F1,-0.181306,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=transaction_core_only].delta_f1_vs_full
+ablation_no_online_behavior_and_dependent_analysis,feature_count,12,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior_and_dependent_analysis].feature_count
+ablation_no_online_behavior_and_dependent_analysis,threshold,0.5,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior_and_dependent_analysis].selected_threshold
+ablation_no_online_behavior_and_dependent_analysis,test_F1,0.9751318764129616,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior_and_dependent_analysis].test_f1
+ablation_no_online_behavior_and_dependent_analysis,delta_F1,-0.017972,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_online_behavior_and_dependent_analysis].delta_f1_vs_full
+ablation_no_contextual_and_dependent_analysis,feature_count,14,features,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_and_dependent_analysis].feature_count
+ablation_no_contextual_and_dependent_analysis,threshold,0.7,probability,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_and_dependent_analysis].selected_threshold
+ablation_no_contextual_and_dependent_analysis,test_F1,0.8564593301435407,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_and_dependent_analysis].test_f1
+ablation_no_contextual_and_dependent_analysis,delta_F1,-0.136644,score,FINAL,artifacts/reports/b8_final/feature_ablation_b8.json,ablations[configuration=no_contextual_and_dependent_analysis].delta_f1_vs_full
+medium_branch,all_medium_review,14181,cases,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,policies[all_medium_manual_review].review_count
+medium_branch,deterministic_replay_review,6383,cases,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,policies[deterministic_offline_investigation_replay].review_count
+medium_branch,review_reduction,7798,cases,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,manual_review_reduction_count
+medium_branch,review_reduction_rate,54.99,percent,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,manual_review_reduction_rate exact 0.549891
+medium_branch,block_precision,94.88,percent,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,block_precision exact 0.9487554904831625
+medium_branch,block_recall,99.69,percent,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,block_recall exact 0.9969230769230769
+medium_branch,false_positive_blocks,35,count,FINAL,artifacts/reports/b8_final/medium_branch_ablation_b8.json,false_positive_blocks
+robustness,seed_list,"42;43;44",seeds,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,protocol.seeds
+robustness_seed_42,AUC,0.9983827150776428,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=42].test_auc
+robustness_seed_42,PR_AUC,0.9970017406400512,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=42].test_pr_auc
+robustness_seed_42,F1,0.993103448275862,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=42].test_f1
+robustness_seed_42,Precision,0.9893129770992366,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=42].test_precision
+robustness_seed_42,Recall,0.9969230769230769,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=42].test_recall
+robustness_seed_43,AUC,0.9987623266953773,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=43].test_auc
+robustness_seed_43,PR_AUC,0.9970987605238817,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=43].test_pr_auc
+robustness_seed_43,F1,0.9900687547746372,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=43].test_f1
+robustness_seed_43,Precision,0.9833080424886191,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=43].test_precision
+robustness_seed_43,Recall,0.9969230769230769,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=43].test_recall
+robustness_seed_44,AUC,0.9988008051004689,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=44].test_auc
+robustness_seed_44,PR_AUC,0.9975486999259158,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=44].test_pr_auc
+robustness_seed_44,F1,0.9908256880733946,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=44].test_f1
+robustness_seed_44,Precision,0.9848024316109423,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=44].test_precision
+robustness_seed_44,Recall,0.9969230769230769,score,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,runs[seed=44].test_recall
+robustness_summary,AUC,"0.9986486156244964 ± 0.00018867515739557264",mean ± population SD,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,summary.test_auc
+robustness_summary,PR_AUC,"0.9972164003632829 ± 0.00023828619201725262",mean ± population SD,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,summary.test_pr_auc
+robustness_summary,F1,"0.9913326303746312 ± 0.0012897245272231583",mean ± population SD,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,summary.test_f1
+robustness_summary,Precision,"0.985807817066266 ± 0.002552503327425876",mean ± population SD,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,summary.test_precision
+robustness_summary,Recall,"0.9969230769230769 ± 0.0",mean ± population SD,FINAL,artifacts/reports/b9_final/b9_repeated_seed_robustness.json,summary.test_recall
+statistics,bootstrap_iterations,2000,replicates,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,bootstrap.iterations
+statistics,AUC_CI95,"[0.9952713267291107; 0.9999996176897215]",interval,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,metrics.auc.ci95_low and ci95_high
+statistics,PR_AUC_CI95,"[0.992546899838475; 0.9999598708634057]",interval,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,metrics.pr_auc.ci95_low and ci95_high
+statistics,F1_CI95,"[0.9885228961647714; 0.9969325153374233]",interval,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,metrics.f1.ci95_low and ci95_high
+statistics,Precision_CI95,"[0.9817351598173516; 0.9969135802469136]",interval,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,metrics.precision.ci95_low and ci95_high
+statistics,Recall_CI95,"[0.9923076923076923; 1.0]",interval,FINAL,artifacts/reports/b10_final/b10_bootstrap_ci.json,metrics.recall.ci95_low and ci95_high
+isolation_forest,threshold,0.41828539293549033,score,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.flag_threshold; report rounded 0.4183
+isolation_forest,validation_flagged,3453,count,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.val_eval.flagged_total
+isolation_forest,validation_catch_rate,34.92063492063492,percent,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.val_eval.fraud_catch_rate
+isolation_forest,validation_false_flag_rate,4.97275204359673,percent,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.val_eval.false_flag_rate
+isolation_forest,test_flagged,4866,count,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.test_eval.flagged_total
+isolation_forest,test_catch_rate,52.92307692307693,percent,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.test_eval.fraud_catch_rate
+isolation_forest,test_false_flag_rate,6.610144715684842,percent,FINAL,artifacts/reports/evaluation_report.json,anomaly_sidecar.test_eval.false_flag_rate
+efficiency,fixed_fit_mean,1.669062444332667,seconds,FINAL,artifacts/reports/b11_final/b11_training_time.json,timing.mean_seconds
+efficiency,local_end_to_end_mean,14.192055347616355,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.local_end_to_end_ms.mean_ms
+efficiency,local_end_to_end_p95,28.13968635018682,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.local_end_to_end_ms.p95_ms
+efficiency,local_end_to_end_p99,46.46767077978442,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.local_end_to_end_ms.p99_ms
+efficiency,sequential_local_throughput,70.46195744776011,tx/s,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.local_end_to_end_ms.throughput_tx_per_second
+efficiency,raw_xgboost_mean,3.550239045042334,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.xgboost_predict_proba_ms.mean_ms
+efficiency,TreeSHAP_mean,3.3466839083969475,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.shap_explanation_ms.mean_ms
+efficiency,Isolation_Forest_mean,6.859352249277064,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.anomaly_sidecar_ms.mean_ms
+efficiency,medium_deterministic_replay_mean,0.09786381843594455,milliseconds,FINAL,artifacts/reports/b11_final/b11_latency_components.json,overall.deterministic_medium_investigation_ms.mean_ms
+efficiency,old_overall_mean,35.72,milliseconds,OBSOLETE,artifacts/reports/latency_report.json,Old timing boundary; exact field overall.mean_ms = 35.716
+efficiency,old_overall_p99,51.55,milliseconds,OBSOLETE,artifacts/reports/latency_report.json,Old timing boundary; exact field overall.p99_ms = 51.546
+ieee_cis,frozen_AUC,0.6260447267256386,score,FINAL,artifacts/reports/b12_final/b12_frozen_ieee.json,metrics.auc
+ieee_cis,transfer_AUC,0.6525325347771955,score,FINAL,artifacts/reports/b12_final/b12_transfer_ieee.json,metrics.auc
+ieee_cis,native_AUC,0.9063988875252156,score,FINAL,artifacts/reports/b12_final/b12_native_ieee.json,metrics.auc
+ieee_cis,leakage_detected,NO,boolean,FINAL,artifacts/reports/b12_final/b12_frozen_ieee.json; b12_transfer_ieee.json; b12_native_ieee.json,All protocol.test_label_leakage and test_used_for_model_selection fields are false
+ieee_cis,old_frozen_AUC,0.6285,score,OBSOLETE / PROVISIONAL,artifacts/reports/external_validation.json,Superseded by clean B12
+ieee_cis,old_transfer_AUC,0.6774,score,OBSOLETE / PROVISIONAL,artifacts/reports/transfer_learning_report.json,Superseded by clean B12
+ieee_cis,old_native_AUC,0.8415,score,OBSOLETE / PROVISIONAL,artifacts/reports/external_validation.json,Legacy 42-feature native benchmark; not final B12 native
+implementation,OS,Linux 6.17.0-20-generic x86_64,text,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.operating_system includes glibc2.39
+implementation,Python,3.12.3,version,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.python_version
+implementation,CPU,AMD Ryzen 7 7435HS,text,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.cpu_model
+implementation,physical_cores,8,cores,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.physical_cores
+implementation,logical_cores,16,cores,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.logical_cores
+implementation,RAM,16,GB installed,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,15.304630279541016 GiB OS-reported
+implementation,GPU,NVIDIA GeForce RTX 4050 Laptop GPU available but not used,text,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,final_environment.gpu
+implementation,XGBoost,3.2.0,version,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,xgboost_execution; CPU hist n_jobs=4
+implementation,Redis_required_full_online,YES,boolean,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,redis.production_full_online_pipeline_requires_redis
+implementation,Redis_required_B11,NO,boolean,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,redis.b11_latency_includes_redis_or_network is false
+implementation,external_LLM_required_reported_experiments,NO,boolean,FINAL,B13_IMPLEMENTATION_REVIEW/b13_environment.json,external_llm required fields are false

@@ -32,6 +32,7 @@ from .features import (
     load_filtered_frame,
 )
 from .llm_provider import build_high_risk_llm
+from .llm_runtime import ModelCallRecorder, execution_summary
 from .narratives import build_transaction_narrative
 from .redis_runtime import EmbeddedRedisServer
 from .schema import ModelPrediction, PipelineActionName, PipelineResult, TransactionEvent
@@ -93,7 +94,12 @@ class AsyncHighRiskLogger:
         self.logger = logger
         self.executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="high-risk-log")
         self.futures: list[Future[Any]] = []
-        self.chain = HIGH_RISK_PROMPT | build_high_risk_llm() | StrOutputParser()
+        self.model = build_high_risk_llm()
+        self.recorder = ModelCallRecorder(self.model)
+        self.chain = HIGH_RISK_PROMPT | self.model | StrOutputParser()
+
+    def runtime_status(self) -> dict[str, Any]:
+        return execution_summary({"high_risk_log": self.recorder})
 
     def submit(self, payload: dict[str, Any]) -> None:
         self.futures.append(self.executor.submit(self._write_log, payload))
@@ -112,8 +118,12 @@ class AsyncHighRiskLogger:
         normalized = self._normalize_payload(payload)
         tx_id = normalized.get("event", {}).get("tx_id")
         score = normalized.get("prediction", {}).get("score")
+        recorder = ModelCallRecorder(self.model)
         try:
-            message = self.chain.invoke({"context": json.dumps(normalized, ensure_ascii=False)})
+            message = self.chain.invoke(
+                {"context": json.dumps(normalized, ensure_ascii=False)},
+                config={"callbacks": [recorder, self.recorder]},
+            )
             record = {
                 "tx_id": tx_id,
                 "score": score,
@@ -127,6 +137,8 @@ class AsyncHighRiskLogger:
                 "message": f"high-risk async logging failed: {exc}",
                 "status": "error",
             }
+        record["execution"] = execution_summary({"high_risk_log": recorder})
+        record["purpose"] = "post_decision_log_only"
         self.logger.append(record)
 
     def drain(self) -> None:
@@ -297,28 +309,10 @@ class FraudFlowRunner:
         route_result = self._handle_medium(payload)
         final_action: PipelineActionName = route_result["final_action"]
 
-        if route_result["agent"] is not None and final_action != "step_up":
-            agent_structured = route_result["agent"].get("agent_output", {}).get("structured_output", {})
-            reason_codes = list(agent_structured.get("reason_codes", []) or [])
-            from .narratives import group_reason_codes
-            narrative = {
-                "human_readable_explanation": route_result["agent"]["human_readable_explanation"],
-                "analyst_report": route_result["agent"]["analyst_report"],
-                "dashboard_summary": route_result["agent"]["dashboard_summary"],
-                "reason_codes": reason_codes,
-                "reason_codes_grouped": group_reason_codes(reason_codes),
-                "anomaly_score": prediction.anomaly_score,
-                "anomaly_flag": prediction.anomaly_flag,
-            }
-        else:
-            narrative = build_transaction_narrative(
-                event=event.to_dict(),
-                lookup=lookup.to_dict(),
-                prediction=prediction.to_dict(),
-                final_action=final_action,
-                final_note=route_result["final_note"],
-                agent=route_result["agent"],
-            )
+        narrative = build_transaction_narrative(
+            event=event.to_dict(), lookup=lookup.to_dict(), prediction=prediction.to_dict(),
+            final_action=final_action, final_note=route_result["final_note"], agent=route_result["agent"],
+        )
 
         result = PipelineResult(
             event=event.to_dict(),
@@ -356,8 +350,10 @@ class FraudFlowRunner:
         return enrich_transactions(raw, source=source)
 
     def bootstrap_online_history(self, rows: int | None = None) -> int:
+        if rows is not None and rows <= 0:
+            return 0
         history_frame = self._prepare_simulation_frame()
-        if rows:
+        if rows is not None:
             history_frame = history_frame.iloc[:rows].copy()
         self.feature_store.warm_start(
             event_from_row(row, source=self.model_service.source)
@@ -494,29 +490,10 @@ class FraudFlowRunner:
         }
         route_result = self.router.invoke(payload)
         final_action = route_result["final_action"]
-        if route_result["agent"] is not None and final_action != "step_up":
-            # Lấy text từ agent, bổ sung các trường còn thiếu từ structured output và prediction
-            agent_structured = route_result["agent"].get("agent_output", {}).get("structured_output", {})
-            reason_codes = list(agent_structured.get("reason_codes", []) or [])
-            from .narratives import group_reason_codes
-            narrative = {
-                "human_readable_explanation": route_result["agent"]["human_readable_explanation"],
-                "analyst_report": route_result["agent"]["analyst_report"],
-                "dashboard_summary": route_result["agent"]["dashboard_summary"],
-                "reason_codes": reason_codes,
-                "reason_codes_grouped": group_reason_codes(reason_codes),
-                "anomaly_score": prediction.anomaly_score,
-                "anomaly_flag": prediction.anomaly_flag,
-            }
-        else:
-            narrative = build_transaction_narrative(
-                event=event.to_dict(),
-                lookup=lookup.to_dict(),
-                prediction=prediction.to_dict(),
-                final_action=final_action,
-                final_note=route_result["final_note"],
-                agent=route_result["agent"],
-            )
+        narrative = build_transaction_narrative(
+            event=event.to_dict(), lookup=lookup.to_dict(), prediction=prediction.to_dict(),
+            final_action=final_action, final_note=route_result["final_note"], agent=route_result["agent"],
+        )
 
         self.feature_store.observe_activity(event)
         if final_action in ("review", "step_up"):

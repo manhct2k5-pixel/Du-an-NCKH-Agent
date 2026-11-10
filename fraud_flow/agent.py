@@ -7,12 +7,13 @@ from typing import Any
 from langchain_classic.agents import AgentExecutor, create_react_agent
 from langchain_classic.output_parsers import RetryOutputParser
 from langchain_core.exceptions import OutputParserException
-from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.output_parsers import PydanticOutputParser, StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import StructuredTool
 
 from .feature_store import RedisFeatureStore
 from .llm_provider import build_decision_llm, build_react_llm, build_retry_llm
+from .llm_runtime import ModelCallRecorder, execution_summary
 from .narratives import build_transaction_narrative
 from .schema import (
     AgentDecision,
@@ -26,7 +27,16 @@ from .schema import (
 
 REACT_PROMPT = PromptTemplate.from_template(
     """You are a fraud investigation ReAct agent.
-You must reason step by step and call tools when needed.
+Investigate using the supplied tools and their actual observations.
+Before the final answer, check all four identifiers from the event with
+get_card_history, check_ip_blacklist, verify_device_id, and query_merchant_risk.
+Call exactly one tool per response. Action Input must be the identifier string,
+without JSON, markdown fences, or surrounding quotes.
+Stop your response after Action Input: the executor supplies the Observation.
+Never output both an Action and a Final Answer in the same response.
+Do not reproduce the format example. Write the final summary in Vietnamese.
+Use only observed facts; missing or zero history does not establish safety.
+The routing score is not the raw fraud probability.
 
 Available tools:
 {tools}
@@ -51,6 +61,10 @@ Thought:{agent_scratchpad}"""
 DECISION_PROMPT = PromptTemplate.from_template(
     """You convert a fraud investigation into strict JSON.
 Return only JSON that matches the schema below.
+Write explanations in Vietnamese, based only on supplied fields and tool results.
+The routing score is not a fraud probability. raw_probability is the model estimate,
+not confirmed fraud. SHAP impacts are not probability percentages.
+Deduplicate device findings. confidence is an uncalibrated assessment, not accuracy.
 
 {format_instructions}
 
@@ -130,6 +144,11 @@ class ReActInvestigator:
         self.react_llm = build_react_llm()
         self.decision_llm = build_decision_llm()
         self.retry_llm = build_retry_llm()
+        self.models = {"react": self.react_llm, "decision": self.decision_llm, "retry": self.retry_llm}
+        self.runtime_recorders = {name: ModelCallRecorder(model) for name, model in self.models.items()}
+
+    def runtime_status(self) -> dict[str, Any]:
+        return execution_summary(self.runtime_recorders)
 
     def investigate(
         self,
@@ -144,8 +163,11 @@ class ReActInvestigator:
             agent=agent,
             tools=tools,
             return_intermediate_steps=True,
-            max_iterations=5,
-            handle_parsing_errors=True,
+            max_iterations=7,
+            handle_parsing_errors=(
+                "Invalid ReAct format. Return exactly one Action and Action Input, or a Final Answer. "
+                "Do not include Observation, JSON, markdown fences, or multiple actions."
+            ),
         )
 
         investigation_context = {
@@ -153,17 +175,29 @@ class ReActInvestigator:
             "lookup": lookup.to_dict(),
             "prediction": prediction.to_dict(),
         }
-        agent_result = executor.invoke({"input": json.dumps(investigation_context, ensure_ascii=False)})
+        recorders = {name: ModelCallRecorder(model) for name, model in self.models.items()}
+        agent_result = executor.invoke(
+            {"input": json.dumps(investigation_context, ensure_ascii=False)},
+            config={"callbacks": [recorders["react"], self.runtime_recorders["react"]]},
+        )
         tool_results, trace = self._collect_tool_results(agent_result.get("intermediate_steps", []))
 
         structured_output, attempts, fallback_used = self._structure_output(
             investigation_context=investigation_context,
             agent_summary=str(agent_result.get("output", "")),
             tool_results=tool_results,
+            recorders=recorders,
         )
 
-        validated = AgentDecision(**structured_output)
+        validated = AgentDecision(**AgentDecisionModel.model_validate(structured_output).model_dump())
         final_action, reviewer_note = self._review_and_finalize(validated, tool_results, prediction)
+        execution = execution_summary(recorders)
+        execution["tools_executed"] = list(tool_results)
+        execution["react_parser_errors"] = sum(step["tool"] == "_Exception" for step in trace)
+        execution["confidence_kind"] = (
+            "heuristic_uncalibrated" if recorders["decision"].description["backend"] == "heuristic_local"
+            else "model_reported_uncalibrated"
+        )
 
         return InvestigationResult(
             action=final_action,
@@ -179,6 +213,7 @@ class ReActInvestigator:
             human_readable_explanation=validated.human_readable_explanation,
             analyst_report=validated.analyst_report,
             dashboard_summary=validated.dashboard_summary,
+            execution=execution,
         )
 
     def _structure_output(
@@ -186,7 +221,9 @@ class ReActInvestigator:
         investigation_context: dict[str, Any],
         agent_summary: str,
         tool_results: dict[str, Any],
+        recorders: dict[str, ModelCallRecorder] | None = None,
     ) -> tuple[dict[str, Any], int, bool]:
+        recorders = recorders or {name: ModelCallRecorder(model) for name, model in self.models.items()}
         parser = PydanticOutputParser(pydantic_object=AgentDecisionModel)
         prompt_value = DECISION_PROMPT.format_prompt(
             format_instructions=parser.get_format_instructions(),
@@ -200,7 +237,10 @@ class ReActInvestigator:
             ),
         )
 
-        completion = self.decision_llm.invoke(prompt_value.to_string())
+        completion = StrOutputParser().invoke(self.decision_llm.invoke(
+            prompt_value.to_string(),
+            config={"callbacks": [recorders["decision"], self.runtime_recorders["decision"]]},
+        ))
         attempts = 1
 
         try:
@@ -208,7 +248,7 @@ class ReActInvestigator:
             return parsed.model_dump(), attempts, False
         except OutputParserException:
             retry_parser = RetryOutputParser.from_llm(
-                llm=self.retry_llm,
+                llm=self.retry_llm.with_config(callbacks=[recorders["retry"], self.runtime_recorders["retry"]]),
                 parser=parser,
                 prompt=RETRY_PROMPT,
                 max_retries=3,
@@ -250,7 +290,8 @@ class ReActInvestigator:
             except (TypeError, json.JSONDecodeError):
                 parsed_observation = observation
 
-            tool_results[action.tool] = parsed_observation
+            if action.tool != "_Exception":
+                tool_results[action.tool] = parsed_observation
             trace.append(
                 {
                     "tool": action.tool,

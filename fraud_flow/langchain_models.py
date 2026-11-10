@@ -108,7 +108,7 @@ def build_decision_payload(context: dict[str, Any]) -> dict[str, Any]:
         prediction=prediction,
         final_action=action,
         final_note=summary,
-        agent={"agent_output": {"structured_output": payload}},
+        agent={"agent_output": {"structured_output": payload}, "tool_results": tool_results},
     )
     payload.update(narrative)
     return payload

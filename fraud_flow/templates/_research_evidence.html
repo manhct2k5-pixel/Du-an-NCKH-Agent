@@ -1,0 +1,30 @@
+{% macro value(number, digits=4) -%}
+{{ ('%.*f'|format(digits, number)) if number is number else 'Chưa có' }}
+{%- endmacro %}
+<section class="research-section panel" aria-labelledby="final-evidence-title">
+  <div class="section-head"><div class="section-label">Bằng chứng NCKH · Bộ kết quả final</div><h2 id="final-evidence-title">Hiệu quả trên holdout PaySim</h2><p class="section-sub">{{ evidence.split.test_rows }} giao dịch test · chia tập theo thời gian · {{ evidence.split.train_rows }} train / {{ evidence.split.validation_rows }} validation. Các số liệu dưới đây đọc từ artifact thực nghiệm, độc lập với giao dịch đang trình diễn.</p></div>
+  <div class="evidence-grid">
+    {% for metric, label in [('auc','ROC-AUC'),('pr_auc','PR-AUC'),('f1','F1'),('precision','Precision'),('recall','Recall')] %}
+    <article class="evidence-card"><h3>{{ label }}</h3><p class="evidence-value">{{ value(evidence.test[metric]) }}</p><small>Holdout PaySim</small></article>
+    {% endfor %}
+    <article class="evidence-card"><h3>Đối chiếu được nguồn</h3><p>Mở dữ liệu JSON đang cấp cho phần kết quả này.</p><a class="case-open" href="/research/evidence">Xem số liệu và nguồn</a></article>
+  </div>
+</section>
+<section class="research-section panel" aria-labelledby="contributions-title">
+  <div class="section-head"><div class="section-label">Phân tích đóng góp và giới hạn</div><h2 id="contributions-title">Agent, độ tin cậy và thời gian xử lý</h2></div>
+  <div class="evidence-grid">
+    <article class="evidence-card"><h3>Ablation nhánh medium</h3><p class="evidence-value">{{ evidence.medium.before if evidence.medium.before is not none else '—' }} → {{ evidence.medium.after if evidence.medium.after is not none else '—' }}</p><p>Số ca cần review; giảm {{ value(evidence.medium.reduction_rate * 100 if evidence.medium.reduction_rate is number else none, 2) }}%.</p><small>B8 final: deterministic offline replay; không đo toàn bộ ReAct runtime.</small></article>
+    <article class="evidence-card"><h3>Khoảng tin cậy 95% của F1</h3><p class="evidence-value">{{ value(evidence.bootstrap.metrics.get('f1', {}).get('ci95_low')) }}–{{ value(evidence.bootstrap.metrics.get('f1', {}).get('ci95_high')) }}</p><p>{{ evidence.bootstrap.iterations or '—' }} lần bootstrap phân tầng trên test của model cố định.</p><small>B10 final; không bao gồm bất định của toàn bộ quá trình huấn luyện.</small></article>
+    <article class="evidence-card"><h3>Latency local trung bình</h3><p class="evidence-value">{{ value(evidence.latency.get('mean_ms'), 2) }} ms</p><p>P95: {{ value(evidence.latency.get('p95_ms'), 2) }} ms.</p><small>B11 final: tuần tự, in-memory; không gồm Redis, network, external LLM/API hoặc logging.</small></article>
+  </div>
+</section>
+<section class="research-section panel" aria-labelledby="final-ablation-title">
+  <div class="section-head"><div class="section-label">B8 final</div><h2 id="final-ablation-title">Đóng góp của các nhóm đặc trưng</h2><p class="section-sub">Giữ cùng giao thức chống leakage và siêu tham số; ngưỡng được chọn trên validation.</p></div>
+  <div class="table-wrap"><table class="research-table"><thead><tr><th>Cấu hình</th><th>Đặc trưng</th><th>AUC</th><th>PR-AUC</th><th>F1</th><th>ΔF1 so với đầy đủ</th></tr></thead><tbody>
+  {% for row in evidence.ablations %}<tr class="{% if row.configuration == 'full_feature_set' %}row-highlight{% endif %}"><th scope="row">{{ row.configuration }}</th><td>{{ row.feature_count }}</td><td>{{ value(row.test_auc) }}</td><td>{{ value(row.test_pr_auc) }}</td><td>{{ value(row.test_f1) }}</td><td>{{ value(row.delta_f1_vs_full) }}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<section class="research-section panel" aria-labelledby="final-external-title">
+  <div class="section-head"><div class="section-label">B12 final · Kiểm định ngoài miền</div><h2 id="final-external-title">Giới hạn chuyển miền sang IEEE-CIS</h2><p class="section-sub">Frozen, transfer và native là ba thiết lập khác nhau. Kết quả cho thấy domain shift, chưa đủ để kết luận model PaySim tổng quát hóa tốt trực tiếp.</p></div>
+  <div class="table-wrap"><table class="research-table"><thead><tr><th>Thiết lập</th><th>AUC</th><th>PR-AUC</th><th>F1</th></tr></thead><tbody>{% for row in evidence.external %}<tr><th scope="row">{{ row.label }}</th><td>{{ value(row.metrics.get('auc')) }}</td><td>{{ value(row.metrics.get('pr_auc')) }}</td><td>{{ value(row.metrics.get('f1')) }}</td></tr>{% endfor %}</tbody></table></div>
+</section>

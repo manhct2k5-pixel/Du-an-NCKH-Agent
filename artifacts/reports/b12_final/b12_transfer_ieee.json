@@ -1,0 +1,162 @@
+{
+  "experiment": "transfer_paysim_to_ieee",
+  "protocol": {
+    "raw_split_before_label_history_features": true,
+    "chronological_split": true,
+    "adapt_fraction": 0.1,
+    "adapt_train_fraction_within_adapt": 0.8,
+    "validation_labels_used_for": [
+      "num_boost_round_selection",
+      "threshold_selection"
+    ],
+    "final_test_labels_available_during_feature_construction": false,
+    "final_test_updates_feature_history": false,
+    "test_used_for_model_selection": false,
+    "test_label_leakage": false,
+    "test_evaluations": 1,
+    "alignment_fit_scope": "adapt_train_covariates_only"
+  },
+  "candidate_num_boost_round": [
+    25,
+    50,
+    75,
+    100
+  ],
+  "selection_criterion": "maximum adapt-validation AUC",
+  "selected_num_boost_round": 25,
+  "threshold_selection": "maximum adapt-validation F1 on PR-curve thresholds",
+  "threshold": 0.8150565028190613,
+  "train_rows": 47243,
+  "validation_rows": 11811,
+  "test_rows": 531486,
+  "feature_count": 25,
+  "adapt_params": {
+    "objective": "binary:logistic",
+    "eval_metric": "logloss",
+    "seed": 42,
+    "tree_method": "hist",
+    "scale_pos_weight": 35.17381316998468,
+    "max_delta_step": 1,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85
+  },
+  "candidate_validation": [
+    {
+      "num_boost_round": 25,
+      "threshold": 0.8150565028190613,
+      "metrics": {
+        "auc": 0.6347888399255281,
+        "pr_auc": 0.04575202807912468,
+        "f1": 0.1372972972972973,
+        "precision": 0.08327868852459017,
+        "recall": 0.39076923076923076,
+        "confusion_matrix": {
+          "true_negative": 10088,
+          "false_positive": 1398,
+          "false_negative": 198,
+          "true_positive": 127
+        }
+      }
+    },
+    {
+      "num_boost_round": 50,
+      "threshold": 0.5206888914108276,
+      "metrics": {
+        "auc": 0.6176710108627226,
+        "pr_auc": 0.04503538309539204,
+        "f1": 0.13353413654618473,
+        "precision": 0.07978404319136173,
+        "recall": 0.40923076923076923,
+        "confusion_matrix": {
+          "true_negative": 9952,
+          "false_positive": 1534,
+          "false_negative": 192,
+          "true_positive": 133
+        }
+      }
+    },
+    {
+      "num_boost_round": 75,
+      "threshold": 0.6354993581771851,
+      "metrics": {
+        "auc": 0.6121008853587645,
+        "pr_auc": 0.04407291713754608,
+        "f1": 0.12197802197802197,
+        "precision": 0.07424749163879599,
+        "recall": 0.3415384615384615,
+        "confusion_matrix": {
+          "true_negative": 10102,
+          "false_positive": 1384,
+          "false_negative": 214,
+          "true_positive": 111
+        }
+      }
+    },
+    {
+      "num_boost_round": 100,
+      "threshold": 0.5620378255844116,
+      "metrics": {
+        "auc": 0.6126026333060984,
+        "pr_auc": 0.04304389356274547,
+        "f1": 0.10991379310344827,
+        "precision": 0.06662312214239059,
+        "recall": 0.31384615384615383,
+        "confusion_matrix": {
+          "true_negative": 10057,
+          "false_positive": 1429,
+          "false_negative": 223,
+          "true_positive": 102
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "auc": 0.6525325347771955,
+    "pr_auc": 0.062448950373776395,
+    "f1": 0.13322005097706033,
+    "precision": 0.0769835035349568,
+    "recall": 0.4943253467843632,
+    "confusion_matrix": {
+      "true_negative": 399654,
+      "false_positive": 112800,
+      "false_negative": 9624,
+      "true_positive": 9408
+    }
+  },
+  "base_model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+  "model_sha256": "deb96587c76cb484fca1e34348a0aeba77316eaebad3a9f8aaa918116d165792",
+  "provenance": {
+    "generated_at": "2026-10-11T12:40:47.856820+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "dataset_paths": {
+      "ieee_transaction": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_transaction.csv",
+      "ieee_identity": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_identity.csv",
+      "paysim_reference": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv"
+    },
+    "dataset_sha256": {
+      "ieee_transaction": "3a5c83ab6b3cc13dcabe5ffa9f522307fd5f7f7b6e6f6a60c32284ca6283d642",
+      "ieee_identity": "b63c725d8377be90a995268d97f347c17d456b95db45807adcf9f59cd603c37c",
+      "paysim_reference": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498"
+    },
+    "production_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+    "production_model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+    "code_sha256": {
+      "composite": "085e7c78d3114350bea597d0fbe50c0165228845c371cd14339920f91e0a76b3",
+      "files": {
+        "scripts/run_b12_final.py": "7d802b5d511c382165162b08d780fdd9ac016ea3ee1d74d7171b80a79050da50",
+        "scripts/ieee_cis_optimized_benchmark.py": "48e439e1b46ef58927dea93ad3f2840560acb157984b4095910aef7c8d57dbf7",
+        "fraud_flow/config.py": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1",
+        "fraud_flow/features.py": "83ddb3f634daed961a216ea1cac053aac38d2e6272e2db3fb5eba4fa385ad1a9",
+        "fraud_flow/feature_store.py": "f524dd2e43a5aec7a161af2e642de4478c556d07f2abbcaf7b19c31a6cb8bd5e",
+        "fraud_flow/llm_features.py": "307cc0984287998a81620544f8a04fc7274a6fbc1b35e9f22bf3a63a95baad92",
+        "fraud_flow/schema.py": "987448560d8851f0518374afa282ad787d7eed6c13daed9be3c19372c7d73cbc"
+      }
+    },
+    "exact_command": "'/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python' scripts/run_b12_final.py",
+    "artifact_scope": "b12_final_only",
+    "random_state": 42
+  }
+}

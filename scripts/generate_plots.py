@@ -2,7 +2,7 @@
 Tạo các biểu đồ kết quả: ROC curve, PR curve, threshold sweep, và
 bảng so sánh baseline — từ các CSV artifact đã có sẵn.
 
-Output:  artifacts/reports/plots/
+Output:  archive/artifacts/reports/plots/
     - roc_curve.png
     - pr_curve.png
     - threshold_sweep.png
@@ -26,9 +26,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from fraud_flow.config import ROOT_DIR
+from fraud_flow.report_paths import ARCHIVE_REPORT_DIR, existing_report_path
 
-REPORT_DIR = Path("artifacts/reports")
-PLOT_DIR = REPORT_DIR / "plots"
+
+REPORT_DIR = ROOT_DIR / "artifacts" / "reports"
+PLOT_DIR = ARCHIVE_REPORT_DIR / "plots"
 
 
 def save(fig: plt.Figure, name: str) -> None:
@@ -40,8 +43,8 @@ def save(fig: plt.Figure, name: str) -> None:
 
 
 def plot_roc_curves():
-    val_path = REPORT_DIR / "validation_roc_curve.csv"
-    test_path = REPORT_DIR / "test_roc_curve.csv"
+    val_path = existing_report_path(REPORT_DIR / "validation_roc_curve.csv")
+    test_path = existing_report_path(REPORT_DIR / "test_roc_curve.csv")
     if not val_path.exists() or not test_path.exists():
         print("  [skip] ROC curve CSVs not found")
         return
@@ -69,8 +72,8 @@ def plot_roc_curves():
 
 
 def plot_pr_curves():
-    val_path = REPORT_DIR / "validation_pr_curve.csv"
-    test_path = REPORT_DIR / "test_pr_curve.csv"
+    val_path = existing_report_path(REPORT_DIR / "validation_pr_curve.csv")
+    test_path = existing_report_path(REPORT_DIR / "test_pr_curve.csv")
     if not val_path.exists() or not test_path.exists():
         print("  [skip] PR curve CSVs not found")
         return
@@ -97,7 +100,7 @@ def plot_pr_curves():
 
 
 def plot_threshold_sweep():
-    path = REPORT_DIR / "validation_threshold_sweep.csv"
+    path = existing_report_path(REPORT_DIR / "validation_threshold_sweep.csv")
     if not path.exists():
         print("  [skip] Threshold sweep CSV not found")
         return
@@ -117,7 +120,7 @@ def plot_threshold_sweep():
 
 
 def plot_baseline_comparison():
-    path = REPORT_DIR / "baseline_comparison.json"
+    path = existing_report_path(REPORT_DIR / "baseline_comparison.json")
     if not path.exists():
         print("  [skip] baseline_comparison.json not found")
         return
@@ -152,7 +155,7 @@ def plot_baseline_comparison():
 
 
 def plot_leakage_comparison():
-    path = REPORT_DIR / "leakage_comparison.json"
+    path = existing_report_path(REPORT_DIR / "leakage_comparison.json")
     if not path.exists():
         print("  [skip] leakage_comparison.json not found — run scripts/compute_leakage_comparison.py first")
         return
@@ -186,7 +189,7 @@ def plot_leakage_comparison():
 
 
 def plot_feature_ablation():
-    path = REPORT_DIR / "feature_ablation.json"
+    path = existing_report_path(REPORT_DIR / "feature_ablation.json")
     if not path.exists():
         print("  [skip] feature_ablation.json not found")
         return

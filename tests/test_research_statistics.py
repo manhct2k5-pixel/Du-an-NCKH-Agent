@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pandas as pd
 
+import fraud_flow.research as research_module
+from fraud_flow.config import APP_CONFIG
 from fraud_flow.features import resolve_ieee_identity_path
 from fraud_flow.config import PAYSIM_FEATURE_COLUMNS
 from fraud_flow.research import (
@@ -95,10 +99,33 @@ def test_resolve_external_validation_path_prefers_explicit_override() -> None:
     assert resolve_external_validation_data_path("paysim", "/tmp/external.csv") == "/tmp/external.csv"
 
 
-def test_resolve_external_validation_path_discovers_ieee_for_paysim() -> None:
+def test_resolve_external_validation_path_discovers_ieee_for_paysim(tmp_path, monkeypatch) -> None:
+    transaction_path = tmp_path / "train_transaction.csv"
+    transaction_path.touch()
+    transaction_path.with_name("train_identity.csv").touch()
+    monkeypatch.setattr(research_module, "APP_CONFIG", replace(
+        APP_CONFIG,
+        data_path=tmp_path / "paysim.csv",
+        transaction_data_path=transaction_path,
+    ))
     discovered = resolve_external_validation_data_path("paysim")
-    assert discovered is not None
-    assert "train_transaction" in discovered
+    assert discovered == str(transaction_path)
+
+
+def test_archived_ieee_requires_explicit_path(tmp_path, monkeypatch) -> None:
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    archived = tmp_path / "archive" / "data" / "ieee-fraud-detection" / "train_transaction.csv"
+    archived.parent.mkdir(parents=True)
+    archived.touch()
+    archived.with_name("train_identity.csv").touch()
+    monkeypatch.setattr(research_module, "APP_CONFIG", replace(
+        APP_CONFIG,
+        data_path=data_dir / "paysim.csv",
+        transaction_data_path=data_dir / "train_transaction.csv",
+    ))
+    assert resolve_external_validation_data_path("paysim") is None
+    assert resolve_external_validation_data_path("paysim", str(archived)) == str(archived)
 
 
 def test_resolve_ieee_identity_path_prefers_transaction_sibling(tmp_path) -> None:

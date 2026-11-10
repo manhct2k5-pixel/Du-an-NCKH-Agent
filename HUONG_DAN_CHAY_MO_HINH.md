@@ -1,5 +1,7 @@
 # Hướng Dẫn Chạy Mô Hình Fraud Flow
 
+> Cập nhật bố cục 2026-11-09: luồng chính dùng PaySim; IEEE-CIS và kết quả research cũ đã cất riêng. Số liệu mô tả dưới đây thuộc các đợt trước; dùng B14 cho báo cáo cuối và tra `archive/manifest.csv` để tìm artifact đã chuyển. Chạy research chủ động sẽ tạo kết quả mới tại đường dẫn output tiêu chuẩn.
+
 Entry point chính:
 
 ```bash
@@ -22,7 +24,7 @@ Mặc định hệ thống dùng `data/paysim.csv`. Các lệnh online (`simulat
 ```bash
 sudo apt update
 sudo apt install -y python3-venv python3-pip redis-server
-cd "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection"
+cd Du-an-NCKH-Agent
 python3 -m venv --clear .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
@@ -36,7 +38,7 @@ python3 -m pip install -r requirements.txt
 Luôn bắt đầu bằng 2 lệnh này để terminal đứng đúng thư mục project và dùng đúng môi trường Python:
 
 ```bash
-cd "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection"
+cd Du-an-NCKH-Agent
 source .venv/bin/activate
 ```
 
@@ -45,19 +47,19 @@ source .venv/bin/activate
 Lệnh đầy đủ để dùng trong báo cáo NCKH:
 
 ```bash
-python3 run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv --seeds 42,43,44 --bootstrap-iterations 300
+python3 run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv --seeds 42,43,44 --bootstrap-iterations 300
 ```
 
 Nếu chỉ muốn kiểm tra nhanh trước khi chạy đầy đủ:
 
 ```bash
-python3 run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv --sample-size 20000 --seeds 42,43 --bootstrap-iterations 25
+python3 run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv --sample-size 20000 --seeds 42,43 --bootstrap-iterations 25
 ```
 
 Kết quả cần xem:
 
-- `docs/REPORT_MO_HINH_PAYSIM.md`
-- `docs/BANG_KET_QUA_BAO_CAO.md`
+- `docs/archive/stages/REPORT_MO_HINH_PAYSIM.md`
+- `docs/archive/stages/BANG_KET_QUA_BAO_CAO.md`
 - `artifacts/reports/research_suite.md`
 - `artifacts/reports/baseline_comparison.md`
 - `artifacts/reports/robustness_validation.md`
@@ -82,7 +84,7 @@ Lệnh này ghi model và metadata vào `artifacts/models/`, đồng thời tạ
 ### Bước 3. Transfer learning thử nghiệm trên IEEE-CIS
 
 ```bash
-python3 run_fraud_flow.py adapt --ieee-data-path data/train_transaction.csv --adapt-fraction 0.10
+python3 run_fraud_flow.py adapt --ieee-data-path archive/data/ieee-fraud-detection/train_transaction.csv --adapt-fraction 0.10
 ```
 
 Lệnh này dùng PaySim booster làm base model, align IEEE-CIS sang 25 PaySim features, train tiếp trên 10%
@@ -137,11 +139,11 @@ Mở trình duyệt:
 ### Block lệnh đầy đủ để copy chạy một lần
 
 ```bash
-cd "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection"
+cd Du-an-NCKH-Agent
 source .venv/bin/activate
-python3 run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv --seeds 42,43,44 --bootstrap-iterations 300
+python3 run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv --seeds 42,43,44 --bootstrap-iterations 300
 python3 run_fraud_flow.py train --source paysim
-python3 run_fraud_flow.py adapt --ieee-data-path data/train_transaction.csv --adapt-fraction 0.10
+python3 run_fraud_flow.py adapt --ieee-data-path archive/data/ieee-fraud-detection/train_transaction.csv --adapt-fraction 0.10
 python3 run_fraud_flow.py deploy --reason "Full PaySim production model; IEEE-CIS frozen validation documents domain shift"
 python3 run_fraud_flow.py status
 python3 run_fraud_flow.py simulate --limit 5000
@@ -169,13 +171,13 @@ python3 run_fraud_flow.py train --data-path data/my_paysim_2024.csv --source pay
 File transaction kèm file identity (tự tìm cùng thư mục theo tên `train_identity.csv`):
 
 ```bash
-python3 run_fraud_flow.py train --data-path data/train_transaction.csv --source ieee
+python3 run_fraud_flow.py train --data-path archive/data/ieee-fraud-detection/train_transaction.csv --source ieee
 ```
 
 Nếu dữ liệu nằm trong thư mục Kaggle gốc:
 
 ```bash
-python3 run_fraud_flow.py train --data-path data/ieee-fraud-detection/train_transaction.csv --source ieee
+python3 run_fraud_flow.py train --data-path archive/data/ieee-fraud-detection/train_transaction.csv --source ieee
 ```
 
 ### Giới hạn số dòng để test nhanh
@@ -200,7 +202,7 @@ python3 run_fraud_flow.py retrain  --data-path data/my_paysim_2024.csv --source 
 ```bash
 python3 run_fraud_flow.py train                        # production, PaySim mặc định
 python3 run_fraud_flow.py train --sample-size 6000     # thực nghiệm nhanh
-python3 run_fraud_flow.py train --data-path data/train_transaction.csv --source ieee
+python3 run_fraud_flow.py train --data-path archive/data/ieee-fraud-detection/train_transaction.csv --source ieee
 ```
 
 - Production ghi vào `artifacts/models/` và `artifacts/reports/`.
@@ -211,8 +213,8 @@ python3 run_fraud_flow.py train --data-path data/train_transaction.csv --source 
 ```bash
 python3 run_fraud_flow.py research
 python3 run_fraud_flow.py research --sample-size 6000
-python3 run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv
-python3 run_fraud_flow.py research --source paysim --external-data-path data/ieee-fraud-detection/train_transaction.csv
+python3 run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv
+python3 run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv
 
 # Chạy kiểm tra độ ổn định (quan trọng cho NCKH)
 # Báo cáo mean/std, confidence interval, và McNemar test

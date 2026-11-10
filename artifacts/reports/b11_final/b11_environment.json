@@ -1,0 +1,39 @@
+{
+  "schema_version": "b11-environment-v1",
+  "generated_at": "2026-10-10T16:56:07.448476+00:00",
+  "cpu_model": "AMD Ryzen 7 7435HS",
+  "physical_cores": 8,
+  "logical_cores": 16,
+  "ram_total_bytes": 16433221632,
+  "ram_total_gib": 15.304630279541016,
+  "operating_system": "Linux-6.17.0-20-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.3",
+  "python_executable": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python",
+  "packages": {
+    "xgboost": "3.2.0",
+    "scikit-learn": "1.8.0",
+    "pandas": "2.2.3",
+    "numpy": "2.2.5",
+    "shap": "0.51.0"
+  },
+  "gpu": {
+    "available": true,
+    "devices": [
+      "NVIDIA GeForce RTX 4050 Laptop GPU"
+    ],
+    "detection": "nvidia-smi query"
+  },
+  "xgboost_benchmark_device": "CPU; tree_method=hist and no device=cuda parameter",
+  "redis_mode": "not used; in-memory FeatureStore; Redis/network overhead excluded",
+  "external_llm_backend_configured": false,
+  "external_llm_react_latency": "NOT MEASURED",
+  "external_llm_reason": "External network/API execution was excluded to avoid dependency and cost.",
+  "clock": "time.perf_counter",
+  "benchmark_command": "'/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python' scripts/run_b11_efficiency.py --training-repetitions 3 --warmup 100 --min-measured 1000 --min-low 800 --min-medium 100 --min-high 1",
+  "provenance_hashes": {
+    "code_sha256": "6b75e946682fcd73812b33a3598e20316c90bb63befbe1832737e851db7ab80c",
+    "dataset_sha256": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498",
+    "model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+    "metadata_sha256": "accf3619d88e9c60553d6909e86c75dcc1a2c34127e59e342e37574ffb54baf2"
+  }
+}

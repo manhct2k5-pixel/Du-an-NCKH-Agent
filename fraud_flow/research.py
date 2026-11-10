@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 import math
+import hashlib
+import subprocess
 import time
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -911,8 +914,12 @@ def action_policy_report(actions: list[str], y_true: pd.Series, medium_routes: l
     review_count = sum(action == "review" for action in actions)
     block_count = int(pred_block.sum())
     approve_count = sum(action == "approve" for action in actions)
-    fraud_in_review = sum(action == "review" and label == 1 for action, label in zip(actions, y_true_array, strict=True))
-    normal_in_block = sum(action == "block" and label == 0 for action, label in zip(actions, y_true_array, strict=True))
+    fraud_in_review = int(
+        sum(action == "review" and label == 1 for action, label in zip(actions, y_true_array, strict=True))
+    )
+    normal_in_block = int(
+        sum(action == "block" and label == 0 for action, label in zip(actions, y_true_array, strict=True))
+    )
 
     return {
         "approve_count": approve_count,
@@ -924,8 +931,10 @@ def action_policy_report(actions: list[str], y_true: pd.Series, medium_routes: l
         "block_precision": block_precision,
         "block_recall": block_recall,
         "block_f1": block_f1,
+        "fraud_review_count": fraud_in_review,
         "fraud_review_rate": round(fraud_in_review / max(positives, 1), 6),
         "review_fraud_share": round(fraud_in_review / max(review_count, 1), 6),
+        "false_positive_blocks": normal_in_block,
         "false_positive_block_rate": round(normal_in_block / max(negatives, 1), 6),
         "medium_case_count": int(sum(medium_routes)),
         "medium_case_share": round(sum(medium_routes) / max(len(actions), 1), 6),
@@ -1213,10 +1222,15 @@ def run_medium_branch_ablation(
     test_proba, explanations = prediction_from_artifact(xgb_artifact, splits.bundle.feature_columns, splits.X_test)
 
     store = FeatureStore()
-    history_df = splits.bundle.dataset.iloc[:split_indices(len(splits.bundle.dataset))[1]].copy()
-    for row in history_df.itertuples(index=False):
+    train_end, val_end = split_indices(len(splits.bundle.dataset))
+    train_history_df = splits.bundle.dataset.iloc[:train_end]
+    validation_activity_df = splits.bundle.dataset.iloc[train_end:val_end]
+    for row in train_history_df.itertuples(index=False):
         event = event_from_row(row, source=splits.bundle.source)
         store.observe(event, event.is_fraud)
+    for row in validation_activity_df.itertuples(index=False):
+        event = event_from_row(row, source=splits.bundle.source)
+        store.observe_activity(event)
 
     policy_actions: dict[str, list[str]] = {
         "score_threshold_block": [],
@@ -1258,7 +1272,7 @@ def run_medium_branch_ablation(
         "score_threshold_block": "Binary threshold baseline with no routing and no manual review state.",
         "route_without_agent": "Original routing but every medium case is held for human review.",
         "route_medium_auto_approve": "Routing with the medium band auto-approved to show the risk of removing investigation.",
-        "route_with_medium_agent": "Routing with the offline replay of the current investigator logic on medium cases.",
+        "route_with_medium_agent": "Routing with deterministic offline investigator-policy replay on medium cases; this is not a ReAct runtime execution.",
     }
 
     policy_reports = []
@@ -1274,6 +1288,12 @@ def run_medium_branch_ablation(
         "artifact_scope": outputs.artifact_scope,
         "selected_threshold": xgb_artifact.threshold,
         "routing_calibration": calibration,
+        "history_protocol": {
+            "train_rows": "activity and labels update historical state",
+            "validation_rows": "activity-only updates; labels are not consumed",
+            "test_rows": "sequential activity-only updates after each decision; labels are not consumed before decisions",
+        },
+        "classifier_predictions_changed": False,
         "medium_case_count": int(sum(medium_routes)),
         "policies": policy_reports,
     }
@@ -1753,7 +1773,10 @@ def run_external_validation(
 
 def build_research_suite_markdown(report: dict[str, Any]) -> str:
     best_baseline = report["baseline"]["models"][0]
-    best_feature = max(report["feature_ablation"]["ablations"], key=lambda item: item["test_metrics"]["auc"])
+    highest_test_auc_feature = max(
+        report["feature_ablation"]["ablations"],
+        key=lambda item: item["test_metrics"]["auc"],
+    )
     best_policy = max(report["medium_branch"]["policies"], key=lambda item: item["block_f1"])
     robustness_best = report["robustness"]["multi_seed_summary"][0]
     external_models = report["external_validation"].get("models", [])
@@ -1794,11 +1817,12 @@ def build_research_suite_markdown(report: dict[str, Any]) -> str:
             f"- Test F1: `{best_baseline['test']['metrics']['f1']:.6f}`",
             f"- Test PR AUC: `{best_baseline['test']['pr_auc']:.6f}`",
             "",
-            "## Best Feature Configuration",
+            "## Highest Observed Held-Out Test AUC Configuration",
             "",
-            f"- Ablation: `{best_feature['name']}`",
-            f"- Test AUC: `{best_feature['test_metrics']['auc']:.6f}`",
-            f"- Test F1: `{best_feature['test_metrics']['f1']:.6f}`",
+            "- Descriptive only; not used for model or feature selection.",
+            f"- Ablation: `{highest_test_auc_feature['name']}`",
+            f"- Test AUC: `{highest_test_auc_feature['test_metrics']['auc']:.6f}`",
+            f"- Test F1: `{highest_test_auc_feature['test_metrics']['f1']:.6f}`",
             (
                 ""
                 if llm_free_feature is None else
@@ -1920,3 +1944,734 @@ def run_research_suite(
     write_report(outputs.research_suite_path, report)
     write_report(outputs.research_suite_markdown_path, build_research_suite_markdown(report))
     return report
+
+
+# B8 v2 is intentionally isolated from run_research_suite so rerunning B8 does
+# not execute or overwrite the B1-B7 baseline/robustness/external artifacts.
+B8_EXPERIMENT_VERSION = "b8-v2-dependency-aware-leakage-aligned"
+B8_EXPECTED_SPLIT = {
+    "dataset_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060,
+}
+B8_FIXED_XGBOOST_PARAMS: dict[str, float | int] = {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.90,
+    "colsample_bytree": 0.85,
+}
+B8_LEAKAGE_CONTROL_PROTOCOL = (
+    "Chronological PaySim split after TRANSFER+CASH_OUT filtering. Training rows update activity and "
+    "label-based historical risk state. Validation and test rows update activity sequentially only; "
+    "their labels never update historical fraud-rate state before feature construction or policy decisions."
+)
+
+
+@dataclass(frozen=True)
+class B8Outputs:
+    directory: Path
+    feature_json: Path
+    feature_csv: Path
+    feature_markdown: Path
+    medium_json: Path
+    medium_csv: Path
+    medium_markdown: Path
+    manifest_json: Path
+    audit_markdown: Path
+
+
+def resolve_b8_outputs() -> B8Outputs:
+    directory = APP_CONFIG.outputs.training_report_path.parent / "b8_final"
+    return B8Outputs(
+        directory=directory,
+        feature_json=directory / "feature_ablation_b8.json",
+        feature_csv=directory / "feature_ablation_b8.csv",
+        feature_markdown=directory / "feature_ablation_b8.md",
+        medium_json=directory / "medium_branch_ablation_b8.json",
+        medium_csv=directory / "medium_branch_ablation_b8.csv",
+        medium_markdown=directory / "medium_branch_ablation_b8.md",
+        manifest_json=directory / "b8_run_manifest.json",
+        audit_markdown=directory / "B8_FINAL_AUDIT.md",
+    )
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def b8_llm_feature_dependency_audit() -> dict[str, Any]:
+    direct_inputs = {
+        "transaction_inputs": [
+            "event.tx_type",
+            "event.amount",
+            "event.oldbalanceOrg",
+            "event.newbalanceOrig",
+            "event.oldbalanceDest",
+            "event.extras.source",
+        ],
+        "online_behavior_inputs": [
+            "lookup.tx_count_24h",
+            "lookup.avg_amount_7d",
+            "lookup.device_tx_count_24h",
+            "lookup.location_tx_count_24h",
+            "lookup.merchant_tx_count_24h",
+            "lookup.location_fraud_rate",
+            "lookup.ip_fraud_rate",
+            "lookup.merchant_fraud_rate",
+        ],
+    }
+    return {
+        "audited_source": "fraud_flow/llm_features.py::build_transaction_llm_analysis and fraud_flow/features.py::assemble_feature_row",
+        "finding": (
+            "All five llm_* columns depend directly or transitively on both transaction/context inputs "
+            "and online behavioral/historical-risk inputs."
+        ),
+        "features": {
+            "llm_risk_score": {
+                "derivation": "risk_score from deterministic rule increments",
+                **direct_inputs,
+            },
+            "llm_reason_count": {
+                "derivation": "length of reason_codes emitted by the same deterministic rules",
+                **direct_inputs,
+            },
+            "llm_high_risk_flag": {
+                "derivation": "int(llm_risk_score >= 0.70); transitive dependencies equal llm_risk_score",
+                **direct_inputs,
+            },
+            "llm_review_flag": {
+                "derivation": "int(0.30 <= llm_risk_score < 0.70); transitive dependencies equal llm_risk_score",
+                **direct_inputs,
+            },
+            "llm_category_hash": {
+                "derivation": "stable hash of a category selected from risk_score and reason_codes",
+                **direct_inputs,
+            },
+        },
+    }
+
+
+def b8_feature_ablation_sets(full_feature_columns: list[str]) -> list[dict[str, Any]]:
+    groups = paysim_feature_groups()
+    online = set(groups["online_behavior"])
+    contextual = set(groups["contextual_aggregates"])
+    analysis = set(groups["llm_analysis"])
+    direct = {
+        item["name"]: item
+        for item in feature_ablation_sets("paysim", full_feature_columns)
+        if item["name"] in {
+            "full_feature_set",
+            "no_online_behavior",
+            "no_llm_analysis",
+            "no_contextual_aggregates",
+            "transaction_core_only",
+        }
+    }
+    direct_group_names = {
+        "full_feature_set": [],
+        "no_online_behavior": ["online_behavior"],
+        "no_llm_analysis": ["llm_analysis"],
+        "no_contextual_aggregates": ["contextual_aggregates"],
+        "transaction_core_only": ["contextual_aggregates", "online_behavior", "llm_analysis"],
+    }
+    ordered_names = [
+        "full_feature_set",
+        "no_online_behavior",
+        "no_llm_analysis",
+        "no_contextual_aggregates",
+        "transaction_core_only",
+    ]
+    configs: list[dict[str, Any]] = []
+    for name in ordered_names:
+        config = dict(direct[name])
+        config["experiment_type"] = "direct_feature_group_ablation"
+        config["removed_feature_groups"] = direct_group_names[name]
+        configs.append(config)
+
+    configs.extend(
+        [
+            {
+                "name": "no_online_behavior_and_dependent_analysis",
+                "feature_columns": [
+                    feature for feature in full_feature_columns
+                    if feature not in online | analysis
+                ],
+                "experiment_type": "dependency_aware_ablation",
+                "removed_feature_groups": ["online_behavior", "dependent_llm_analysis"],
+                "note": "Removes eight direct online-behavior columns and all five dependent llm_* analysis columns.",
+            },
+            {
+                "name": "no_contextual_and_dependent_analysis",
+                "feature_columns": [
+                    feature for feature in full_feature_columns
+                    if feature not in contextual | analysis
+                ],
+                "experiment_type": "dependency_aware_ablation",
+                "removed_feature_groups": ["contextual_aggregates", "dependent_llm_analysis"],
+                "note": "Removes six direct contextual columns and all five dependent llm_* analysis columns.",
+            },
+        ]
+    )
+    return configs
+
+
+def _b8_git_state(root: Path) -> tuple[str, bool]:
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    dirty = bool(
+        subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    )
+    return commit, dirty
+
+
+def build_b8_provenance(splits: ExperimentSplits) -> dict[str, Any]:
+    actual_split = {
+        "dataset_rows": len(splits.bundle.dataset),
+        "train_rows": len(splits.train_df),
+        "validation_rows": len(splits.val_df),
+        "test_rows": len(splits.test_df),
+    }
+    if splits.bundle.source != "paysim":
+        raise RuntimeError(f"B8 requires PaySim, received {splits.bundle.source!r}.")
+    if actual_split != B8_EXPECTED_SPLIT:
+        raise RuntimeError(
+            f"B8 dataset/split mismatch; expected {B8_EXPECTED_SPLIT}, received {actual_split}. "
+            "No B8 model training was started."
+        )
+
+    root = Path(__file__).resolve().parents[1]
+    data_path = Path(splits.bundle.data_path).resolve()
+    git_commit, git_dirty = _b8_git_state(root)
+    script_path = root / "scripts" / "run_b8_ablation.py"
+    code_hashes = {"fraud_flow/research.py": sha256_file(Path(__file__).resolve())}
+    if script_path.exists():
+        code_hashes["scripts/run_b8_ablation.py"] = sha256_file(script_path)
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": git_commit,
+        "git_dirty": git_dirty,
+        "code_sha256": code_hashes,
+        "random_state": APP_CONFIG.training.random_state,
+        "dataset_source": splits.bundle.source,
+        "dataset_path": str(data_path),
+        "dataset_sha256": sha256_file(data_path),
+        **actual_split,
+        "split_strategy": split_strategy_for_source(splits.bundle.source),
+        "leakage_control_protocol": B8_LEAKAGE_CONTROL_PROTOCOL,
+        "experiment_version": B8_EXPERIMENT_VERSION,
+    }
+
+
+def build_b8_feature_markdown(report: dict[str, Any]) -> str:
+    provenance = report["provenance"]
+    dependency_rows = []
+    for name, detail in report["llm_feature_dependency_audit"]["features"].items():
+        dependency_rows.append(
+            [
+                name,
+                detail["derivation"],
+                ", ".join(detail["transaction_inputs"]),
+                ", ".join(detail["online_behavior_inputs"]),
+            ]
+        )
+    result_rows = []
+    for item in report["ablations"]:
+        result_rows.append(
+            [
+                item["configuration"],
+                item["experiment_type"],
+                item["feature_count"],
+                item["selected_threshold"],
+                item["validation_auc"],
+                item["validation_f1"],
+                item["test_auc"],
+                item["test_pr_auc"],
+                item["test_f1"],
+                item["test_precision"],
+                item["test_recall"],
+                item["delta_auc_vs_full"],
+                item["delta_pr_auc_vs_full"],
+                item["delta_f1_vs_full"],
+            ]
+        )
+    return "\n".join(
+        [
+            "# B8 Final Feature Ablation",
+            "",
+            f"- Generated at: `{provenance['generated_at']}`",
+            f"- Git commit: `{provenance['git_commit']}`",
+            f"- Git dirty: `{str(provenance['git_dirty']).lower()}`",
+            f"- Experiment version: `{provenance['experiment_version']}`",
+            f"- Dataset: `{provenance['dataset_source']}` / `{provenance['dataset_rows']}` rows",
+            f"- Split: `{provenance['train_rows']} / {provenance['validation_rows']} / {provenance['test_rows']}`",
+            f"- Split strategy: `{provenance['split_strategy']}`",
+            f"- Random state: `{provenance['random_state']}`",
+            f"- Leakage control: {provenance['leakage_control_protocol']}",
+            f"- Fixed XGBoost params: `{json.dumps(report['fixed_xgboost_params'], ensure_ascii=False)}`",
+            "- Threshold selection: validation only.",
+            "- Test-set use: final evaluation only; never model/feature/threshold selection.",
+            "",
+            "## Audited dependencies of `llm_*`",
+            "",
+            report["llm_feature_dependency_audit"]["finding"],
+            "",
+            markdown_table(
+                ["Feature", "Derivation", "Transaction/context inputs", "Online/history inputs"],
+                dependency_rows,
+            ),
+            "",
+            "## Results",
+            "",
+            markdown_table(
+                [
+                    "Configuration", "Experiment", "Features", "Threshold", "Val AUC", "Val F1",
+                    "Test AUC", "Test PR-AUC", "Test F1", "Test precision", "Test recall",
+                    "Delta AUC", "Delta PR-AUC", "Delta F1",
+                ],
+                result_rows,
+            ),
+        ]
+    )
+
+
+def run_b8_feature_ablation(
+    splits: ExperimentSplits,
+    outputs: B8Outputs,
+    provenance: dict[str, Any],
+) -> tuple[dict[str, Any], ModelRunArtifact]:
+    configs = b8_feature_ablation_sets(splits.bundle.feature_columns)
+    items: list[dict[str, Any]] = []
+    full_artifact: ModelRunArtifact | None = None
+
+    for config in configs:
+        artifact = fit_best_xgboost(
+            splits,
+            config["feature_columns"],
+            fixed_params=B8_FIXED_XGBOOST_PARAMS,
+            random_state=APP_CONFIG.training.random_state,
+        )
+        validation_metrics = artifact.report["validation"]["metrics"]
+        test_metrics = artifact.report["test"]["metrics"]
+        removed_features = [
+            feature for feature in splits.bundle.feature_columns
+            if feature not in set(config["feature_columns"])
+        ]
+        item = {
+            "configuration": config["name"],
+            "experiment_type": config["experiment_type"],
+            "removed_feature_groups": config["removed_feature_groups"],
+            "removed_features": removed_features,
+            "remaining_features": config["feature_columns"],
+            "feature_count": len(config["feature_columns"]),
+            "selected_threshold": artifact.threshold,
+            "threshold_selected_on": "validation",
+            "validation_auc": validation_metrics["auc"],
+            "validation_f1": validation_metrics["f1"],
+            "test_auc": test_metrics["auc"],
+            "test_pr_auc": artifact.report["test"]["pr_auc"],
+            "test_f1": test_metrics["f1"],
+            "test_precision": test_metrics["precision"],
+            "test_recall": test_metrics["recall"],
+            "train_seconds": artifact.report["train_seconds"],
+            "note": config["note"],
+        }
+        if config["name"] == "full_feature_set":
+            full_artifact = artifact
+        items.append(item)
+
+    if full_artifact is None:
+        raise RuntimeError("B8 feature ablation did not produce full_feature_set.")
+    full_item = next(item for item in items if item["configuration"] == "full_feature_set")
+    for item in items:
+        item["delta_auc_vs_full"] = round(item["test_auc"] - full_item["test_auc"], 6)
+        item["delta_pr_auc_vs_full"] = round(item["test_pr_auc"] - full_item["test_pr_auc"], 6)
+        item["delta_f1_vs_full"] = round(item["test_f1"] - full_item["test_f1"], 6)
+
+    report = {
+        "provenance": provenance,
+        "fixed_xgboost_params": B8_FIXED_XGBOOST_PARAMS,
+        "hyperparameters_fixed_across_ablations": True,
+        "threshold_selection": "validation_only",
+        "test_set_used_for_selection": False,
+        "llm_feature_dependency_audit": b8_llm_feature_dependency_audit(),
+        "ablations": items,
+    }
+    write_report(outputs.feature_json, report)
+    csv_rows = []
+    for item in items:
+        csv_rows.append(
+            {
+                **{key: value for key, value in provenance.items() if key != "code_sha256"},
+                "code_sha256": json.dumps(provenance["code_sha256"], sort_keys=True),
+                **item,
+                "removed_feature_groups": json.dumps(item["removed_feature_groups"]),
+                "removed_features": json.dumps(item["removed_features"]),
+                "remaining_features": json.dumps(item["remaining_features"]),
+            }
+        )
+    write_csv_report(pd.DataFrame(csv_rows), outputs.feature_csv)
+    write_report(outputs.feature_markdown, build_b8_feature_markdown(report))
+    return report, full_artifact
+
+
+def build_b8_medium_markdown(report: dict[str, Any]) -> str:
+    provenance = report["provenance"]
+    rows = []
+    for item in report["policies"]:
+        rows.append(
+            [
+                item["policy"], item["medium_case_count"], item["approve_count"], item["approve_rate"],
+                item["review_count"], item["review_rate"], item["block_count"], item["block_rate"],
+                item["block_precision"], item["block_recall"], item["block_f1"],
+                item["fraud_review_count"], item["fraud_review_rate"],
+                item["false_positive_blocks"], item["false_positive_block_rate"],
+                item["manual_review_reduction_count"], item["manual_review_reduction_rate"],
+            ]
+        )
+    return "\n".join(
+        [
+            "# B8 Final Medium-Branch Policy Ablation",
+            "",
+            f"- Generated at: `{provenance['generated_at']}`",
+            f"- Git commit: `{provenance['git_commit']}`",
+            f"- Git dirty: `{str(provenance['git_dirty']).lower()}`",
+            f"- Experiment version: `{provenance['experiment_version']}`",
+            f"- Dataset: `{provenance['dataset_source']}` / `{provenance['dataset_rows']}` rows",
+            f"- Split: `{provenance['train_rows']} / {provenance['validation_rows']} / {provenance['test_rows']}`",
+            f"- Split strategy: `{provenance['split_strategy']}`",
+            f"- Random state: `{provenance['random_state']}`",
+            f"- Leakage control: {provenance['leakage_control_protocol']}",
+            "- Experiment meaning: deterministic offline medium-branch investigation replay.",
+            "- Full ReAct runtime executed: `false`.",
+            "- Classifier predictions changed: `false`.",
+            "- Low/high route actions fixed across policies: `true`.",
+            "",
+            markdown_table(
+                [
+                    "Policy", "Medium cases", "Approve", "Approve rate", "Review", "Review rate",
+                    "Block", "Block rate", "Block precision", "Block recall", "Block F1",
+                    "Fraud reviewed", "Fraud review rate", "FP blocks", "FP block rate",
+                    "Review reduction", "Review reduction rate",
+                ],
+                rows,
+            ),
+        ]
+    )
+
+
+def run_b8_medium_branch_ablation(
+    splits: ExperimentSplits,
+    xgb_artifact: ModelRunArtifact,
+    outputs: B8Outputs,
+    provenance: dict[str, Any],
+) -> dict[str, Any]:
+    calibration = build_routing_calibration(
+        xgb_artifact.validation_proba,
+        low_quantile=APP_CONFIG.training.calibration_low_quantile,
+        high_quantile=APP_CONFIG.training.calibration_high_quantile,
+        low_threshold=APP_CONFIG.routing.low,
+        high_threshold=APP_CONFIG.routing.high,
+    )
+    test_proba, explanations = prediction_from_artifact(
+        xgb_artifact,
+        splits.bundle.feature_columns,
+        splits.X_test,
+    )
+    if not np.array_equal(test_proba, xgb_artifact.test_proba):
+        raise RuntimeError("Classifier test probabilities changed between feature and medium B8 stages.")
+
+    store = FeatureStore()
+    for row in splits.train_df.itertuples(index=False):
+        event = event_from_row(row, source=splits.bundle.source)
+        store.observe(event, event.is_fraud)
+    for row in splits.val_df.itertuples(index=False):
+        event = event_from_row(row, source=splits.bundle.source)
+        store.observe_activity(event)
+
+    policy_actions: dict[str, list[str]] = {
+        "all_medium_manual_review": [],
+        "deterministic_offline_investigation_replay": [],
+    }
+    medium_routes: list[bool] = []
+    fixed_route_actions: list[str] = []
+    for index, row in enumerate(splits.test_df.itertuples(index=False)):
+        event = event_from_row(row, source=splits.bundle.source)
+        lookup = store.lookup(event)
+        raw_probability = float(test_proba[index])
+        score = calibrate_operational_score(raw_probability, calibration)
+        route = route_score(score, low_threshold=APP_CONFIG.routing.low, high_threshold=APP_CONFIG.routing.high)
+        is_medium = route == "medium"
+        medium_routes.append(is_medium)
+        fixed_action = "approve" if route == "low" else "block" if route == "high" else "review"
+        fixed_route_actions.append(fixed_action)
+        policy_actions["all_medium_manual_review"].append(fixed_action)
+
+        prediction = ModelPrediction(
+            score=score,
+            raw_probability=raw_probability,
+            route=route,
+            explanation=explanations[index],
+            latency_ms=0.0,
+        )
+        if is_medium:
+            replay = replay_medium_agent(store, event, lookup, prediction)
+            policy_actions["deterministic_offline_investigation_replay"].append(replay["action"])
+        else:
+            policy_actions["deterministic_offline_investigation_replay"].append(fixed_action)
+        store.observe_activity(event)
+
+    replay_actions = policy_actions["deterministic_offline_investigation_replay"]
+    if any(
+        replay_actions[index] != fixed_route_actions[index]
+        for index, is_medium in enumerate(medium_routes)
+        if not is_medium
+    ):
+        raise RuntimeError("B8 medium policy changed a low/high route action.")
+
+    baseline_review_count = sum(action == "review" for action in policy_actions["all_medium_manual_review"])
+    policy_notes = {
+        "all_medium_manual_review": "All medium-risk cases are sent to manual review; low/high actions remain fixed.",
+        "deterministic_offline_investigation_replay": (
+            "Deterministic offline investigator policy runs only on medium cases; this does not execute ReActInvestigator."
+        ),
+    }
+    policy_reports = []
+    for policy, actions in policy_actions.items():
+        metrics = action_policy_report(actions, splits.y_test, medium_routes)
+        reduction_count = baseline_review_count - metrics["review_count"]
+        policy_reports.append(
+            {
+                "policy": policy,
+                **metrics,
+                "manual_review_reduction_count": reduction_count,
+                "manual_review_reduction_rate": round(
+                    reduction_count / max(baseline_review_count, 1),
+                    6,
+                ),
+                "classifier_predictions_changed": False,
+                "note": policy_notes[policy],
+            }
+        )
+
+    report = {
+        "provenance": provenance,
+        "experiment_name": "deterministic offline medium-branch investigation replay",
+        "full_react_runtime_executed": False,
+        "classifier_predictions_changed": False,
+        "classifier_test_probability_sha256": hashlib.sha256(
+            np.asarray(test_proba, dtype=np.float64).tobytes()
+        ).hexdigest(),
+        "same_held_out_test_set": True,
+        "low_high_route_actions_fixed": True,
+        "selected_classifier_threshold": xgb_artifact.threshold,
+        "routing_calibration": calibration,
+        "history_protocol": {
+            "training": "activity and labels warm-start FeatureStore",
+            "validation": "activity-only warm-start; validation labels are not consumed",
+            "test": "lookup and decision first, then activity-only update; test labels are never consumed",
+        },
+        "medium_case_count": int(sum(medium_routes)),
+        "policies": policy_reports,
+    }
+    write_report(outputs.medium_json, report)
+    csv_rows = []
+    for item in policy_reports:
+        csv_rows.append(
+            {
+                **{key: value for key, value in provenance.items() if key != "code_sha256"},
+                "code_sha256": json.dumps(provenance["code_sha256"], sort_keys=True),
+                "full_react_runtime_executed": False,
+                "classifier_predictions_changed": False,
+                "low_high_route_actions_fixed": True,
+                **item,
+            }
+        )
+    write_csv_report(pd.DataFrame(csv_rows), outputs.medium_csv)
+    write_report(outputs.medium_markdown, build_b8_medium_markdown(report))
+    return report
+
+
+def validate_b8_reports(
+    feature_report: dict[str, Any],
+    medium_report: dict[str, Any],
+) -> dict[str, bool]:
+    direct_counts = {
+        item["configuration"]: item["feature_count"]
+        for item in feature_report["ablations"]
+        if item["experiment_type"] == "direct_feature_group_ablation"
+    }
+    expected_direct_counts = {
+        "full_feature_set": 25,
+        "no_online_behavior": 17,
+        "no_llm_analysis": 20,
+        "no_contextual_aggregates": 19,
+        "transaction_core_only": 6,
+    }
+    policies = {item["policy"]: item for item in medium_report["policies"]}
+    return {
+        "expected_dataset_and_split": all(
+            feature_report["provenance"][key] == value
+            for key, value in B8_EXPECTED_SPLIT.items()
+        ),
+        "direct_feature_counts": direct_counts == expected_direct_counts,
+        "dependency_aware_configs_present": {
+            "no_online_behavior_and_dependent_analysis",
+            "no_contextual_and_dependent_analysis",
+        }.issubset({item["configuration"] for item in feature_report["ablations"]}),
+        "fixed_hyperparameters": feature_report["hyperparameters_fixed_across_ablations"] is True,
+        "validation_only_thresholds": all(
+            item["threshold_selected_on"] == "validation"
+            for item in feature_report["ablations"]
+        ),
+        "test_not_used_for_selection": feature_report["test_set_used_for_selection"] is False,
+        "llm_dependencies_audited": len(feature_report["llm_feature_dependency_audit"]["features"]) == 5,
+        "same_held_out_test_set": medium_report["same_held_out_test_set"] is True,
+        "low_high_fixed": medium_report["low_high_route_actions_fixed"] is True,
+        "classifier_predictions_unchanged": medium_report["classifier_predictions_changed"] is False,
+        "not_react_runtime": medium_report["full_react_runtime_executed"] is False,
+        "required_medium_policies": {
+            "all_medium_manual_review",
+            "deterministic_offline_investigation_replay",
+        } == set(policies),
+        "policy_counts_cover_test": all(
+            item["approve_count"] + item["review_count"] + item["block_count"]
+            == feature_report["provenance"]["test_rows"]
+            for item in policies.values()
+        ),
+    }
+
+
+def build_b8_final_audit(
+    feature_report: dict[str, Any],
+    medium_report: dict[str, Any],
+    checks: dict[str, bool],
+) -> str:
+    provenance = feature_report["provenance"]
+    status = "PASS" if all(checks.values()) else "FAIL"
+    check_lines = [f"- [{'x' if passed else ' '}] `{name}`" for name, passed in checks.items()]
+    return "\n".join(
+        [
+            "# B8 Final Audit",
+            "",
+            f"- Generated at: `{provenance['generated_at']}`",
+            f"- Git commit: `{provenance['git_commit']}`",
+            f"- Git dirty: `{str(provenance['git_dirty']).lower()}`",
+            f"- Code SHA-256: `{json.dumps(provenance['code_sha256'], sort_keys=True)}`",
+            f"- Dataset SHA-256: `{provenance['dataset_sha256']}`",
+            f"- Random state: `{provenance['random_state']}`",
+            f"- Dataset source: `{provenance['dataset_source']}`",
+            f"- Dataset rows: `{provenance['dataset_rows']}`",
+            f"- Train rows: `{provenance['train_rows']}`",
+            f"- Validation rows: `{provenance['validation_rows']}`",
+            f"- Test rows: `{provenance['test_rows']}`",
+            f"- Split strategy: `{provenance['split_strategy']}`",
+            f"- Leakage-control protocol: {provenance['leakage_control_protocol']}",
+            f"- Experiment version: `{provenance['experiment_version']}`",
+            "",
+            "## Answers",
+            "",
+            "1. **Same dataset/split?** Yes. Every feature ablation uses the same `ExperimentSplits`: 460394 / 322275 / 69059 / 69060, chronological and unshuffled.",
+            "2. **Fixed hyperparameters?** Yes. Every configuration uses the same `B8_FIXED_XGBOOST_PARAMS`; no per-ablation tuning is run.",
+            "3. **Threshold selected only on validation?** Yes. `find_best_threshold` receives validation labels/probabilities only.",
+            "4. **Test used for model selection?** No. Test is final evaluation only; any highest observed test result is descriptive and not a selection decision.",
+            "5. **Test-label leakage?** No in the audited protocol. Classifier eval freezes validation/test risk labels. Medium replay uses train labels, validation activity only, and test activity only after each decision.",
+            "6. **Dependencies of `llm_*`?** All five are deterministic derivatives of the same heuristic analysis and depend directly/transitively on transaction/context plus all eight online/history lookup inputs; see the feature JSON/Markdown dependency table.",
+            "7. **Direct vs dependency-aware?** Direct ablation removes named input columns only. Dependency-aware ablation also removes all `llm_*` proxy columns that consume the removed source information.",
+            "8. **Does medium policy change classifier probability?** No. The identical full-model probability vector is reused; its SHA-256 is recorded.",
+            "9. **Does medium experiment run full ReAct runtime?** No. It calls deterministic offline replay (`build_decision_payload` plus deterministic finalization rules) only for medium cases.",
+            "10. **Can this be called ReAct performance?** No. It is workflow/operational policy evidence, not ReAct or classifier-performance evidence.",
+            "11. **Artifact git commit/hash?** Yes. Git commit, dirty flag, code SHA-256 and dataset SHA-256 are recorded.",
+            "12. **Need another rerun?** No, provided these generated artifacts and recorded dirty-source hashes are the evidence submitted. A clean committed rerun is optional for stronger archival provenance, not required by the checks here.",
+            "",
+            "## Machine-checked conditions",
+            "",
+            *check_lines,
+            "",
+            f"B8_STATUS = {status}",
+        ]
+    )
+
+
+def run_b8_ablation(data_path: str | None = None) -> dict[str, Any]:
+    outputs = resolve_b8_outputs()
+    expected_outputs = [
+        outputs.feature_json,
+        outputs.feature_csv,
+        outputs.feature_markdown,
+        outputs.medium_json,
+        outputs.medium_csv,
+        outputs.medium_markdown,
+        outputs.manifest_json,
+        outputs.audit_markdown,
+    ]
+    existing = [str(path) for path in expected_outputs if path.exists()]
+    if existing:
+        raise FileExistsError(
+            "Refusing to overwrite an existing B8 final artifact: " + ", ".join(existing)
+        )
+
+    splits = prepare_experiment_splits(data_path=data_path, sample_size=None, source="paysim")
+    provenance = build_b8_provenance(splits)
+    outputs.directory.mkdir(parents=True, exist_ok=True)
+    feature_report, full_artifact = run_b8_feature_ablation(splits, outputs, provenance)
+    medium_report = run_b8_medium_branch_ablation(splits, full_artifact, outputs, provenance)
+    checks = validate_b8_reports(feature_report, medium_report)
+    status = "PASS" if all(checks.values()) else "FAIL"
+    write_report(outputs.audit_markdown, build_b8_final_audit(feature_report, medium_report, checks))
+
+    artifact_paths = [
+        outputs.feature_json,
+        outputs.feature_csv,
+        outputs.feature_markdown,
+        outputs.medium_json,
+        outputs.medium_csv,
+        outputs.medium_markdown,
+        outputs.audit_markdown,
+    ]
+    manifest = {
+        "provenance": provenance,
+        "b8_status": status,
+        "scope": "B8 only; B1-B7, robustness, external validation, latency, and production models were not run or modified",
+        "fixed_xgboost_params": B8_FIXED_XGBOOST_PARAMS,
+        "feature_ablations_run": [item["configuration"] for item in feature_report["ablations"]],
+        "medium_policies_run": [item["policy"] for item in medium_report["policies"]],
+        "checks": checks,
+        "artifact_sha256": {
+            path.name: sha256_file(path)
+            for path in artifact_paths
+        },
+    }
+    write_report(outputs.manifest_json, manifest)
+    if status != "PASS":
+        raise RuntimeError(f"B8 validation failed: {checks}")
+    return {
+        "B8_STATUS": status,
+        "git_commit": provenance["git_commit"],
+        "git_dirty": provenance["git_dirty"],
+        "dataset_size": provenance["dataset_rows"],
+        "split": {
+            "train": provenance["train_rows"],
+            "validation": provenance["validation_rows"],
+            "test": provenance["test_rows"],
+        },
+        "feature_ablations_run": manifest["feature_ablations_run"],
+        "medium_policies_run": manifest["medium_policies_run"],
+        "output_directory": str(outputs.directory),
+    }

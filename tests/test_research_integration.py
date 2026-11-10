@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from fraud_flow.research import run_research_suite
+import fraud_flow.research as research_module
 
 
 @pytest.mark.integration
-def test_research_suite_small_sample_generates_new_reports() -> None:
+def test_research_suite_small_sample_generates_new_reports(tmp_path, monkeypatch) -> None:
+    config = research_module.APP_CONFIG
+    monkeypatch.setattr(research_module, "APP_CONFIG", replace(
+        config,
+        outputs=replace(config.outputs, experiments_dir=tmp_path / "experiments"),
+    ))
     report = run_research_suite(
         sample_size=20000,
         seeds=[42, 43],
@@ -25,3 +32,5 @@ def test_research_suite_small_sample_generates_new_reports() -> None:
     external_path = Path(report["artifacts"]["external_validation_json"])
     assert robustness_path.exists()
     assert external_path.exists()
+    assert robustness_path.is_relative_to(tmp_path)
+    assert external_path.is_relative_to(tmp_path)

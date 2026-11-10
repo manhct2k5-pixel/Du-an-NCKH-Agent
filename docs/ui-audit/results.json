@@ -1,0 +1,771 @@
+{
+  "results": [
+    {
+      "viewport": "desktop",
+      "name": "home",
+      "url": "/",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 1062,
+        "h1": [
+          "Một cổng vào gọn, luồng quyết định rõ ràng."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "name": "form",
+      "url": "/transaction/form",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 2094,
+        "h1": [
+          "Nhập một giao dịch và xem pipeline phản ứng ngay trên màn hình."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "name": "dashboard",
+      "url": "/dashboard/html",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1496,
+        "height": 4013,
+        "h1": [
+          "ui-seed-1-false"
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "name": "queue",
+      "url": "/reviews/pending",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 3296,
+        "h1": [
+          "Các giao dịch đang chờ analyst xác minh."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "name": "docs",
+      "url": "/docs",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 4686,
+        "h1": [
+          "Test endpoint thật mà vẫn nhìn gọn và có định hướng."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "desktop",
+      "name": "research",
+      "url": "/research",
+      "status": 200,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 1932,
+        "h1": [
+          "Kết quả thực nghiệm"
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "home",
+      "url": "/",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 1910,
+        "h1": [
+          "Một cổng vào gọn, luồng quyết định rõ ràng."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "form",
+      "url": "/transaction/form",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 4867,
+        "h1": [
+          "Nhập một giao dịch và xem pipeline phản ứng ngay trên màn hình."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "dashboard",
+      "url": "/dashboard/html",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 471,
+        "height": 7651,
+        "h1": [
+          "ui-seed-1-false"
+        ],
+        "overflow": [
+          {
+            "tag": "ARTICLE",
+            "class": "case-item ",
+            "width": 240
+          },
+          {
+            "tag": "DIV",
+            "class": "case-head",
+            "width": 206
+          },
+          {
+            "tag": "STRONG",
+            "class": "",
+            "width": 110
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "width": 206
+          },
+          {
+            "tag": "DIV",
+            "class": "case-meta",
+            "width": 206
+          },
+          {
+            "tag": "SPAN",
+            "class": "route-tag tone-warning",
+            "width": 97
+          },
+          {
+            "tag": "SPAN",
+            "class": "",
+            "width": 95
+          },
+          {
+            "tag": "ARTICLE",
+            "class": "case-item ",
+            "width": 240
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                ".case-list"
+              ],
+              "html": "<div class=\"case-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".queue-list"
+              ],
+              "html": "<div class=\"queue-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".trace-list"
+              ],
+              "html": "<div class=\"trace-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "queue",
+      "url": "/reviews/pending",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 4997,
+        "h1": [
+          "Các giao dịch đang chờ analyst xác minh."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "docs",
+      "url": "/docs",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 7982,
+        "h1": [
+          "Test endpoint thật mà vẫn nhìn gọn và có định hướng."
+        ],
+        "overflow": [
+          {
+            "tag": "TABLE",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "THEAD",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 101
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 66
+          },
+          {
+            "tag": "TBODY",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TD",
+            "class": "",
+            "width": 101
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                ".table-shell"
+              ],
+              "html": "<div class=\"table-shell\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "name": "research",
+      "url": "/research",
+      "status": 200,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 2421,
+        "h1": [
+          "Kết quả thực nghiệm"
+        ],
+        "overflow": [
+          {
+            "tag": "TABLE",
+            "class": "research-table",
+            "width": 1086
+          },
+          {
+            "tag": "THEAD",
+            "class": "",
+            "width": 1084
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 1084
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 205
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 92
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 104
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 87
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 77
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                "section:nth-child(3) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(4) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(5) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(6) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "home",
+      "url": "/",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 320,
+        "height": 2073,
+        "h1": [
+          "Một cổng vào gọn, luồng quyết định rõ ràng."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "form",
+      "url": "/transaction/form",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 320,
+        "height": 5261,
+        "h1": [
+          "Nhập một giao dịch và xem pipeline phản ứng ngay trên màn hình."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "dashboard",
+      "url": "/dashboard/html",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 424,
+        "height": 8124,
+        "h1": [
+          "ui-seed-1-false"
+        ],
+        "overflow": [
+          {
+            "tag": "ARTICLE",
+            "class": "case-item ",
+            "width": 240
+          },
+          {
+            "tag": "DIV",
+            "class": "case-head",
+            "width": 206
+          },
+          {
+            "tag": "STRONG",
+            "class": "",
+            "width": 110
+          },
+          {
+            "tag": "SPAN",
+            "class": "pill tiny tone-warning",
+            "width": 64
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "width": 206
+          },
+          {
+            "tag": "DIV",
+            "class": "case-meta",
+            "width": 206
+          },
+          {
+            "tag": "SPAN",
+            "class": "route-tag tone-warning",
+            "width": 97
+          },
+          {
+            "tag": "SPAN",
+            "class": "",
+            "width": 95
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                ".case-list"
+              ],
+              "html": "<div class=\"case-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".queue-list"
+              ],
+              "html": "<div class=\"queue-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".sim-confusion-grid"
+              ],
+              "html": "<div class=\"sim-confusion-grid\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".trace-list"
+              ],
+              "html": "<div class=\"trace-list\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "queue",
+      "url": "/reviews/pending",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 320,
+        "height": 5655,
+        "h1": [
+          "Các giao dịch đang chờ analyst xác minh."
+        ],
+        "overflow": []
+      },
+      "accessibility": [],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "docs",
+      "url": "/docs",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 320,
+        "height": 8504,
+        "h1": [
+          "Test endpoint thật mà vẫn nhìn gọn và có định hướng."
+        ],
+        "overflow": [
+          {
+            "tag": "TABLE",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "THEAD",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 101
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 101
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 66
+          },
+          {
+            "tag": "TBODY",
+            "class": "",
+            "width": 486
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 486
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                ".table-shell"
+              ],
+              "html": "<div class=\"table-shell\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".confusion-panel.panel:nth-child(3) > .confusion-wrap"
+              ],
+              "html": "<div class=\"confusion-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".confusion-panel.panel:nth-child(4) > .confusion-wrap"
+              ],
+              "html": "<div class=\"confusion-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "viewport": "small-mobile",
+      "name": "research",
+      "url": "/research",
+      "status": 200,
+      "layout": {
+        "width": 320,
+        "scrollWidth": 320,
+        "height": 2603,
+        "h1": [
+          "Kết quả thực nghiệm"
+        ],
+        "overflow": [
+          {
+            "tag": "TABLE",
+            "class": "research-table",
+            "width": 1086
+          },
+          {
+            "tag": "THEAD",
+            "class": "",
+            "width": 1084
+          },
+          {
+            "tag": "TR",
+            "class": "",
+            "width": 1084
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 205
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 92
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 104
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 87
+          },
+          {
+            "tag": "TH",
+            "class": "",
+            "width": 77
+          }
+        ]
+      },
+      "accessibility": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodes": [
+            {
+              "target": [
+                "section:nth-child(3) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(4) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(5) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                "section:nth-child(6) > .table-wrap"
+              ],
+              "html": "<div class=\"table-wrap\">",
+              "failure": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "pageErrors": []
+    }
+  ],
+  "flows": {
+    "formTop": 2222.296875,
+    "errorStatus": 422,
+    "errorUX": {
+      "message": "[object Object]",
+      "resultTop": 1493.484375,
+      "viewportHeight": 844,
+      "ariaLive": null,
+      "focusedElement": "<button type=\"submit\" class=\"primary\">Gửi giao dịch</button>"
+    },
+    "pendingUX": {
+      "disabled": false,
+      "text": "Gửi giao dịch",
+      "busy": null
+    },
+    "duplicateSubmitRequests": 2,
+    "successUX": {
+      "action": "Thông qua",
+      "resultTop": 1493.484375,
+      "viewportHeight": 844,
+      "liveRegion": false
+    },
+    "pendingReviews": 10,
+    "reviewUI": {
+      "forms": 0,
+      "buttons": 0,
+      "links": [
+        "Mở trên dashboard",
+        "JSON",
+        "Mở trên dashboard",
+        "JSON"
+      ]
+    }
+  }
+}

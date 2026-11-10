@@ -10,6 +10,7 @@ venv/
 env/
 .env
 .env.*
+!.env.example
 
 # Local editor/assistant state
 .vscode/
@@ -19,12 +20,14 @@ env/
 # Large datasets and downloaded competition files
 data/*.csv
 data/ieee-fraud-detection/
+/archive/data/
 
 # Generated runtime logs and queues
 artifacts/logs/
 artifacts/redis/
-handoff_members/**/predictions.jsonl
-handoff_members/**/manual_review_queue.jsonl
+
+# Generated review exports; keep source reports and unique review documents
+/B*_REVIEW*.zip
 
 # OS files
 .DS_Store

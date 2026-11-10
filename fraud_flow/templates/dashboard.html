@@ -6,6 +6,8 @@
   <title>Fraud Flow Control Room</title>
   <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
   <link rel="stylesheet" href="/static/css/dashboard.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/research_demo.css?v={{ version }}">
+  <script defer src="/static/js/ui_shell.js?v={{ version }}"></script>
 </head>
 <body>
   <div class="page-shell">
@@ -15,7 +17,7 @@
     <aside class="left-rail">
       <section class="rail-card brand-card">
         <div class="brand-kicker">FRAUD FLOW</div>
-        <h2>Realtime fraud review cockpit</h2>
+            <h2>Theo dõi giao dịch và bằng chứng</h2>
         <p>{{ dashboard_report.executive_summary }}</p>
         <div class="hero-tags">
           <span class="pill tone-neutral">{{ profile.source|upper }}</span>
@@ -52,6 +54,7 @@
               <span class="route-tag tone-{{ row.route_tone }}">{{ row.route_label }}</span>
               <span>score {{ row.score }}</span>
             </div>
+            <a class="case-open" href="/dashboard/html?tx_id={{ row.tx_id|urlencode }}">Xem giao dịch {{ row.tx_id }}</a>
           </article>
           {% else %}
           <div class="empty-state">Chưa có case gần đây để hiển thị.</div>
@@ -209,7 +212,7 @@
 
         <div class="queue-actions">
           {% if queue_overview.can_show_more %}
-          <a class="queue-action" href="/dashboard/html?queue_limit={{ queue_overview.next_limit }}">Xem {{ queue_overview.next_limit }} case</a>
+          <a class="queue-action" href="/dashboard/html?queue_limit={{ queue_overview.next_limit }}&amp;tx_id={{ focus_case.tx_id|urlencode }}">Xem {{ queue_overview.next_limit }} case</a>
           {% elif queue_overview.reached_dashboard_cap %}
           <span class="queue-action is-disabled">Dashboard giới hạn {{ queue_overview.limit }} case</span>
           {% endif %}
@@ -225,6 +228,7 @@
             </div>
             <p>{{ row.tx_type }} • {{ row.amount }} • {{ row.timestamp }}</p>
             <p class="queue-detail">{{ row.note }}</p>
+            <a class="case-open" href="/dashboard/html?tx_id={{ row.tx_id|urlencode }}">Xem bằng chứng giao dịch</a>
             <div class="case-meta">
               <span class="route-tag tone-{{ row.route_tone }}">{{ row.route_label }}</span>
               <span>score {{ row.score }}</span>
@@ -253,7 +257,7 @@
             <div class="sim-metric sim-metric--highlight">
               <div class="sim-metric-head">
                 <span>Precision</span>
-                <span class="metric-tooltip-icon" data-tooltip="Trong số giao dịch bị BLOCK, bao nhiêu % thật sự là fraud? Cao = ít chặn nhầm (FP thấp). Công thức: TP / (TP + FP)">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="Trong số giao dịch bị BLOCK, bao nhiêu % thật sự là fraud? Cao = ít chặn nhầm (FP thấp). Công thức: TP / (TP + FP)" aria-label="Trong số giao dịch bị BLOCK, bao nhiêu % thật sự là fraud? Cao = ít chặn nhầm (FP thấp). Công thức: TP / (TP + FP)">?</button>
               </div>
               <strong class="metric-value-precision">{{ live_metrics.precision_block }}</strong>
               <div class="metric-desc">Tỉ lệ block đúng trên tổng block</div>
@@ -261,7 +265,7 @@
             <div class="sim-metric sim-metric--highlight">
               <div class="sim-metric-head">
                 <span>Recall</span>
-                <span class="metric-tooltip-icon" data-tooltip="Trong số fraud THẬT, bao nhiêu % bị mô hình phát hiện? Cao = ít bỏ sót (FN thấp). Công thức: TP / (TP + FN)">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="Trong số fraud THẬT, bao nhiêu % bị mô hình phát hiện? Cao = ít bỏ sót (FN thấp). Công thức: TP / (TP + FN)" aria-label="Trong số fraud THẬT, bao nhiêu % bị mô hình phát hiện? Cao = ít bỏ sót (FN thấp). Công thức: TP / (TP + FN)">?</button>
               </div>
               <strong class="metric-value-recall">{{ live_metrics.recall_block }}</strong>
               <div class="metric-desc">Tỉ lệ phát hiện fraud thật</div>
@@ -269,7 +273,7 @@
             <div class="sim-metric sim-metric--highlight">
               <div class="sim-metric-head">
                 <span>F1-Score</span>
-                <span class="metric-tooltip-icon" data-tooltip="Trung bình điều hòa của Precision và Recall. Cân bằng giữa hai chỉ số — quan trọng khi dữ liệu mất cân bằng. Công thức: 2 × (P × R) / (P + R)">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="Trung bình điều hòa của Precision và Recall. Cân bằng giữa hai chỉ số — quan trọng khi dữ liệu mất cân bằng. Công thức: 2 × (P × R) / (P + R)" aria-label="Trung bình điều hòa của Precision và Recall. Cân bằng giữa hai chỉ số — quan trọng khi dữ liệu mất cân bằng. Công thức: 2 × (P × R) / (P + R)">?</button>
               </div>
               <strong class="metric-value-f1">{{ live_metrics.f1_block }}</strong>
               <div class="metric-desc">Cân bằng Precision &amp; Recall</div>
@@ -280,11 +284,11 @@
             <div class="sim-conf-header"></div>
             <div class="sim-conf-header">
               Dự đoán: Pass
-              <span class="metric-tooltip-icon" data-tooltip="Mô hình cho qua — không bị block">?</span>
+              <button type="button" class="metric-tooltip-icon" data-tooltip="Mô hình cho qua — không bị block" aria-label="Mô hình cho qua — không bị block">?</button>
             </div>
             <div class="sim-conf-header">
               Dự đoán: Block
-              <span class="metric-tooltip-icon" data-tooltip="Mô hình chặn lại — đánh dấu đáng ngờ">?</span>
+              <button type="button" class="metric-tooltip-icon" data-tooltip="Mô hình chặn lại — đánh dấu đáng ngờ" aria-label="Mô hình chặn lại — đánh dấu đáng ngờ">?</button>
             </div>
 
             <div class="sim-conf-label">Thật: Fraud</div>
@@ -293,7 +297,7 @@
               <strong>{{ simulation_summary.false_negative_misses }}</strong>
               <div class="conf-cell-desc">
                 Fraud thật nhưng mô hình cho qua.
-                <span class="metric-tooltip-icon" data-tooltip="False Negative: nguy hiểm nhất — tổn thất tài chính thực sự xảy ra vì không chặn kịp thời.">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="False Negative: nguy hiểm nhất — tổn thất tài chính thực sự xảy ra vì không chặn kịp thời." aria-label="False Negative: nguy hiểm nhất — tổn thất tài chính thực sự xảy ra vì không chặn kịp thời.">?</button>
               </div>
             </div>
             <div class="sim-conf-cell tone-tp">
@@ -301,7 +305,7 @@
               <strong>{{ simulation_summary.true_positive_blocks }}</strong>
               <div class="conf-cell-desc">
                 Fraud thật và bị chặn thành công.
-                <span class="metric-tooltip-icon" data-tooltip="True Positive: kết quả tốt nhất — mô hình phát hiện và ngăn chặn fraud đúng.">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="True Positive: kết quả tốt nhất — mô hình phát hiện và ngăn chặn fraud đúng." aria-label="True Positive: kết quả tốt nhất — mô hình phát hiện và ngăn chặn fraud đúng.">?</button>
               </div>
             </div>
 
@@ -311,7 +315,7 @@
               <strong>{{ simulation_summary.true_negative_passes }}</strong>
               <div class="conf-cell-desc">
                 Giao dịch hợp lệ, cho qua đúng.
-                <span class="metric-tooltip-icon" data-tooltip="True Negative: đúng — không phải fraud và không bị chặn, trải nghiệm người dùng tốt.">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="True Negative: đúng — không phải fraud và không bị chặn, trải nghiệm người dùng tốt." aria-label="True Negative: đúng — không phải fraud và không bị chặn, trải nghiệm người dùng tốt.">?</button>
               </div>
             </div>
             <div class="sim-conf-cell tone-fp">
@@ -319,7 +323,7 @@
               <strong>{{ simulation_summary.false_positive_blocks }}</strong>
               <div class="conf-cell-desc">
                 Giao dịch hợp lệ nhưng bị chặn.
-                <span class="metric-tooltip-icon" data-tooltip="False Positive: gây phiền cho người dùng vô tội — ảnh hưởng trải nghiệm và doanh thu.">?</span>
+                <button type="button" class="metric-tooltip-icon" data-tooltip="False Positive: gây phiền cho người dùng vô tội — ảnh hưởng trải nghiệm và doanh thu." aria-label="False Positive: gây phiền cho người dùng vô tội — ảnh hưởng trải nghiệm và doanh thu.">?</button>
               </div>
             </div>
           </div>
@@ -367,7 +371,7 @@
       <section class="panel llm-panel">
         <div class="workflow-head">
           <div>
-            <div class="section-label">LLM Reasoning</div>
+            <div class="section-label">Giải thích và thực thi agent</div>
             <h2>Trace reasoning và tool execution của case này</h2>
           </div>
         </div>

@@ -1,0 +1,68 @@
+{
+  "provenance": {
+    "generated_at": "2026-10-10T14:42:29.119846+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "code_sha256": {
+      "fraud_flow/research.py": "b4084e86b8657df99a87be403e3dba3324d6b688c1c53c6c30a608bd1c686a6a",
+      "scripts/run_b8_ablation.py": "2c303d7f638a0f25c3572202e94437c277d32823ec613bfcd377a4b965a64c2b"
+    },
+    "random_state": 42,
+    "dataset_source": "paysim",
+    "dataset_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "dataset_sha256": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498",
+    "dataset_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060,
+    "split_strategy": "chronological_by_step_after_TRANSFER_CASH_OUT_filter",
+    "leakage_control_protocol": "Chronological PaySim split after TRANSFER+CASH_OUT filtering. Training rows update activity and label-based historical risk state. Validation and test rows update activity sequentially only; their labels never update historical fraud-rate state before feature construction or policy decisions.",
+    "experiment_version": "b8-v2-dependency-aware-leakage-aligned"
+  },
+  "b8_status": "PASS",
+  "scope": "B8 only; B1-B7, robustness, external validation, latency, and production models were not run or modified",
+  "fixed_xgboost_params": {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85
+  },
+  "feature_ablations_run": [
+    "full_feature_set",
+    "no_online_behavior",
+    "no_llm_analysis",
+    "no_contextual_aggregates",
+    "transaction_core_only",
+    "no_online_behavior_and_dependent_analysis",
+    "no_contextual_and_dependent_analysis"
+  ],
+  "medium_policies_run": [
+    "all_medium_manual_review",
+    "deterministic_offline_investigation_replay"
+  ],
+  "checks": {
+    "expected_dataset_and_split": true,
+    "direct_feature_counts": true,
+    "dependency_aware_configs_present": true,
+    "fixed_hyperparameters": true,
+    "validation_only_thresholds": true,
+    "test_not_used_for_selection": true,
+    "llm_dependencies_audited": true,
+    "same_held_out_test_set": true,
+    "low_high_fixed": true,
+    "classifier_predictions_unchanged": true,
+    "not_react_runtime": true,
+    "required_medium_policies": true,
+    "policy_counts_cover_test": true
+  },
+  "artifact_sha256": {
+    "feature_ablation_b8.json": "e1ec71ebed71e71107234d44cc4e31f08127bf970190a31ae1d82b9f177c01d9",
+    "feature_ablation_b8.csv": "0889d59147d7827e5f78e60bb769029ee57fb3d8574f764667650686ab0cef93",
+    "feature_ablation_b8.md": "1720f4cbb3e7066bb899103f7c6ebc1adc4c35326e6a4d9531cc252c830ca98c",
+    "medium_branch_ablation_b8.json": "e985779737da22ed1a27631746492ab37e770d103e0a9f536e143ffe880bd803",
+    "medium_branch_ablation_b8.csv": "9c2e8defadf51579e36f1d810c7212a048cfaf6f54813cdd1348fbfe8edeea36",
+    "medium_branch_ablation_b8.md": "e8c207c37bcbc4ac720876ab7146ec9ea530689777f5d69bd60c4ef85a6c6d85",
+    "B8_FINAL_AUDIT.md": "328327f5cf118e23f3745777df9cc26ab04e6c6d6c7c628147c4b91a4241218f"
+  }
+}

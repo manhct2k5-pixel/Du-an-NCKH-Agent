@@ -65,14 +65,14 @@ REASON_GROUPS = {
 
 REASON_LABELS = {
     # transaction_risk
-    "velocity_spike": "tần suất giao dịch tăng đột biến",
+    "velocity_spike": "tần suất giao dịch 24 giờ đạt ngưỡng cảnh báo",
     "amount_anomaly": "số tiền giao dịch bất thường so với lịch sử",
     "balance_drain": "tài khoản nguồn bị rút cạn sau giao dịch",
     "night_transaction": "giao dịch thực hiện trong khung giờ đêm bất thường",
     "new_recipient": "người nhận chưa từng xuất hiện trong lịch sử",
     "medium_branch_review": "giao dịch nằm trong vùng cần đánh giá thêm",
     # device_risk
-    "new_device": "thiết bị mới chưa có lịch sử giao dịch",
+    "new_device": "thiết bị chưa có giao dịch trong cửa sổ 24 giờ",
     "device_step_up": "thiết bị cần xác minh tăng cường",
     "device_reuse": "thiết bị có dấu hiệu dùng chung bất thường",
     # ip_risk
@@ -116,129 +116,95 @@ def _friendly_reason(code: str) -> str:
     return REASON_LABELS.get(code, code.replace("_", " "))
 
 
-def _top_feature_lines(prediction: dict[str, Any]) -> list[str]:
-    rows = prediction.get("explanation", []) or []
-    lines: list[str] = []
-    for item in rows[:3]:
-        feature = _friendly_feature(str(item.get("feature", "unknown_feature")))
-        impact = float(item.get("impact", 0.0))
-        direction = "tăng" if impact >= 0 else "giảm"
-        lines.append(f"{feature} đang {direction} điểm rủi ro ({impact:+.4f}).")
-    return lines
-
-
-def _lookup_lines(lookup: dict[str, Any]) -> list[str]:
-    lines: list[str] = []
-    if lookup.get("tx_count_24h", 0) >= 3:
-        lines.append(f"Tần suất theo thẻ đạt {lookup['tx_count_24h']} giao dịch trong 24 giờ.")
-    if lookup.get("device_tx_count_24h", 0) == 0:
-        lines.append("Thiết bị hiện tại chưa có lịch sử giao dịch trong 24 giờ gần nhất.")
-    if lookup.get("location_fraud_rate", 0.0) >= 0.03:
-        lines.append(f"Khu vực đang có tỷ lệ fraud khoảng {lookup['location_fraud_rate']:.2%}.")
-    if lookup.get("ip_fraud_rate", 0.0) >= 0.03:
-        lines.append(f"IP đang có tỷ lệ fraud khoảng {lookup['ip_fraud_rate']:.2%}.")
-    if lookup.get("merchant_fraud_rate", 0.0) >= 0.02:
-        lines.append(f"Merchant đang có tỷ lệ fraud khoảng {lookup['merchant_fraud_rate']:.2%}.")
-    return lines
-
-
 def build_transaction_narrative(
-    *,
-    event: dict[str, Any],
-    lookup: dict[str, Any],
-    prediction: dict[str, Any],
-    final_action: str,
-    final_note: str,
-    agent: dict[str, Any] | None = None,
-) -> dict[str, str]:
+    *, event: dict[str, Any], lookup: dict[str, Any], prediction: dict[str, Any],
+    final_action: str, final_note: str, agent: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Render observed facts after the final policy decision, without a model call."""
     tx_id = str(event.get("tx_id", "unknown"))
-    tx_type = str(event.get("tx_type", "unknown"))
-    amount = float(event.get("amount", 0.0))
-    score = float(prediction.get("score", 0.0))
     route = str(prediction.get("route", "unknown"))
+    score = float(prediction.get("score", 0.0))
+    raw = prediction.get("raw_probability")
     anomaly_score = float(prediction.get("anomaly_score") or 0.0)
     anomaly_flag = bool(prediction.get("anomaly_flag", False))
-
-    reason_codes: list[str] = []
-    evidence: list[str] = []
-    if agent:
-        structured = agent.get("agent_output", {}).get("structured_output", {})
-        reason_codes = list(structured.get("reason_codes", []) or [])
-        evidence = list(structured.get("evidence", []) or [])
-
-    # Tự động thêm anomaly reason code nếu flag bật
+    structured = (agent or {}).get("agent_output", {}).get("structured_output", {})
+    reason_codes = list(dict.fromkeys(structured.get("reason_codes", []) or []))
     if anomaly_flag and "anomaly_high_score" not in reason_codes:
         reason_codes.append("anomaly_high_score")
-    if anomaly_score >= 0.5 and not anomaly_flag and "anomaly_detected" not in reason_codes:
-        reason_codes.append("anomaly_detected")
+    tools = (agent or {}).get("tool_results") or {}
+    supporting: list[dict[str, str]] = []
+    mitigating: list[dict[str, str]] = []
 
-    top_feature_lines = _top_feature_lines(prediction)
-    lookup_lines = _lookup_lines(lookup)
-    friendly_reasons = [_friendly_reason(code) for code in reason_codes[:4]]
-    grouped_codes = group_reason_codes(reason_codes)
+    def add(target: list[dict[str, str]], text: str, source: str) -> None:
+        target.append({"text": text, "source": source})
 
-    if route == "low":
-        headline = (
-            f"Giao dịch {tx_id} ({tx_type}, {amount:,.2f}) được xếp vào vùng rủi ro thấp "
-            f"với score {score:.6f}, nên hệ thống tự động thông qua."
-        )
-    elif route == "high":
-        headline = (
-            f"Giao dịch {tx_id} ({tx_type}, {amount:,.2f}) rơi vào vùng rủi ro cao "
-            f"với score {score:.6f}, nên hệ thống chặn ngay để bảo toàn an toàn giao dịch."
-        )
+    device = tools.get("verify_device_id") or {}
+    if lookup.get("device_tx_count_24h") == 0:
+        detail = "Thiết bị chưa có giao dịch trong cửa sổ 24 giờ"
+        source = "lookup.device_tx_count_24h"
+        if device.get("needs_step_up") is True:
+            detail += "; công cụ thiết bị đề nghị xác minh bổ sung"
+            source += ", tool_results.verify_device_id.needs_step_up"
+        add(supporting, detail + ".", source)
+    elif device.get("needs_step_up") is True:
+        add(supporting, "Công cụ thiết bị đề nghị xác minh bổ sung.", "tool_results.verify_device_id.needs_step_up")
+    if lookup.get("tx_count_24h", 0) >= 3:
+        add(supporting, f"Thẻ có {lookup['tx_count_24h']} giao dịch trong 24 giờ.", "lookup.tx_count_24h")
+    for key, label, threshold in [("location_fraud_rate", "Khu vực", .03), ("ip_fraud_rate", "IP", .03), ("merchant_fraud_rate", "Đơn vị nhận", .02)]:
+        if lookup.get(key, 0) >= threshold:
+            add(supporting, f"{label} có tỷ lệ gian lận lịch sử {lookup[key]:.2%}.", "lookup." + key)
+    ip = tools.get("check_ip_blacklist") or {}
+    if ip.get("blacklisted") is True:
+        add(supporting, "IP nằm trong danh sách đen nội bộ.", "tool_results.check_ip_blacklist.blacklisted")
+    elif ip.get("blacklisted") is False:
+        add(mitigating, "IP không nằm trong danh sách đen nội bộ; điều này chưa chứng minh giao dịch an toàn.", "tool_results.check_ip_blacklist.blacklisted")
+    card = tools.get("get_card_history") or {}
+    if card.get("historical_fraud_rate", 0) >= .05:
+        add(supporting, f"Thẻ có tỷ lệ gian lận lịch sử {card['historical_fraud_rate']:.2%}.", "tool_results.get_card_history.historical_fraud_rate")
+    merchant = tools.get("query_merchant_risk") or {}
+    if merchant.get("merchant_fraud_rate", 0) >= .1 and lookup.get("merchant_fraud_rate", 0) < .02:
+        add(supporting, f"Công cụ ghi nhận tỷ lệ gian lận lịch sử của đơn vị nhận {merchant['merchant_fraud_rate']:.2%}.", "tool_results.query_merchant_risk.merchant_fraud_rate")
+    if anomaly_flag:
+        add(supporting, "Bộ phát hiện bất thường đã bật cảnh báo; đây chưa phải nhãn gian lận.", "prediction.anomaly_flag")
+
+    actions = {"approve": "Thông qua", "review": "Giữ để xác minh", "block": "Chặn", "step_up": "Yêu cầu xác minh tăng cường"}
+    routes = {"low": "thấp", "medium": "trung bình", "high": "cao"}
+    headline = f"{actions.get(final_action, final_action)}. Điểm vận hành {score:.3f} thuộc nhánh {routes.get(route, route)}"
+    headline += f"; xác suất gốc XGBoost {float(raw):.4%}." if raw is not None else "; chưa có xác suất gốc trong log."
+    if final_action == "review" and route == "high":
+        decision_reason = "Chốt xác minh theo chính sách bảo vệ khi điểm phân luồng cao nhưng xác suất gốc chưa đủ để tự động chặn."
+    elif final_action == "review":
+        decision_reason = "Chốt xác minh sau điều tra để analyst kiểm tra thêm trước khi kết luận."
     elif final_action == "step_up":
-        headline = (
-            f"Giao dịch {tx_id} ({tx_type}, {amount:,.2f}) ở vùng trung gian "
-            f"với score {score:.6f} và có tín hiệu bất thường — yêu cầu xác minh tăng cường. "
-            "Đây KHÔNG phải xác nhận gian lận."
-        )
+        decision_reason = "Chốt xác minh tăng cường theo chính sách xử lý tín hiệu bất thường."
+    elif final_action == "block":
+        decision_reason = "Chốt chặn theo chính sách rủi ro; quyết định này chưa xác nhận nhãn gian lận thực tế."
+    elif route == "low":
+        decision_reason = "Chính sách nhánh thấp cho phép tự động thông qua, bỏ qua điều tra ReAct."
     else:
-        headline = (
-            f"Giao dịch {tx_id} ({tx_type}, {amount:,.2f}) nằm ở vùng rủi ro trung gian "
-            f"với score {score:.6f}, nên được chuyển sang tác tử điều tra để xem xét thêm."
-        )
-
-    detail_parts = []
-    if friendly_reasons:
-        detail_parts.append("Các lý do chính gồm: " + ", ".join(friendly_reasons) + ".")
-    if lookup_lines:
-        detail_parts.append("Tín hiệu từ feature store: " + " ".join(lookup_lines[:2]))
-    if top_feature_lines:
-        detail_parts.append("Tín hiệu từ mô hình: " + " ".join(top_feature_lines[:2]))
-
-    human_explanation = " ".join([headline, *detail_parts, final_note]).strip()
-
-    analyst_lines = [
-        f"Tx {tx_id}: route={route}, final_action={final_action}, score={score:.6f}.",
-        f"Loại giao dịch: {tx_type}; số tiền: {amount:,.2f}.",
-        f"Anomaly score: {anomaly_score:.4f} | Flagged: {anomaly_flag}.",
+        decision_reason = "Chốt thông qua sau điều tra và kiểm tra chính sách."
+    facts = " ".join(item["text"] for item in supporting[:2])
+    human = " ".join(part for part in [headline, facts, decision_reason] if part)
+    model_evidence = [
+        {"feature": item.get("feature", "unknown"), "label": _friendly_feature(str(item.get("feature", "unknown"))),
+         "impact": float(item.get("impact", 0)),
+         "direction": "tăng" if float(item.get("impact", 0)) > 0 else "giảm" if float(item.get("impact", 0)) < 0 else "trung tính"}
+        for item in (prediction.get("explanation") or [])[:3]
     ]
-    if grouped_codes:
-        for group, codes in grouped_codes.items():
-            labels = ", ".join(_friendly_reason(c) for c in codes)
-            analyst_lines.append(f"[{group}] {labels}.")
-    if evidence:
-        analyst_lines.append("Evidence: " + " | ".join(evidence[:3]))
-    elif top_feature_lines:
-        analyst_lines.append("Model signals: " + " | ".join(top_feature_lines[:3]))
-    analyst_report = " ".join(analyst_lines)
-
-    anomaly_tag = f" | anomaly {anomaly_score:.3f}{'⚠' if anomaly_flag else ''}" if anomaly_score > 0 else ""
-    action_display = f"{final_action.upper()}🔐" if final_action == "step_up" else final_action.upper()
-    dashboard_summary = (
-        f"{tx_id}: {route.upper()} -> {action_display} | "
-        f"{tx_type} {amount:,.2f} | score {score:.3f}{anomaly_tag}"
-    )
-
+    analyst = [human, f"Mã giao dịch: {tx_id}."]
+    analyst += [f"{item['text']} [Nguồn: {item['source']}]" for item in supporting + mitigating]
+    if model_evidence:
+        analyst.append("SHAP mô tả đóng góp trên thang đầu ra mô hình, không phải phần trăm xác suất.")
+    if agent:
+        analyst.append("Confidence của agent chưa được hiệu chuẩn; không phải độ chính xác hay xác suất gian lận.")
     return {
-        "human_readable_explanation": human_explanation,
-        "analyst_report": analyst_report,
-        "dashboard_summary": dashboard_summary,
-        "reason_codes": reason_codes,
-        "reason_codes_grouped": grouped_codes,
-        "anomaly_score": anomaly_score,
-        "anomaly_flag": anomaly_flag,
+        "human_readable_explanation": human,
+        "analyst_report": " ".join(analyst),
+        "dashboard_summary": f"{tx_id}: {route.upper()} → {final_action.upper()} | điểm vận hành {score:.3f}",
+        "reason_codes": reason_codes, "reason_codes_grouped": group_reason_codes(reason_codes),
+        "anomaly_score": anomaly_score, "anomaly_flag": anomaly_flag,
+        "supporting_evidence": supporting, "mitigating_evidence": mitigating, "model_evidence": model_evidence,
+        "decision_reason": decision_reason, "policy_note": final_note, "explanation_source": "grounded_template_v2",
     }
 
 

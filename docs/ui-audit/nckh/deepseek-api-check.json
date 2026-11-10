@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-11-09",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "test": "single real request with synthetic API_OK prompt",
+  "live_request_attempted": true,
+  "status": "error",
+  "http_status": 402,
+  "error_type": "APIStatusError",
+  "external_response_observed": false,
+  "execution": {
+    "stages": {
+      "api_check": {
+        "backend": "deepseek",
+        "model": "deepseek-flash",
+        "attempts": 1,
+        "successful_responses": 0,
+        "failures": 1
+      }
+    },
+    "external_responses": 0,
+    "heuristic_responses": 0,
+    "external_response_observed": false,
+    "providers_observed": []
+  },
+  "interpretation": "DeepSeek returned HTTP 402 (insufficient balance). No successful model response; medium end-to-end live API test postponed until balance is available.",
+  "reference": "https://api-docs.deepseek.com/quick_start/error_codes/"
+}

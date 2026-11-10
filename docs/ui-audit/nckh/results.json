@@ -1,0 +1,154 @@
+{
+  "outcomes": [
+    {
+      "scenario": "low",
+      "actualRoute": "low",
+      "action": "approve",
+      "agent": false
+    },
+    {
+      "scenario": "medium",
+      "actualRoute": "medium",
+      "action": "review",
+      "agent": true
+    },
+    {
+      "scenario": "high",
+      "actualRoute": "high",
+      "action": "block",
+      "agent": false
+    }
+  ],
+  "checks": [
+    {
+      "view": "desktop",
+      "name": "home",
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "view": "desktop",
+      "name": "form",
+      "width": 1440,
+      "scroll": 1440,
+      "formTop": 508.578125,
+      "violations": []
+    },
+    {
+      "view": "desktop",
+      "name": "dashboard",
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "view": "desktop",
+      "name": "queue",
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "view": "desktop",
+      "name": "docs",
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "view": "desktop",
+      "name": "research",
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "home",
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "form",
+      "width": 390,
+      "scroll": 390,
+      "formTop": 660.9375,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "dashboard",
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "queue",
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "docs",
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "view": "mobile",
+      "name": "research",
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "home",
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "form",
+      "width": 320,
+      "scroll": 320,
+      "formTop": 739.125,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "dashboard",
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "queue",
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "docs",
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    },
+    {
+      "view": "small-mobile",
+      "name": "research",
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    }
+  ],
+  "errors": []
+}

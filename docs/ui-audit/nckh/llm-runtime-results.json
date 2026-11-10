@@ -1,0 +1,129 @@
+{
+  "verified_at": "2026-11-09T16:38:17.940Z",
+  "environment": "isolated runtime under /tmp, API key unset",
+  "live_external_llm_tested": false,
+  "actual_medium": {
+    "score": 0.700115,
+    "raw_probability": 0.0006879878346808255,
+    "action": "review",
+    "execution": {
+      "stages": {
+        "react": {
+          "backend": "heuristic_local",
+          "model": "heuristic-react-llm",
+          "attempts": 5,
+          "successful_responses": 5,
+          "failures": 0
+        },
+        "decision": {
+          "backend": "heuristic_local",
+          "model": "heuristic-decision-llm",
+          "attempts": 1,
+          "successful_responses": 1,
+          "failures": 0
+        },
+        "retry": {
+          "backend": "heuristic_local",
+          "model": "heuristic-retry-llm",
+          "attempts": 0,
+          "successful_responses": 0,
+          "failures": 0
+        }
+      },
+      "external_responses": 0,
+      "heuristic_responses": 6,
+      "external_response_observed": false,
+      "tools_executed": [
+        "get_card_history",
+        "check_ip_blacklist",
+        "verify_device_id",
+        "query_merchant_risk"
+      ],
+      "confidence_kind": "heuristic_uncalibrated"
+    },
+    "explanation": "Giữ để xác minh. Điểm vận hành 0.700 thuộc nhánh trung bình; xác suất gốc XGBoost 0.0688%. Thiết bị chưa có giao dịch trong cửa sổ 24 giờ; công cụ thiết bị đề nghị xác minh bổ sung. Chốt xác minh sau điều tra để analyst kiểm tra thêm trước khi kết luận."
+  },
+  "status": {
+    "configuration": {
+      "api_key_configured": false,
+      "dependency_installed": false,
+      "configured_mode": "heuristic_local",
+      "state": "not_configured",
+      "network_probe_performed": false
+    },
+    "decision_runtime": {
+      "stages": {
+        "react": {
+          "backend": "heuristic_local",
+          "model": "heuristic-react-llm",
+          "attempts": 20,
+          "successful_responses": 20,
+          "failures": 0
+        },
+        "decision": {
+          "backend": "heuristic_local",
+          "model": "heuristic-decision-llm",
+          "attempts": 4,
+          "successful_responses": 4,
+          "failures": 0
+        },
+        "retry": {
+          "backend": "heuristic_local",
+          "model": "heuristic-retry-llm",
+          "attempts": 0,
+          "successful_responses": 0,
+          "failures": 0
+        }
+      },
+      "external_responses": 0,
+      "heuristic_responses": 24,
+      "external_response_observed": false
+    },
+    "post_decision_log_runtime": {
+      "stages": {
+        "high_risk_log": {
+          "backend": "heuristic_local",
+          "model": "heuristic-high-risk-llm",
+          "attempts": 1,
+          "successful_responses": 1,
+          "failures": 0
+        }
+      },
+      "external_responses": 0,
+      "heuristic_responses": 1,
+      "external_response_observed": false
+    },
+    "label": "ReAct heuristic local; không gọi LLM ngoài",
+    "scope": "current_process_since_startup",
+    "explanation_renderer": "grounded_template_v2",
+    "note": "Hậu kiểm bất đồng bộ không tham gia quyết định. Cấu hình API chưa chứng minh gọi thành công."
+  },
+  "expanded_result_checks": [
+    {
+      "width": 1440,
+      "scroll": 1440,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "scroll": 320,
+      "violations": []
+    }
+  ],
+  "ui_mock_checks": [
+    {
+      "mode": "external_mock",
+      "label": "LLM qua API: đã nhận phản hồi trong giao dịch này."
+    },
+    {
+      "mode": "legacy_mock",
+      "label": "Chưa có bằng chứng thực thi LLM trong kết quả này."
+    }
+  ],
+  "page_errors": []
+}

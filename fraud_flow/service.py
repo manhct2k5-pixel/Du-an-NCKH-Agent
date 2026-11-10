@@ -4,15 +4,18 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from io import BytesIO
 import json
+import math
 import os
 import re
 from typing import Any, Literal
 from uuid import uuid4
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -20,7 +23,10 @@ from .deployment import DeploymentManager
 from .features import BASE_TIMESTAMP, join_parts, normalize_text, stable_bucket
 from .ops import build_dashboard_data, build_research_data, read_pending_reviews, render_dashboard_html, submit_manual_review
 from .pipeline import FraudFlowRunner
+from .llm_provider import provider_configuration
 from .schema import TransactionEvent
+from .research_evidence import build_research_evidence
+from .demo_scenarios import DEMO_SCENARIOS
 from .web_ui import STATIC_DIR, UI_VERSION, render_template
 
 SWAGGER_VI_JS_PATH = STATIC_DIR / "js" / "swagger_vi.js"
@@ -145,20 +151,23 @@ class TransactionIn(BaseModel):
     newbalanceOrig: float = Field(default=0.0, ge=0.0)
     oldbalanceDest: float = Field(default=0.0, ge=0.0)
     newbalanceDest: float = Field(default=0.0, ge=0.0)
-    is_fraud: int | None = None
-    is_flagged_fraud: int | None = None
+    is_fraud: int | None = Field(default=None, ge=0, le=1)
+    is_flagged_fraud: int | None = Field(default=None, ge=0, le=1)
     source: Literal["paysim", "ieee"] | None = None
     extras: dict[str, Any] = Field(default_factory=dict)
 
-    model_config = {"json_schema_extra": {"examples": [PAYSIM_EXAMPLE, IEEE_EXAMPLE]}}
+    model_config = {
+        "allow_inf_nan": False,
+        "json_schema_extra": {"examples": [PAYSIM_EXAMPLE, IEEE_EXAMPLE]},
+    }
 
     def to_event(self, default_source: str = "paysim") -> TransactionEvent:
         timestamp = self.timestamp or datetime.now(timezone.utc).isoformat()
+        try:
+            dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("timestamp must be ISO-8601, for example 2025-01-01T14:00:00+00:00") from exc
         if self.step is None:
-            try:
-                dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-            except ValueError as exc:
-                raise ValueError("timestamp must be ISO-8601, for example 2025-01-01T14:00:00+00:00") from exc
             step = max(0, int((dt - BASE_TIMESTAMP.replace(tzinfo=dt.tzinfo)).total_seconds() // 3600))
         else:
             step = self.step
@@ -224,6 +233,7 @@ def _render_home_html(app: FastAPI) -> str:
         version=app.version,
         profile=dashboard_data["profile"],
         deployment=dashboard_data["deployment"],
+        offline_metrics=dashboard_data["offline_metrics"],
         live_metrics=dashboard_data["live_metrics"],
         totals=dashboard_data["totals"],
         dashboard_report=dashboard_data["dashboard_report"],
@@ -279,7 +289,31 @@ def _render_research_html(app: FastAPI) -> str:
         bootstrapped_rows=bootstrapped_rows,
         bootstrapped_rows_label=_format_bootstrapped_rows_label(bootstrapped_rows),
         **research_data,
+        evidence=build_research_evidence(),
     )
+
+
+def _llm_status(app: FastAPI) -> dict[str, Any]:
+    runner = getattr(app.state, "runner", None)
+    agent = getattr(runner, "agent", None)
+    logger = getattr(runner, "high_risk_logger", None)
+    decision = agent.runtime_status() if agent is not None else {}
+    post_decision = logger.runtime_status() if logger is not None else {}
+    config = provider_configuration()
+    backends = {row["backend"] for row in decision.get("stages", {}).values()}
+    if decision.get("external_response_observed"):
+        providers = ", ".join(decision.get("providers_observed", []))
+        label = f"{providers} · LLM qua API: đã nhận phản hồi trong tiến trình này"
+    elif backends == {"heuristic_local"}:
+        label = "ReAct heuristic local; không gọi LLM ngoài"
+    elif config["api_key_configured"] and config["dependency_installed"]:
+        label = f"{config['provider']} API đã cấu hình; chưa ghi nhận phản hồi"
+    else:
+        label = "Chưa ghi nhận phản hồi LLM qua API"
+    return {"configuration": config, "decision_runtime": decision, "post_decision_log_runtime": post_decision,
+            "label": label, "scope": "current_process_since_startup",
+            "explanation_renderer": "grounded_template_v2",
+            "note": "Hậu kiểm bất đồng bộ không tham gia quyết định. Cấu hình API chưa chứng minh gọi thành công."}
 
 
 def _render_transaction_form_html(app: FastAPI) -> str:
@@ -291,6 +325,8 @@ def _render_transaction_form_html(app: FastAPI) -> str:
         version=app.version,
         example=PAYSIM_EXAMPLE,
         example_json=json.dumps(PAYSIM_EXAMPLE, ensure_ascii=False, indent=2),
+        demo_scenarios=DEMO_SCENARIOS,
+        agent_mode=_llm_status(app)["label"],
         profile=dashboard_data["profile"],
         deployment=dashboard_data["deployment"],
         live_metrics=dashboard_data["live_metrics"],
@@ -301,8 +337,8 @@ def _render_transaction_form_html(app: FastAPI) -> str:
     )
 
 
-def _render_pending_reviews_html(app: FastAPI, *, queue_limit: int | None = None) -> str:
-    dashboard_data = build_dashboard_data(queue_limit=queue_limit)
+def _render_pending_reviews_html(app: FastAPI, *, queue_limit: int | None = None, focus_tx_id: str | None = None) -> str:
+    dashboard_data = build_dashboard_data(queue_limit=queue_limit, focus_tx_id=focus_tx_id)
     bootstrapped_rows = getattr(app.state, "bootstrapped_rows", 0)
     return render_template(
         "review_queue.html",
@@ -315,6 +351,7 @@ def _render_pending_reviews_html(app: FastAPI, *, queue_limit: int | None = None
         product_story=dashboard_data["product_story"],
         review_queue_cards=dashboard_data["review_queue_cards"],
         queue_overview=dashboard_data["queue_overview"],
+        requested_focus_tx_id=focus_tx_id,
         bootstrapped_rows=bootstrapped_rows,
         bootstrapped_rows_label=_format_bootstrapped_rows_label(bootstrapped_rows),
     )
@@ -636,6 +673,41 @@ def create_app() -> FastAPI:
     )
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+    @app.exception_handler(RequestValidationError)
+    async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+        # Invalid raw JSON can contain NaN/Infinity. Keep the error itself JSON-safe.
+        errors = jsonable_encoder(
+            exc.errors(),
+            custom_encoder={float: lambda value: value if math.isfinite(value) else str(value)},
+        )
+        return JSONResponse(status_code=422, content={"detail": errors})
+
+    # Optional SDK errors are translated without returning credentials or raw upstream bodies.
+    try:
+        from openai import APIError
+    except ImportError:
+        APIError = None
+    if APIError is not None:
+        async def llm_api_error_handler(request: Request, exc: Exception) -> JSONResponse:
+            upstream_status = getattr(exc, "status_code", None)
+            provider = provider_configuration()["provider"]
+            provider_label = {"deepseek": "DeepSeek", "openai": "OpenAI", "ds2api": "DS2API"}[provider]
+            messages = {
+                401: f"{provider_label} từ chối API key. Kiểm tra key trong .env và khởi động lại server.",
+                402: f"API {provider_label} báo không đủ số dư. Bổ sung số dư tài khoản API rồi thử lại.",
+                404: f"{provider_label} không tìm thấy model. Kiểm tra FRAUD_LLM_MODEL trong .env.",
+                429: f"{provider_label} đang giới hạn lượt gọi hoặc quota. Kiểm tra tài khoản API rồi thử lại sau.",
+            }
+            if provider == "ds2api":
+                messages[401] = "DS2API chưa xác thực được phiên DeepSeek Web. Kiểm tra tài khoản hoặc token trong config.json của DS2API."
+            return JSONResponse(status_code=503, content={
+                "detail": messages.get(upstream_status, f"Chưa nhận được phản hồi từ API {provider_label}. Kiểm tra kết nối rồi thử lại."),
+                "error_code": "llm_insufficient_balance" if upstream_status == 402 else "llm_api_unavailable",
+                "provider": provider,
+                "upstream_status": upstream_status,
+            })
+        app.add_exception_handler(APIError, llm_api_error_handler)
+
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)
     def home() -> str:
         return _render_home_html(app)
@@ -655,6 +727,14 @@ def create_app() -> FastAPI:
     @app.get("/research", response_class=HTMLResponse, include_in_schema=False)
     def research() -> str:
         return _render_research_html(app)
+
+    @app.get("/research/evidence", tags=["Giám sát"], summary="Số liệu final phục vụ đối chiếu NCKH")
+    def research_evidence() -> dict[str, Any]:
+        return build_research_evidence()
+
+    @app.get("/llm/status", tags=["Giám sát"], summary="Cấu hình và bằng chứng thực thi LLM trong tiến trình hiện tại")
+    def llm_status() -> dict[str, Any]:
+        return _llm_status(app)
 
     @app.get("/swagger-ui", include_in_schema=False)
     def swagger_ui() -> HTMLResponse:
@@ -700,25 +780,10 @@ def create_app() -> FastAPI:
             "và trả về quyết định cuối cùng. Endpoint này phải được gọi bằng POST qua /docs, Swagger hoặc curl."
         ),
     )
-    def ingest_transaction(payload: TransactionIn, background_tasks: BackgroundTasks) -> dict[str, Any]:
+    def ingest_transaction(payload: TransactionIn) -> dict[str, Any]:
         event = _event_from_payload_or_400(payload, app.state.runner.model_service.source)
         runner: FraudFlowRunner = app.state.runner
-
-        lookup, prediction = runner.quick_predict(event)
-
-        if prediction.route == "medium":
-            # Trả về ngay lập tức, đẩy agent sang background
-            runner.feature_store.observe_activity(event)
-            runner.review_events[event.tx_id] = event
-            background_tasks.add_task(runner.run_medium_agent_task, event, lookup, prediction)
-            return {
-                "tx_id": event.tx_id,
-                "route": "medium",
-                "final_action": "pending_review",
-                "message": "Đang chuyển LLM Agent điều tra",
-            }
-
-        # Low / high: xử lý đồng bộ bình thường (không có agent)
+        # Use the same complete scoring/logging path as the batch endpoint.
         result = runner.process_event(
             event,
             actual_label=event.is_fraud,
@@ -776,6 +841,7 @@ def create_app() -> FastAPI:
         request: Request,
         limit: int | None = 50,
         format: Literal["html", "json", "xlsx"] | None = None,
+        tx_id: str | None = None,
     ) -> HTMLResponse | dict[str, Any]:
         if format == "xlsx":
             return _pending_reviews_xlsx_response()
@@ -783,7 +849,7 @@ def create_app() -> FastAPI:
         accept = request.headers.get("accept", "")
         wants_json = format == "json" or ("application/json" in accept and format != "html")
         if not wants_json:
-            return HTMLResponse(_render_pending_reviews_html(app, queue_limit=limit))
+            return HTMLResponse(_render_pending_reviews_html(app, queue_limit=limit, focus_tx_id=tx_id))
 
         rows = read_pending_reviews()
         if limit is not None:

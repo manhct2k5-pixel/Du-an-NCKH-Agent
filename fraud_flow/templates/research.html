@@ -6,6 +6,8 @@
   <title>Fraud Flow — Research</title>
   <link rel="stylesheet" href="/static/css/app_shell.css?v={{ version }}">
   <link rel="stylesheet" href="/static/css/research.css?v={{ version }}">
+  <link rel="stylesheet" href="/static/css/research_demo.css?v={{ version }}">
+  <script defer src="/static/js/ui_shell.js?v={{ version }}"></script>
 </head>
 <body>
   <div class="page-shell">
@@ -23,6 +25,21 @@
         Test {{ split.test_pct|default("N/A") }} %
       </p>
     </div>
+
+    {% if evidence.available %}
+    {% include "_research_evidence.html" %}
+    {% else %}
+    <p class="evidence-scope">Chưa có đủ artifact final để trình bày kết quả. Các bảng lịch sử phía dưới được giữ để đối chiếu.</p>
+    {% endif %}
+
+    <details class="history-details">
+    <summary>Baseline và các báo cáo trước đây · mở để đối chiếu</summary>
+    {% if research_archived %}
+    <div class="not-ready-banner">
+      <strong>Có kết quả từ các đợt thực nghiệm trước.</strong>
+      Các kết quả này được lưu để đối chiếu lịch sử; báo cáo cuối dùng bộ số liệu B8–B14 đã kiểm tra.
+    </div>
+    {% endif %}
 
     {% if not research_ready %}
     <div class="not-ready-banner">
@@ -252,10 +269,11 @@
         <h2>External Validation</h2>
       </div>
       <p class="ext-note">
-        External validation chưa được thực thi. Chạy <code>python run_fraud_flow.py research --source paysim --external-data-path data/train_transaction.csv</code> để kích hoạt.
+        External validation chưa được thực thi. Chạy <code>python run_fraud_flow.py research --source paysim --external-data-path archive/data/ieee-fraud-detection/train_transaction.csv</code> để kích hoạt.
       </p>
     </section>
     {% endif %}
+    </details>
   </main>
 </body>
 </html>

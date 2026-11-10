@@ -1,0 +1,6 @@
+# Optional OpenAI-compatible API backends (OpenAI / DeepSeek).
+# Keep core research dependencies unchanged.
+-r requirements.txt
+langchain-openai==1.1.12
+openai==2.54.0
+python-dotenv==1.2.2

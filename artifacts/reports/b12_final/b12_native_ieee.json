@@ -1,0 +1,192 @@
+{
+  "experiment": "native_ieee_no_target_encoding",
+  "protocol": {
+    "feature_profile_predeclared": "no_target_encoding",
+    "feature_profile_selected_on_test": false,
+    "candidate_selection_source": "validation_only",
+    "threshold_selection_source": "validation_only",
+    "test_used_for_model_selection": false,
+    "test_label_leakage": false,
+    "test_evaluations": 1,
+    "chronological_split": "70/15/15 by TransactionDT then TransactionID",
+    "categorical_maps_fit_on": "train_only",
+    "v_feature_selection_source": "train_only"
+  },
+  "feature_profile": "no_target_encoding",
+  "feature_count": 328,
+  "selected_v_features": 220,
+  "candidate_count": 4,
+  "selection_criterion": "validation PR-AUC + validation F1",
+  "selected_candidate": 4,
+  "threshold_selection": "maximum validation F1 on PR-curve thresholds",
+  "threshold": 0.7437319755554199,
+  "train_rows": 413378,
+  "validation_rows": 88581,
+  "test_rows": 88581,
+  "candidates": [
+    {
+      "candidate_index": 1,
+      "params": {
+        "n_estimators": 500,
+        "max_depth": 5,
+        "learning_rate": 0.04,
+        "subsample": 0.9,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 20,
+        "reg_lambda": 5.0,
+        "scale_pos_weight_multiplier": 1.0
+      },
+      "threshold": 0.8630197644233704,
+      "selection_score": 1.0516118901423523,
+      "train_seconds": 16.923359050000272,
+      "validation_metrics": {
+        "auc": 0.9058335264276414,
+        "pr_auc": 0.5317650233279256,
+        "f1": 0.5198468668144267,
+        "precision": 0.6715252472670484,
+        "recall": 0.4240631163708087,
+        "confusion_matrix": {
+          "true_negative": 84908,
+          "false_positive": 631,
+          "false_negative": 1752,
+          "true_positive": 1290
+        }
+      }
+    },
+    {
+      "candidate_index": 2,
+      "params": {
+        "n_estimators": 650,
+        "max_depth": 6,
+        "learning_rate": 0.03,
+        "subsample": 0.9,
+        "colsample_bytree": 0.75,
+        "min_child_weight": 10,
+        "reg_lambda": 4.0,
+        "scale_pos_weight_multiplier": 0.75
+      },
+      "threshold": 0.7952066659927368,
+      "selection_score": 1.084633727558857,
+      "train_seconds": 24.03068360799989,
+      "validation_metrics": {
+        "auc": 0.9138054025500776,
+        "pr_auc": 0.5522012951264246,
+        "f1": 0.5324324324324324,
+        "precision": 0.6449953227315248,
+        "recall": 0.4533201840894149,
+        "confusion_matrix": {
+          "true_negative": 84780,
+          "false_positive": 759,
+          "false_negative": 1663,
+          "true_positive": 1379
+        }
+      }
+    },
+    {
+      "candidate_index": 3,
+      "params": {
+        "n_estimators": 800,
+        "max_depth": 4,
+        "learning_rate": 0.025,
+        "subsample": 0.95,
+        "colsample_bytree": 0.7,
+        "min_child_weight": 30,
+        "reg_alpha": 0.5,
+        "reg_lambda": 8.0,
+        "scale_pos_weight_multiplier": 1.0
+      },
+      "threshold": 0.8682677149772644,
+      "selection_score": 1.0103873171061295,
+      "train_seconds": 21.480119554999874,
+      "validation_metrics": {
+        "auc": 0.89476349065902,
+        "pr_auc": 0.5097723109560681,
+        "f1": 0.5006150061500615,
+        "precision": 0.6650326797385621,
+        "recall": 0.40138067061143984,
+        "confusion_matrix": {
+          "true_negative": 84924,
+          "false_positive": 615,
+          "false_negative": 1821,
+          "true_positive": 1221
+        }
+      }
+    },
+    {
+      "candidate_index": 4,
+      "params": {
+        "n_estimators": 450,
+        "max_depth": 7,
+        "learning_rate": 0.035,
+        "subsample": 0.85,
+        "colsample_bytree": 0.7,
+        "min_child_weight": 8,
+        "reg_alpha": 0.25,
+        "reg_lambda": 3.0,
+        "scale_pos_weight_multiplier": 0.6
+      },
+      "threshold": 0.7437319755554199,
+      "selection_score": 1.1006370178346072,
+      "train_seconds": 20.758406932999605,
+      "validation_metrics": {
+        "auc": 0.9192010232149818,
+        "pr_auc": 0.5634853150482295,
+        "f1": 0.5371517027863777,
+        "precision": 0.6528692380056444,
+        "recall": 0.45627876397107164,
+        "confusion_matrix": {
+          "true_negative": 84801,
+          "false_positive": 738,
+          "false_negative": 1654,
+          "true_positive": 1388
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "auc": 0.9063988875252156,
+    "pr_auc": 0.5235711746773812,
+    "f1": 0.5042294961382862,
+    "precision": 0.5821656050955414,
+    "recall": 0.4446967239701589,
+    "confusion_matrix": {
+      "true_negative": 84514,
+      "false_positive": 984,
+      "false_negative": 1712,
+      "true_positive": 1371
+    }
+  },
+  "model_sha256": "db262f13b89498c079f8d2ed973399e1330757003442e011b12f848fe7d84091",
+  "provenance": {
+    "generated_at": "2026-10-11T12:43:03.211527+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "dataset_paths": {
+      "ieee_transaction": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_transaction.csv",
+      "ieee_identity": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/train_identity.csv",
+      "paysim_reference": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv"
+    },
+    "dataset_sha256": {
+      "ieee_transaction": "3a5c83ab6b3cc13dcabe5ffa9f522307fd5f7f7b6e6f6a60c32284ca6283d642",
+      "ieee_identity": "b63c725d8377be90a995268d97f347c17d456b95db45807adcf9f59cd603c37c",
+      "paysim_reference": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498"
+    },
+    "production_model_path": "/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+    "production_model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+    "code_sha256": {
+      "composite": "085e7c78d3114350bea597d0fbe50c0165228845c371cd14339920f91e0a76b3",
+      "files": {
+        "scripts/run_b12_final.py": "7d802b5d511c382165162b08d780fdd9ac016ea3ee1d74d7171b80a79050da50",
+        "scripts/ieee_cis_optimized_benchmark.py": "48e439e1b46ef58927dea93ad3f2840560acb157984b4095910aef7c8d57dbf7",
+        "fraud_flow/config.py": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1",
+        "fraud_flow/features.py": "83ddb3f634daed961a216ea1cac053aac38d2e6272e2db3fb5eba4fa385ad1a9",
+        "fraud_flow/feature_store.py": "f524dd2e43a5aec7a161af2e642de4478c556d07f2abbcaf7b19c31a6cb8bd5e",
+        "fraud_flow/llm_features.py": "307cc0984287998a81620544f8a04fc7274a6fbc1b35e9f22bf3a63a95baad92",
+        "fraud_flow/schema.py": "987448560d8851f0518374afa282ad787d7eed6c13daed9be3c19372c7d73cbc"
+      }
+    },
+    "exact_command": "'/home/phan-van-manh/B\u1ea3n t\u1ea3i v\u1ec1/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python' scripts/run_b12_final.py",
+    "artifact_scope": "b12_final_only",
+    "random_state": 42
+  }
+}

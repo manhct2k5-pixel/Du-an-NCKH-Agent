@@ -1,0 +1,93 @@
+{
+  "schema_version": "b13-implementation-settings-v1",
+  "generated_at": "2026-10-11T13:12:25Z",
+  "audit_scope": "Implementation and reproducibility settings only; no B1-B12 experiment was rerun and no model was retrained.",
+  "evidence_priority": [
+    "artifacts/reports/b11_final/b11_environment.json",
+    "artifacts/reports/b11_final/B11_FINAL_AUDIT.md",
+    "artifacts/reports/b12_final/*.json",
+    "current repository code and lockfiles",
+    "README and run guides, treated as secondary when they conflict with final artifacts"
+  ],
+  "final_environment": {
+    "operating_system": "Linux-6.17.0-20-generic-x86_64-with-glibc2.39",
+    "cpu_model": "AMD Ryzen 7 7435HS",
+    "physical_cores": 8,
+    "logical_cores": 16,
+    "ram_total_bytes": 16433221632,
+    "ram_total_gib": 15.304630279541016,
+    "gpu": {
+      "available": true,
+      "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "driver_version_observed_during_b13": "580.126.09",
+      "actually_used_by_xgboost": false
+    },
+    "python_version": "3.12.3",
+    "python_executable": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python",
+    "confirmation": {
+      "b11": "Exact environment is embedded in the final B11 artifact.",
+      "b12": "B12 provenance records the same repository virtual-environment interpreter and was produced on the currently corroborated final host; its JSON does not independently embed an OS string.",
+      "current_host": "OS, CPU, core counts, RAM, GPU and interpreter were corroborated read-only during B13."
+    }
+  },
+  "xgboost_execution": {
+    "version": "3.2.0",
+    "tree_method": "hist",
+    "n_jobs": 4,
+    "device_parameter": null,
+    "gpu_actually_used": false,
+    "evidence": "B11 records CPU execution with tree_method=hist and no device=cuda; config.py and B9 final artifacts record n_jobs=4."
+  },
+  "random_seeds": {
+    "main_production_seed": 42,
+    "b9_robustness_seeds": [42, 43, 44]
+  },
+  "redis": {
+    "production_full_online_pipeline_requires_redis": true,
+    "local_research_benchmark_uses_redis": false,
+    "b11_latency_includes_redis_or_network": false,
+    "in_memory_feature_store": "fraud_flow.feature_store.FeatureStore; used by local research and B11 replay.",
+    "redis_feature_store": "fraud_flow.feature_store.RedisFeatureStore; used by the full online FraudFlowRunner/API pipeline.",
+    "embedded_server": "The CLI full online pipeline starts EmbeddedRedisServer when needed."
+  },
+  "external_llm": {
+    "required_for_paysim_reported_classifier_results": false,
+    "required_for_deterministic_medium_replay": false,
+    "full_react_runtime_may_use_external_llm_api": true,
+    "full_react_runtime_hard_requires_external_llm_api": false,
+    "explanation": "The reported classifier and deterministic replay paths are local. Full ReAct can use an external OpenAI-compatible backend when the optional integration and API key are configured, but the code falls back to a local heuristic LLM.",
+    "current_external_backend_configured_in_b11": false
+  },
+  "environment_conflicts": {
+    "python": {
+      "final_value": "3.12.3",
+      "old_or_outdated_value": "3.13.2 in README.md, requirements.txt commentary, and notebook metadata",
+      "value_to_use_in_paper": "Python 3.12.3 for the final B11/B12 artifact environment"
+    },
+    "operating_system": {
+      "final_value": "Linux-6.17.0-20-generic-x86_64-with-glibc2.39",
+      "old_or_outdated_value": "Windows 11 for train/research and WSL Ubuntu for full pipeline in README.md",
+      "value_to_use_in_paper": "Linux 6.17.0-20-generic x86_64 (glibc 2.39) for the final B11/B12 execution environment"
+    },
+    "ram": {
+      "final_value": "15.304630279541016 GiB OS-reported",
+      "old_or_outdated_value": "16 GB marketing/rounded description",
+      "value_to_use_in_paper": "16 GB installed (15.30 GiB OS-reported)"
+    }
+  },
+  "provenance": {
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "requirements_locked_sha256": "8182f237eea1f5d6c47f9a90cb62e716d03cfcb3269a65d1afd56995f06e5b8a",
+    "requirements_sha256": "9310cdf2b00f5de15cc641e564350be1c6572af7660d818a08d9c50bd0304a95",
+    "config_py_sha256": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1",
+    "run_fraud_flow_py_sha256": "14faa41106769946b5761fc9a0edec8db0ca879ec4fe740b14f3ca5e5a48746e",
+    "b12_code_composite_sha256": "085e7c78d3114350bea597d0fbe50c0165228845c371cd14339920f91e0a76b3",
+    "note": "The worktree was already dirty before B13 outputs were created; provenance must not be described as a clean checkout."
+  },
+  "execution_guardrails": {
+    "model_retrained": false,
+    "b1_b12_rerun": false,
+    "manuscript_modified": false
+  }
+}

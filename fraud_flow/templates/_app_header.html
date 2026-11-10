@@ -1,7 +1,7 @@
 <header class="app-header">
   <div class="app-brand">
     <a class="app-home" href="/">Fraud Flow</a>
-    <p>{{ product_story.operations_mode }}</p>
+    <p>NCKH · PaySim · XGBoost · ReAct</p>
   </div>
 
   <div class="app-presence">
@@ -22,10 +22,8 @@
   </div>
 
   <nav class="app-nav" aria-label="Điều hướng chính">
-    <a class="app-link {% if current_page == 'home' %}active{% endif %}" href="/">Portal</a>
-    <a class="app-link {% if current_page == 'form' %}active{% endif %}" href="/transaction/form">Live Demo</a>
-    <a class="app-link {% if current_page == 'dashboard' %}active{% endif %}" href="/dashboard/html">Control Room</a>
-    <a class="app-link {% if current_page == 'docs' %}active{% endif %}" href="/docs">API Workspace</a>
-    <a class="app-link {% if current_page == 'research' %}active{% endif %}" href="/research">Research</a>
+    {% for key, href, label in [('home', '/', 'Trang chủ'), ('form', '/transaction/form', 'Giao dịch'), ('dashboard', '/dashboard/html', 'Giám sát'), ('reviews', '/reviews/pending', 'Xác minh'), ('research', '/research', 'Nghiên cứu'), ('docs', '/docs', 'Tài liệu')] %}
+    <a class="app-link {% if current_page == key %}active{% endif %}" href="{{ href }}" {% if current_page == key %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
   </nav>
 </header>

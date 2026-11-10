@@ -1,0 +1,148 @@
+{
+  "schema_version": "b11-fixed-training-time-v1",
+  "description": "fixed-configuration model fitting time; not full hyperparameter-search time",
+  "source": "PaySim",
+  "split": {
+    "total_rows": 460394,
+    "train_rows": 322275,
+    "validation_rows": 69059,
+    "test_rows": 69060,
+    "train_end": 322275,
+    "val_end": 391334
+  },
+  "train_rows": 322275,
+  "feature_count": 25,
+  "feature_columns": [
+    "amount_log1p",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "type_encoded",
+    "balance_diff",
+    "amount_ratio",
+    "org_balance_delta_ratio",
+    "hour_of_day",
+    "is_night_tx",
+    "recipient_new_flag",
+    "tx_count_24h",
+    "avg_amount_7d",
+    "device_tx_count_24h",
+    "location_tx_count_24h",
+    "merchant_tx_count_24h",
+    "location_fraud_rate",
+    "ip_fraud_rate",
+    "merchant_fraud_rate",
+    "llm_risk_score",
+    "llm_reason_count",
+    "llm_high_risk_flag",
+    "llm_review_flag",
+    "llm_category_hash"
+  ],
+  "class_balance": {
+    "positive_count": 429,
+    "negative_count": 321846,
+    "scale_pos_weight": 750.2237762237762
+  },
+  "fixed_parameters": {
+    "n_estimators": 260,
+    "max_depth": 6,
+    "learning_rate": 0.06,
+    "subsample": 0.9,
+    "colsample_bytree": 0.85,
+    "max_delta_step": 1,
+    "tree_method": "hist",
+    "random_state": 42,
+    "n_jobs": 4,
+    "scale_pos_weight": 750.2237762237762
+  },
+  "repetitions": 3,
+  "timing_boundary": "time.perf_counter immediately before and after temporary_model.fit(X_train, y_train)",
+  "timing": {
+    "individual_seconds": [
+      1.823165555999367,
+      1.586516784998821,
+      1.5975049919998128
+    ],
+    "mean_seconds": 1.669062444332667,
+    "median_seconds": 1.5975049919998128,
+    "min_seconds": 1.586516784998821,
+    "max_seconds": 1.823165555999367
+  },
+  "temporary_models_saved": false,
+  "candidate_search": false,
+  "provenance": {
+    "generated_at": "2026-10-10T16:56:07.448476+00:00",
+    "git_commit": "8ad06aff01a5932d94436df9e34f7fca820c9fea",
+    "git_dirty": true,
+    "code_sha256": "6b75e946682fcd73812b33a3598e20316c90bb63befbe1832737e851db7ab80c",
+    "code_file_sha256": {
+      "scripts/run_b11_efficiency.py": "4f082675cfca2f3ccf4a58925e337d5d3940070dd327d3493ea5fccc57a98a65",
+      "scripts/benchmark_latency.py": "b1f2fbf3248f68c34e21d696983499252ce34d3566ba7ba6d48a1cad18e9ddf5",
+      "fraud_flow/pipeline.py": "8d6ae0f7cbf4d058c4826161ca62d60eb788f0169ebfe7d21e4037b29a034893",
+      "fraud_flow/features.py": "83ddb3f634daed961a216ea1cac053aac38d2e6272e2db3fb5eba4fa385ad1a9",
+      "fraud_flow/feature_store.py": "f524dd2e43a5aec7a161af2e642de4478c556d07f2abbcaf7b19c31a6cb8bd5e",
+      "fraud_flow/research.py": "b4084e86b8657df99a87be403e3dba3324d6b688c1c53c6c30a608bd1c686a6a",
+      "fraud_flow/anomaly.py": "722736ebd83a547b64c49d62dbbf4382cdca466672845e2b716dd5d037015a07",
+      "fraud_flow/calibration.py": "7082e17e167761d36a2c681965d6b5a2cb0eef7c1694a8f4f7a6e89cea8e16dc",
+      "fraud_flow/config.py": "7ff1a1597e21c700e96a56166115685c4f9db2c357fd664b7c6c4cd9b946a4e1"
+    },
+    "dataset_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/data/paysim.csv",
+    "dataset_sha256": "437a7d591b68460292d092b5bbf7f7ab9b432534e2a974f0d6413c029eb56498",
+    "model_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/xgboost_fraud.json",
+    "model_sha256": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+    "metadata_path": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/artifacts/models/model_metadata.json",
+    "metadata_sha256": "accf3619d88e9c60553d6909e86c75dcc1a2c34127e59e342e37574ffb54baf2",
+    "anomaly_sidecar_sha256": "ac3cb88780dad0f81e0b029f88da94a83ca10deeb27be5115f04ef5c74690658",
+    "evaluation_report_sha256": "b7641803edb35d450f27b2de3c6bd4f74406f75d58bced8311f2deb109a95bf4",
+    "old_latency_report_sha256": "15be52ad936ce31101071db7e2f77040f31cfe10abb78826ca49d11eca921345",
+    "protected_hashes_before": {
+      "artifacts/models/xgboost_fraud.json": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+      "artifacts/models/model_metadata.json": "accf3619d88e9c60553d6909e86c75dcc1a2c34127e59e342e37574ffb54baf2",
+      "artifacts/reports/evaluation_report.json": "b7641803edb35d450f27b2de3c6bd4f74406f75d58bced8311f2deb109a95bf4",
+      "artifacts/reports/latency_report.json": "15be52ad936ce31101071db7e2f77040f31cfe10abb78826ca49d11eca921345",
+      "artifacts/models/anomaly_sidecar.joblib": "ac3cb88780dad0f81e0b029f88da94a83ca10deeb27be5115f04ef5c74690658"
+    },
+    "protected_hashes_after": {
+      "artifacts/models/xgboost_fraud.json": "bb162f4d671ed3c7d68d19fed888d87e4b86a2b1d6c337bfc2e6b0793f9f1ebf",
+      "artifacts/models/model_metadata.json": "accf3619d88e9c60553d6909e86c75dcc1a2c34127e59e342e37574ffb54baf2",
+      "artifacts/reports/evaluation_report.json": "b7641803edb35d450f27b2de3c6bd4f74406f75d58bced8311f2deb109a95bf4",
+      "artifacts/reports/latency_report.json": "15be52ad936ce31101071db7e2f77040f31cfe10abb78826ca49d11eca921345",
+      "artifacts/models/anomaly_sidecar.joblib": "ac3cb88780dad0f81e0b029f88da94a83ca10deeb27be5115f04ef5c74690658"
+    },
+    "benchmark_command": "'/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python' scripts/run_b11_efficiency.py --training-repetitions 3 --warmup 100 --min-measured 1000 --min-low 800 --min-medium 100 --min-high 1",
+    "sample_count": 1332,
+    "warmup_count": 100,
+    "timing_boundary": "For each measured transaction, local_end_to_end_ms starts immediately before the in-memory FeatureStore lookup and stops immediately after activity-only state update. It includes feature lookup, feature assembly, one-row DataFrame construction, raw XGBoost predict_proba, TreeSHAP explanation, calibration/routing, anomaly-sidecar scoring, deterministic offline investigation replay for medium routes, and observe_activity. Event parsing, dataset loading, model/explainer loading, training, external LLM/API calls, Redis, network, logging, and concurrency are outside this boundary.",
+    "machine_environment": {
+      "cpu_model": "AMD Ryzen 7 7435HS",
+      "physical_cores": 8,
+      "logical_cores": 16,
+      "ram_total_bytes": 16433221632,
+      "ram_total_gib": 15.304630279541016,
+      "operating_system": "Linux-6.17.0-20-generic-x86_64-with-glibc2.39",
+      "python_version": "3.12.3",
+      "python_executable": "/home/phan-van-manh/Bản tải về/fraud_detection-20260417T022402Z-3-001/fraud_detection/.venv/bin/python",
+      "packages": {
+        "xgboost": "3.2.0",
+        "scikit-learn": "1.8.0",
+        "pandas": "2.2.3",
+        "numpy": "2.2.5",
+        "shap": "0.51.0"
+      },
+      "gpu": {
+        "available": true,
+        "devices": [
+          "NVIDIA GeForce RTX 4050 Laptop GPU"
+        ],
+        "detection": "nvidia-smi query"
+      },
+      "xgboost_benchmark_device": "CPU; tree_method=hist and no device=cuda parameter",
+      "redis_mode": "not used; in-memory FeatureStore; Redis/network overhead excluded",
+      "external_llm_backend_configured": false,
+      "external_llm_react_latency": "NOT MEASURED",
+      "external_llm_reason": "External network/API execution was excluded to avoid dependency and cost.",
+      "clock": "time.perf_counter"
+    }
+  }
+}

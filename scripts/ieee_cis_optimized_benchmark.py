@@ -39,6 +39,7 @@ from xgboost import XGBClassifier
 
 from fraud_flow.config import APP_CONFIG
 from fraud_flow.features import deterministic_time_sample
+from fraud_flow.report_paths import ARCHIVE_REPORT_DIR
 
 import matplotlib
 matplotlib.use("Agg")
@@ -53,7 +54,7 @@ ROBUSTNESS_JSON = Path("artifacts/reports/ieee_optimized_robustness.json")
 ROBUSTNESS_CSV = Path("artifacts/reports/ieee_optimized_robustness.csv")
 SIDECAR_JSON = Path("artifacts/reports/ieee_optimized_sidecar.json")
 SIDECAR_CSV = Path("artifacts/reports/ieee_optimized_sidecar.csv")
-PLOT_DIR = Path("artifacts/reports/plots")
+PLOT_DIR = ARCHIVE_REPORT_DIR / "plots"
 
 BASE_DROP_COLUMNS = {"TransactionID", "isFraud"}
 CATEGORICAL_INTERACTIONS = {

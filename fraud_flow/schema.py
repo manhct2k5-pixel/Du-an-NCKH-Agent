@@ -91,6 +91,7 @@ class InvestigationResult:
     human_readable_explanation: str
     analyst_report: str
     dashboard_summary: str
+    execution: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
